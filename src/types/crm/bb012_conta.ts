@@ -1097,6 +1097,7 @@ export interface Code_Erro {
     Mensagem: string;
 }
 export interface ApiResponse<T> {
+    Lista_csicp_bb012: any;
     PageSize: any;
     data: T;
     status: number;

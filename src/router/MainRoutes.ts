@@ -1,4 +1,4 @@
-import { RouteNames } from './RouteNames';
+import { RouteNames } from './RouteNames'; // Caso não precise, pode remover essa importação
 
 const MainRoutes = {
     path: '/Main',
@@ -23,6 +23,23 @@ const MainRoutes = {
             meta: {
                 title: 'Contas'
             }
+        },
+        {
+            name: 'ContasCreate',
+            path: '/ContasCreate',
+            component: () => import('@/views/Relacionamento/ContasCreateView.vue'),
+            meta: {
+                title: 'Contas'
+            }
+        },
+        {
+            name: 'ContasEdit',
+            path: 'ContasEdit/:id?',
+            component: () => import('@/views/Relacionamento/ContasEditView.vue'),
+            meta: {
+                title: 'Contas'
+            },
+            props: true
         }
     ]
 };
