@@ -172,19 +172,19 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted, watch } from 'vue';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '../../stores/auth';
 import { useRouter } from 'vue-router';
 // Import de API's
-import { GetContasList, SoftDeleteConta } from '@/services/contas/bb012_conta';
+import { GetContasList, SoftDeleteConta } from '../../services/contas/bb012_conta';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { ContaCompleta, ApiResponse, Lista_csicp_bb012 } from '@/types/crm/bb012_conta';
+import type { ContaCompleta, ApiResponse, Lista_csicp_bb012 } from '../../types/crm/bb012_conta';
 //Import de componentes
-import Pagination from '@/components/navigation/Pagination.vue';
-import BtnAdicionar from '@/components/botoes/cs_BtnAdicionar.vue';
-import BtnExcluir from '@/components/botoes/cs_BtnExcluir.vue';
-import BtnIsActive from '@/components/botoes/cs_BtnIsActive.vue';
-import BtnCancelar from '@/components/botoes/cs_BtnCancelar.vue';
+import Pagination from '../../components/navigation/Pagination.vue';
+import BtnAdicionar from '../../components/botoes/cs_BtnAdicionar.vue';
+import BtnExcluir from '../../components/botoes/cs_BtnExcluir.vue';
+import BtnIsActive from '../../components/botoes/cs_BtnIsActive.vue';
+import BtnCancelar from '../../components/botoes/cs_BtnCancelar.vue';
 
 interface Item {
     ID: string;

@@ -2,17 +2,17 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted } from 'vue';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '../../stores/auth';
 import { useRouter } from 'vue-router';
-import { validationRules } from '@/utils/ValidationRules';
+import { validationRules } from '../../utils/ValidationRules';
 // Import de API's
-import { GetContaById } from '@/services/contas/bb012_conta';
+import { GetContaById } from '../../services/contas/bb012_conta';
 // Import de types
-import type { ContaById } from '@/types/crm/bb012_GetContaById';
-import type { Csicp_bb012 } from '@/types/crm/bb012_conta';
+import type { ContaById } from '../../types/crm/bb012_GetContaById';
+import type { Csicp_bb012 } from '../../types/crm/bb012_conta';
 //Import de componentes
-import InputTexto from '@/components/campos/cs_InputTexto.vue';
-import InputValor from '@/components/campos/cs_InputValor.vue';
+import InputTexto from '../../components/campos/cs_InputTexto.vue';
+import InputValor from '../../components/campos/cs_InputValor.vue';
 
 const props = defineProps<{
     id: string;
