@@ -13,7 +13,7 @@ const CrmRoutes = {
         {
             name: 'Contas',
             path: '/Contas',
-            component: () => import('@/views/Relacionamento/ContasView.vue'),
+            component: () => import('../../views/Relacionamento/ContasView.vue'),
             meta: {
                 title: 'Contas'
             }
@@ -21,7 +21,7 @@ const CrmRoutes = {
         {
             name: 'ContasCreate',
             path: '/ContasCreate',
-            component: () => import('@/views/Relacionamento/ContasCreateView.vue'),
+            component: () => import('../../views/Relacionamento/ContasCreateView.vue'),
             meta: {
                 title: 'Contas'
             }
@@ -29,7 +29,7 @@ const CrmRoutes = {
         {
             name: 'ContasEdit',
             path: 'ContasEdit/:id?',
-            component: () => import('@/views/Relacionamento/ContasEditView.vue'),
+            component: () => import('../../views/Relacionamento/ContasEditView.vue'),
             meta: {
                 title: 'Contas'
             },
