@@ -93,12 +93,12 @@ import type { Csicp_bb012 } from '../../types/crm/bb012_conta';
 //Import de componentes
 import InputTexto from '../../components/campos/cs_InputTexto.vue';
 import InputValor from '../../components/campos/cs_InputValor.vue';
+import { User } from '@/types/login/Login';
 
 const props = defineProps<{
     id: string;
 }>();
 
-const tenant = 135;
 const router = useRouter();
 
 //Variáveis de modelo
@@ -142,6 +142,23 @@ const rules = {
 };
 
 //Funções
+function getUserFromLocalStorage(): User | null {
+    const storedUser = localStorage.getItem('user');
+
+    if (storedUser) {
+        try {
+            return JSON.parse(storedUser) as User;
+        } catch (e) {
+            console.error('Erro ao parsear o usuário do localStorage', e);
+            return null;
+        }
+    }
+
+    return null;
+}
+
+const user = getUserFromLocalStorage();
+
 const showSnackbar = (message: string, color: string) => {
     snackbarMessage.value = message;
     snackbarColor.value = color;
@@ -150,7 +167,7 @@ const showSnackbar = (message: string, color: string) => {
 
 const fetchContaById = async (id: string) => {
     try {
-        const data: ContaById = await GetContaById(tenant, id);
+        const data: ContaById = await GetContaById(user?.TenantId, id);
 
         var_BB012_ID.value = data.csicp_bb012.csicp_bb012.ID;
         var_BB012_Codigo.value = data.csicp_bb012.csicp_bb012.BB012_Codigo;
@@ -188,5 +205,6 @@ const fetchContaById = async (id: string) => {
 
 onMounted(() => {
     fetchContaById(props.id);
+    getUserFromLocalStorage();
 });
 </script>
