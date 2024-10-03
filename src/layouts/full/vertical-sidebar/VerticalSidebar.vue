@@ -14,8 +14,8 @@
             <div class="sidebar_profile border-bottom">
                 <v-list class="bg-muted">
                     <v-list-item class="pa-4 ml-1">
-                        <v-list-item-title class="text-h6">{{ authStore.user?.NomeUsuario }}</v-list-item-title>
-                        <v-list-item-subtitle class="text-subtitle-1">{{ authStore.user?.NomeEstabelecimento }}</v-list-item-subtitle>
+                        <v-list-item-title class="text-h6"></v-list-item-title>
+                        <v-list-item-subtitle class="text-subtitle-1"></v-list-item-subtitle>
                         <template v-slot:prepend class="me-0">
                             <v-avatar size="45" class="me-0">
                                 <img src="https://picsum.photos/50/50" width="50" />
@@ -51,11 +51,9 @@ import NavGroup from './NavGroup/index.vue';
 import NavItem from './NavItem/index.vue';
 import NavCollapse from './NavCollapse/NavCollapse.vue';
 import Logo from '../logo/Logo.vue';
-import { useAuthStore } from '@/stores/auth';
 
 const customizer = useCustomizerStore();
 const sidebarMenu = shallowRef(sidebarItems);
-const authStore = useAuthStore();
 </script>
 
 <style scoped>

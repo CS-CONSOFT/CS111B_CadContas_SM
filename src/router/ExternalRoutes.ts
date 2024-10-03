@@ -1,17 +1,13 @@
-const MainRoutes = {
-    path: '/Main',
-    meta: {
-        requiresAuth: true
-    },
-    redirect: '/Main',
+const CrmRoutes = {
+    path: '/',
     component: () => import('@/layouts/full/FullLayout.vue'),
     children: [
         {
-            name: 'Home',
-            path: '/Home',
+            name: 'CRM',
+            path: '/CRM',
             component: () => import('@/views/HomeView.vue'),
             meta: {
-                title: 'Home'
+                title: 'CRM'
             }
         },
         {
@@ -42,4 +38,4 @@ const MainRoutes = {
     ]
 };
 
-export default MainRoutes;
+export default CrmRoutes;

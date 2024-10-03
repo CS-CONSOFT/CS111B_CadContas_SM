@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        <v-toolbar title="Contas" class="rounded-lg" style="background-color: transparent">
+        <v-toolbar title="Editar Conta" class="rounded-lg" style="background-color: transparent">
             <v-row class="d-flex flex-row-reverse">
                 <v-col cols="auto" class="d-flex align-center">
                     <v-btn prepend-icon="mdi-arrow-left" flat class="bg-primary mr-4" to="/Contas">Voltar</v-btn>
@@ -17,7 +17,7 @@
                 </v-row>
 
                 <v-card class="pa-2 border ma-1 mb-10" elevation="0">
-                    <template v-slot:title> Informações da Conta</template>
+                    <template v-slot:title>Conta</template>
 
                     <template v-slot:text class="pa-0">
                         <v-row class="d-flex">
@@ -28,8 +28,11 @@
                             <v-col cols="2">Select</v-col>
                             <v-col cols="2">Select</v-col>
                         </v-row>
-                        
+
                         <v-row class="d-flex mt-5">
+                            <v-col cols="12">
+                                <p class="text-h6">Sobre</p>
+                            </v-col>
                             <v-col col="6">
                                 <InputTexto
                                     v-model="var_BB012_Codigo"
@@ -80,7 +83,6 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted } from 'vue';
-import { useAuthStore } from '../../stores/auth';
 import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 // Import de API's
@@ -96,8 +98,7 @@ const props = defineProps<{
     id: string;
 }>();
 
-const authStore = useAuthStore();
-const tenant = authStore.user?.TenantId;
+const tenant = 135;
 const router = useRouter();
 
 //Variáveis de modelo

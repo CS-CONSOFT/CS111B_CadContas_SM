@@ -1,39 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import MainRoutes from './MainRoutes';
-import AuthRoutes from './AuthRoutes';
-import { useAuthStore } from '@/stores/auth';
+import CrmRoutes from './ExternalRoutes';
 
-export const router = createRouter({
+const routes = [
+    CrmRoutes,
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: () => import('@/views/NotFound.vue')
+    }
+];
+
+const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
-    routes: [
-        {
-            path: '/',
-            redirect: '/Login'
-        },
-        MainRoutes,
-        AuthRoutes,
-        {
-            path: '/:pathMatch(.*)*',
-            component: () => import('@/views/authentication/Error.vue')
-        }
-    ]
+    routes
 });
 
-router.beforeEach(async (to, from, next) => {
-    const publicPages = ['/Login'];
-    const authRequired = !publicPages.includes(to.path);
-    const auth = useAuthStore();
-
-    await auth.checkSession();
-
-    if (!to.matched.length) {
-        return next('/Home');
-    }
-
-    if (authRequired && !auth.user) {
-        auth.returnUrl = to.fullPath;
-        return next('/Login');
-    }
-
-    next();
-});
+export default router;

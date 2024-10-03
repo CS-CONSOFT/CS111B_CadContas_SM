@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
-import { router } from './router';
+import router from './router'; // Importe o roteador
 import vuetify from './plugins/vuetify';
 import '@/scss/style.scss';
 import PerfectScrollbar from 'vue3-perfect-scrollbar';
@@ -11,14 +11,13 @@ import 'vue3-carousel/dist/carousel.css';
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import 'vue3-easy-data-table/dist/style.css';
 import VueScrollTo from 'vue-scrollto';
-import { useAuthStore } from '@/stores/auth';
 import { useCustomizerStore } from '@/stores/customizer';
 
 const app = createApp(App);
 const pinia = createPinia();
 
 app.use(pinia);
-app.use(router);
+app.use(router); // Use o roteador na aplicação
 app.component('EasyDataTable', Vue3EasyDataTable);
 app.use(PerfectScrollbar);
 app.use(VueTablerIcons);
@@ -30,9 +29,6 @@ app.use(VueScrollTo, {
 });
 
 app.mount('#app');
-
-const authStore = useAuthStore();
-authStore.checkSession();
 
 const customizerStore = useCustomizerStore();
 
@@ -52,9 +48,4 @@ customizerStore.$patch({
 // Re-salvar o estado da customização atualizado no localStorage
 customizerStore.$subscribe((mutation, state) => {
     localStorage.setItem('customizerState', JSON.stringify(state));
-});
-
-router.beforeEach((to, from, next) => {
-    document.title = (to.meta.title as string) || 'Aplicação';
-    next();
 });

@@ -23,15 +23,13 @@
                     </v-avatar>
                     <div class="ml-3">
                         <h6 class="text-h6 mb-n1">{{ authStore.user?.NomeUsuario }}</h6>
-                        <span class="text-subtitle-1 font-weight-regular textSecondary">{{
-                            authStore.user?.NomeEstabelecimento
-                        }}</span>
+                        <span class="text-subtitle-1 font-weight-regular textSecondary">{{ authStore.user?.NomeEstabelecimento }}</span>
                     </div>
                 </div>
                 <v-divider></v-divider>
             </div>
             <div class="pt-4 pb-6 px-8 text-center">
-                <v-btn color="primary"  block @click="authStore.logout()">Logout</v-btn>
+                <v-btn color="primary" block @click="authStore.logout()">Logout</v-btn>
                 <span class="text-subtitle-1 font-weight-medium textSecondary mt-5 mb-5 d-flex align-start">Alterar Estabelecimento</span>
                 <SelectEstabelecimento />
             </div>
@@ -40,8 +38,5 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
 import SelectEstabelecimento from '@/components/select/SelectEstabelecimento.vue';
-
-const authStore = useAuthStore();
 </script>

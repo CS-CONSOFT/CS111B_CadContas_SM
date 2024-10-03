@@ -16,12 +16,10 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/auth';
 import { IEstabelecimentoListItem } from '@/types/login/Login';
 import { StorageTypesKey } from '@/types/StorageTypes';
 import { onMounted, ref, watch } from 'vue';
 const selectedEstab = ref('');
-const currentUser = useAuthStore().user;
 
 function getListEstabelecimento() {
     const userEstabs = JSON.parse(localStorage.getItem(StorageTypesKey.USER_ESTABS) || '') as IEstabelecimentoListItem[];

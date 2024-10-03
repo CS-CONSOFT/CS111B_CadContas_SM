@@ -196,7 +196,6 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted, watch } from 'vue';
-import { useAuthStore } from '../../stores/auth';
 import { useRouter } from 'vue-router';
 // Import de API's
 import { DeleteConta, GetContasList, SoftDeleteConta } from '../../services/contas/bb012_conta';
@@ -279,8 +278,7 @@ const active = ref(true);
 const count = false;
 const search = ref('');
 
-const authStore = useAuthStore();
-const tenant = authStore.user?.TenantId;
+const tenant = 135;
 const router = useRouter();
 
 //variaveis da paginação
