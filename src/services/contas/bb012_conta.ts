@@ -35,7 +35,7 @@ const GetContaById = async (tenantId: number | undefined, In_BB012_ID: string): 
 
     try {
         const response: AxiosResponse<ContaById> = await axios.get(url, {
-            params: {
+            headers: {
                 tenant_id: tenantId,
                 In_BB012_ID: In_BB012_ID
             }

@@ -1,5 +1,3 @@
-import { RouteNames } from './RouteNames'; // Caso não precise, pode remover essa importação
-
 const MainRoutes = {
     path: '/Main',
     meta: {

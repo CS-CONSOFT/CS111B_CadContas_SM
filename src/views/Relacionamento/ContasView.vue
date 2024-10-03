@@ -90,10 +90,10 @@
                                 <v-list-item v-for="(opcao, index) in opcoesMenu" :key="index" @click="opcao.acao(item)">
                                     <div class="d-flex">
                                         <v-col cols="3">
-                                            <v-icon>{{ opcao.icone }}</v-icon>
+                                            <v-icon>{{ opcao.icone(item) }}</v-icon>
                                         </v-col>
                                         <v-col cols="9">
-                                            <v-list-item-title>{{ opcao.nome }}</v-list-item-title>
+                                            <v-list-item-title>{{ opcao.nome(item) }}</v-list-item-title>
                                         </v-col>
                                     </div>
                                 </v-list-item>
@@ -162,6 +162,30 @@
         </div>
     </v-container>
 
+    <v-dialog v-model="confirmDialog" max-width="400">
+        <v-card>
+            <v-card-title class="text-h5 pa-4 bg-error">Confirmar Exclusão</v-card-title>
+            <v-card-text>Tem certeza de que deseja excluir esta conta?</v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <BtnCancelar @click="cancelDelete" />
+                <BtnExcluir @click="deleteContaConfirmed" />
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="confirmSoftDeleteDialog" max-width="400">
+        <v-card>
+            <v-card-title class="text-h5 pa-4 bg-secondary"> Confirmar {{ active ? 'Inativação' : 'Ativação' }} </v-card-title>
+            <v-card-text> Tem certeza de que deseja {{ active ? 'inativar' : 'ativar' }} esta conta? </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <BtnCancelar @click="cancelSoftDelete" />
+                <BtnIsActive :IsActive="active" @click="softDeleteContaConfirmed" />
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
     <v-snackbar v-model="snackbar" :timeout="3000" top v-bind:color="snackbarColor" multi-line>
         {{ snackbarMessage }}
         <template v-slot:actions>
@@ -175,7 +199,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useAuthStore } from '../../stores/auth';
 import { useRouter } from 'vue-router';
 // Import de API's
-import { GetContasList, SoftDeleteConta } from '../../services/contas/bb012_conta';
+import { DeleteConta, GetContasList, SoftDeleteConta } from '../../services/contas/bb012_conta';
 // Import de Types
 import type { AxiosResponse } from 'axios';
 import type { ContaCompleta, ApiResponse, Lista_csicp_bb012 } from '../../types/crm/bb012_conta';
@@ -319,7 +343,8 @@ const fetchData = async () => {
             Contato: item.csicp_bb012.csicp_bb012.BB012_FaxCelular,
             Modalidade: item.csicp_bb012.csicp_bb012_MRel.Label,
             CPF: item.csicp_bb012.csicp_bb001.BB001_CPF_Oficial,
-            Status: item.csicp_bb012.csicp_bb012_StaCta.Label
+            Status: item.csicp_bb012.csicp_bb012_StaCta.Label,
+            IsActive: item.csicp_bb012.csicp_bb012.BB012_Is_Active
         }));
 
         totalItems.value = data.PageSize.cs_list_total_itens;
@@ -334,15 +359,15 @@ const fetchData = async () => {
 // Array de opções do menu de ações
 const opcoesMenu = [
     {
-        nome: 'Extras',
-        icone: 'mdi-plus-circle-outline',
+        nome: () => 'Extras',
+        icone: () => 'mdi-plus-circle-outline',
         acao: (item: Item) => {
             console.log('Ação 1 selecionada para', item);
         }
     },
     {
-        nome: 'Editar Registro',
-        icone: 'mdi-clipboard-edit-outline',
+        nome: () => 'Editar Registro',
+        icone: () => 'mdi-clipboard-edit-outline',
         acao: async (item: { ID: any }) => {
             if (item && item.ID) {
                 await router.push({
@@ -357,24 +382,33 @@ const opcoesMenu = [
         }
     },
     {
-        nome: 'Excluir',
-        icone: 'mdi-delete',
+        nome: (item: Item) => (item.IsActive ? 'Inativar' : 'Ativar'),
+        icone: (item: Item) => (item.IsActive ? 'mdi-cancel' : 'mdi-check'),
         acao: (item: Item) => {
-            console.log('Ação 3 selecionada para', item);
+            confirmSoftDeleteDialog.value = true;
+            itemToSoftDelete.value = item;
         }
     },
     {
-        nome: 'Ficha',
-        icone: 'mdi-clipboard-outline',
+        nome: () => 'Excluir',
+        icone: () => 'mdi-delete',
         acao: (item: Item) => {
-            console.log('Ação 4 selecionada para', item);
+            confirmDialog.value = true;
+            itemToDelete.value = item;
         }
     },
     {
-        nome: 'SMS',
-        icone: 'mdi-cellphone',
+        nome: () => 'Ficha',
+        icone: () => 'mdi-clipboard-outline',
         acao: (item: Item) => {
-            console.log('Ação 5 selecionada para', item);
+            console.log('Visualizando ficha para', item);
+        }
+    },
+    {
+        nome: () => 'SMS',
+        icone: () => 'mdi-cellphone',
+        acao: (item: Item) => {
+            console.log('Enviando SMS para', item);
         }
     }
 ];
@@ -385,13 +419,37 @@ const redirectToCreate = async () => {
     });
 };
 
-const confirmDelete = (item: Item) => {
-    confirmDialog.value = true;
-    itemToDelete.value = item;
-};
-
 const cancelDelete = () => {
     confirmDialog.value = false;
+};
+
+const deleteContaConfirmed = async () => {
+    if (!itemToDelete.value) return;
+    try {
+        await DeleteConta(tenant, itemToDelete.value.ID);
+        showSnackbar('Conta excluído com sucesso', 'success');
+        fetchData();
+        confirmDialog.value = false;
+    } catch (error) {
+        showSnackbar('Erro ao excluir o conta', 'error');
+        confirmDialog.value = false;
+    }
+};
+
+const cancelSoftDelete = () => {
+    confirmSoftDeleteDialog.value = false;
+};
+
+const softDeleteContaConfirmed = async () => {
+    if (!itemToSoftDelete.value) return;
+    try {
+        await SoftDeleteConta(tenant, itemToSoftDelete.value.ID);
+        showSnackbar(`Conta ${active.value ? 'inativado' : 'ativado'} com sucesso`, 'success');
+        fetchData();
+        confirmSoftDeleteDialog.value = false;
+    } catch (error) {
+        showSnackbar(`Erro ao ${active.value ? 'inativar' : 'ativar'} a conta`, 'error');
+    }
 };
 
 const updatePage = (page: number) => {
