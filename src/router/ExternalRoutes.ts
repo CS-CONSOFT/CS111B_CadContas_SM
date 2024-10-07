@@ -34,6 +34,15 @@ const CrmRoutes = {
                 title: 'Contas'
             },
             props: true
+        },
+        {
+            name: 'ContasEditCompleto',
+            path: 'ContasEditCompleto/:id?',
+            component: () => import('../../src/views/Relacionamento/ContasEditAvancadoView.vue'),
+            meta: {
+                title: 'Contas'
+            },
+            props: true
         }
     ]
 };

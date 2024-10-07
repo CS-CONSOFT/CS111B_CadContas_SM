@@ -9,73 +9,226 @@
         </v-toolbar>
 
         <v-form ref="formRef">
-            <v-card class="px-4 py-2 border ma-1" elevation="0">
+            <v-card class="px-4 py-2 border" elevation="0">
                 <v-row class="d-flex flex-row-reverse my-2">
                     <v-col cols="auto">
                         <v-btn color="primary" @click="">Salvar</v-btn>
+                        <v-btn color="error" :to="'/Contas'" class="ml-4">Cancelar</v-btn>
                     </v-col>
                 </v-row>
 
-                <v-card class="pa-2 border ma-1 mb-10" elevation="0">
-                    <template v-slot:title>Conta</template>
-
-                    <template v-slot:text class="pa-0">
-                        <v-row class="d-flex">
-                            <v-col cols="2"> Select </v-col>
+                <v-card class="border mb-10" elevation="0">
+                    <v-row>
+                        <v-col cols="12">
+                            <p class="px-6 py-3 ma-0 rounded-t bg-primary">Conta</p>
+                        </v-col>
+                        <v-row class="d-flex ml-6 justify-space-between">
+                            <v-col cols="2">Select</v-col>
                             <v-col cols="2">Select</v-col>
                             <v-col cols="2">Select</v-col>
                             <v-col cols="2">Select</v-col>
                             <v-col cols="2">Select</v-col>
                             <v-col cols="2">Select</v-col>
                         </v-row>
+                    </v-row>
 
-                        <v-row class="d-flex mt-5">
-                            <v-col cols="12">
-                                <p class="text-h6">Sobre</p>
-                            </v-col>
-                            <v-col col="6">
-                                <InputTexto
-                                    v-model="var_BB012_Codigo"
-                                    Prm_etiqueta="Código"
-                                    :Prm_limpavel="false"
-                                    :Prm_isObrigatorio="true"
-                                    :rules="rules.codigo"
-                                />
+                    <v-row class="d-flex mt-5 px-4">
+                        <v-col cols="12">
+                            <p class="py-3 ma-0 rounded">Sobre</p>
+                        </v-col>
+                        <v-col col="6">
+                            <InputTexto
+                                v-model="BB012.BB012_Codigo"
+                                Prm_etiqueta="Código"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="true"
+                                :rules="rules.codigo"
+                            />
 
-                                <InputTexto
-                                    v-model="var_BB012_Nome_Cliente"
-                                    Prm_etiqueta="Nome da Conta"
-                                    :Prm_limpavel="false"
-                                    :Prm_isObrigatorio="true"
-                                    :rules="rules.nome"
-                                />
+                            <InputTexto
+                                v-model="BB012.BB012_Nome_Cliente"
+                                Prm_etiqueta="Nome da Conta"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="true"
+                                :rules="rules.nome"
+                            />
 
-                                <InputTexto
-                                    v-model="var_BB012_Nome_Fantasia"
-                                    Prm_etiqueta="Nome Fantasia"
-                                    :Prm_limpavel="false"
-                                    :Prm_isObrigatorio="false"
-                                />
-                            </v-col>
-                            <v-col col="6">
-                                <InputTexto
-                                    v-model="var_BB012_Data_Aniversario"
-                                    Prm_etiqueta="Data Aniversario"
-                                    :Prm_limpavel="false"
-                                    :Prm_isObrigatorio="false"
-                                    type="date"
-                                />
+                            <InputTexto
+                                v-model="BB012.BB012_Nome_Fantasia"
+                                Prm_etiqueta="Nome Fantasia"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                            />
+                        </v-col>
+                        <v-col col="6">
+                            <InputTexto
+                                v-model="BB012.BB012_Data_Aniversario"
+                                Prm_etiqueta="Data Aniversario"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                                type="date"
+                            />
 
-                                <InputTexto
-                                    v-model="var_BB012_Data_Cadastro"
-                                    Prm_etiqueta="Data Cadastro"
-                                    :Prm_limpavel="false"
-                                    :Prm_isObrigatorio="false"
-                                />
-                            </v-col>
-                        </v-row>
-                    </template>
+                            <InputTexto
+                                v-model="BB012.BB012_Data_Cadastro"
+                                Prm_etiqueta="Data Cadastro"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                            />
+                        </v-col>
+                    </v-row>
                 </v-card>
+
+                <v-card class="border mb-10" elevation="0">
+                    <v-row>
+                        <v-col cols="12">
+                            <p class="px-6 py-3 ma-0 rounded-t bg-primary">Endereço</p>
+                        </v-col>
+                    </v-row>
+                    <v-row class="d-flex mt-5 px-4">
+                        <v-col col="6">
+                            <div class="d-flex justify-between">
+                                <v-col cols="11" class="px-0 py-0">
+                                    <InputTexto
+                                        v-model="BB01206.BB012_CEP"
+                                        Prm_etiqueta="CEP"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                    />
+                                </v-col>
+                                <v-col cols="1" class="py-0">
+                                    <v-btn class="v-btn-icon" icon="mdi-magnify"></v-btn>
+                                </v-col>
+                            </div>
+
+                            <div class="d-flex">
+                                <v-col cols="9" class="pa-0">
+                                    <InputTexto
+                                        v-model="BB01206.BB012_Logradouro"
+                                        Prm_etiqueta="Logradouro"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                    />
+                                </v-col>
+                                <v-col cols="3" class="pa-0 pl-4">
+                                    <InputTexto
+                                        v-model="BB01206.BB012_Numero"
+                                        Prm_etiqueta="Número"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                    />
+                                </v-col>
+                            </div>
+
+                            <InputTexto
+                                v-model="BB01206.BB012_Complemento"
+                                Prm_etiqueta="Complemento"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                            />
+                        </v-col>
+                        <v-col col="6">
+                            <InputTexto
+                                v-model="BB01206.BB012_Perimetro"
+                                Prm_etiqueta="Perímetro"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                            />
+                            <div class="d-flex">
+                                <v-col cols="6" class="pa-0">
+                                    <InputTexto
+                                        v-model="BB01206.BB012_Bairro"
+                                        Prm_etiqueta="Bairro"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                    />
+                                </v-col>
+                                <v-col cols="6" class="pa-0 pl-4">
+                                    <InputTexto
+                                        v-model="BB01206.BB012_Bairro"
+                                        Prm_etiqueta="Bairro"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                    />
+                                </v-col>
+                            </div>
+                            <div class="d-flex">
+                                <v-col cols="6" class="pa-0">
+                                    <InputTexto
+                                        v-model="BB01206.BB012_Bairro"
+                                        Prm_etiqueta="Bairro"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                    />
+                                </v-col>
+                                <v-col cols="6" class="pa-0 pl-4">
+                                    <InputTexto
+                                        v-model="BB01206.BB012_Bairro"
+                                        Prm_etiqueta="Bairro"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                    />
+                                </v-col>
+                            </div>
+                        </v-col>
+                    </v-row>
+                </v-card>
+
+                <v-card class="border mb-10" elevation="0">
+                    <v-row>
+                        <v-col cols="12">
+                            <p class="px-6 py-3 ma-0 rounded-t bg-primary">Outros Dados</p>
+                        </v-col>
+                    </v-row>
+                    <v-row class="d-flex mt-5 px-4">
+                        <v-col cols="6">
+                            <InputTexto v-model="BB01202.BB012_CPF" Prm_etiqueta="CPF" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
+
+                            <InputTexto
+                                v-model="BB01206.BB012_Bairro"
+                                Prm_etiqueta="Zona"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                            />
+
+                            <InputTexto
+                                v-model="BB01206.BB012_Bairro"
+                                Prm_etiqueta="Entrega Montagem Rota"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                            />
+                        </v-col>
+                        <v-col cols="6">
+                            <InputTexto
+                                v-model="BB01206.BB012_Bairro"
+                                Prm_etiqueta="Venda Rota"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                            />
+
+                            <InputTexto
+                                v-model="BB01206.BB012_Bairro"
+                                Prm_etiqueta="Limite de Crédito"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                            />
+                        </v-col>
+                    </v-row>
+                </v-card>
+                <v-row class="d-flex flex-row-reverse my-2">
+                    <v-col cols="auto" class="d-flex align-center">
+                        <v-btn text class="text-h6 pa-2" @click="redirectToEditCompleto(BB012.ID)">
+                            <span class="underline">Mais Informações</span>
+                            <v-icon class="ml-1">mdi-chevron-right</v-icon>
+                        </v-btn>
+                    </v-col>
+                </v-row>
+                <v-row class="d-flex flex-row-reverse my-2">
+                    <v-col cols="auto">
+                        <v-btn color="primary" @click="">Salvar</v-btn>
+                        <v-btn color="error" :to="'/Contas'" class="ml-4">Cancelar</v-btn>
+                    </v-col>
+                </v-row>
             </v-card>
         </v-form>
     </v-container>
@@ -89,10 +242,9 @@ import { validationRules } from '../../utils/ValidationRules';
 import { GetContaById } from '../../services/contas/bb012_conta';
 // Import de types
 import type { ContaById } from '../../types/crm/bb012_GetContaById';
-import type { Csicp_bb012 } from '../../types/crm/bb012_conta';
+import type { BB01206, BB012, BB01202 } from '../../views/Relacionamento/bb012_Types';
 //Import de componentes
 import InputTexto from '../../components/campos/cs_InputTexto.vue';
-import InputValor from '../../components/campos/cs_InputValor.vue';
 import { User } from '@/types/login/Login';
 
 const props = defineProps<{
@@ -102,33 +254,103 @@ const props = defineProps<{
 const router = useRouter();
 
 //Variáveis de modelo
-const var_BB012_ID = ref<string>('');
-const var_BB012_Codigo = ref<number>(0);
-const var_BB012_Nome_Cliente = ref<string>('');
-const var_BB012_Nome_Fantasia = ref<string>('');
-const var_BB012_Data_Aniversario = ref<string>('');
-const var_BB012_Data_Cadastro = ref<string>('');
-const var_BB012_Telefone = ref<string>('');
-const var_BB012_FaxCelular = ref<string>('');
-const var_BB012_Home_Page = ref<string>('');
-const var_BB012_Email = ref<string>('');
-const var_BB012_Data_Entrada_Sit = ref<string>('');
-const var_BB012_Data_Saida_Sit = ref<string>('');
-const var_BB012_Descricao = ref<string>('');
-const var_BB012_Is_Active = ref<boolean>(false);
-const var_BB012_Tipo_Conta_ID = ref<number>(0);
-const var_BB012_Grupoconta_ID = ref<number>(0);
-const var_BB012_ClasseConta_ID = ref<number>(0);
-const var_BB012_StatusConta_ID = ref<number>(0);
-const var_BB012_Sit_Conta_ID = ref<number>(0);
-const var_BB012_ModRelacao_ID = ref<number>(0);
-const var_BB012_Sequence = ref<number>(0);
-const var_bb012_dUltAlteracao = ref<string>('');
-const var_bb012_EstabCadID = ref<string>('');
-const var_bb012_KeyAcess = ref<string>('');
-const var_bb012_ID_Indicador = ref<string>('');
-const var_bb012_CountAppMCon = ref<number>(0);
-const var_bb012_OriCadastroID = ref<number>(0);
+const BB012 = ref<BB012>({
+    ID: '',
+    BB012_Codigo: 0,
+    BB012_Nome_Cliente: '',
+    BB012_Nome_Fantasia: '',
+    BB012_Data_Aniversario: '',
+    BB012_Data_Cadastro: '',
+    BB012_Telefone: '',
+    BB012_FaxCelular: '',
+    BB012_Home_Page: '',
+    BB012_Email: '',
+    BB012_Data_Entrada_Sit: '',
+    BB012_Data_Saida_Sit: '',
+    BB012_Descricao: '',
+    BB012_Is_Active: false,
+    BB012_Tipo_Conta_ID: 0,
+    BB012_Grupoconta_ID: 0,
+    BB012_ClasseConta_ID: 0,
+    BB012_StatusConta_ID: 0,
+    BB012_Sit_Conta_ID: 0,
+    BB012_ModRelacao_ID: 0,
+    BB012_Sequence: 0,
+    bb012_dUltAlteracao: '',
+    bb012_EstabCadID: '',
+    bb012_KeyAcess: '',
+    bb012_ID_Indicador: '',
+    bb012_CountAppMCon: 0,
+    bb012_OriCadastroID: 0
+});
+
+const BB01206 = ref<BB01206>({
+    Id: '',
+    BB012_ID: '',
+    BB012J_EnderecoID: '',
+    BB012_Logradouro: '',
+    BB012_Numero: '',
+    BB012_Complemento: '',
+    BB012_Perimetro: '',
+    BB012_CodgBairro: '',
+    BB012_Bairro: '',
+    BB012_Codigo_Cidade: '',
+    BB012_UF: '',
+    BB012_CEP: 0,
+    BB012_Codigo_Pais: '',
+    BB012_Entrega_Logradouro: '',
+    BB012_Entrega_Numero: '',
+    BB012_Entrega_Complement: '',
+    BB012_Entrega_CodgBairro: '',
+    BB012_Entrega_Bairro: '',
+    BB012_Entrega_Cod_Cidade: '',
+    BB012_Entrega_Uf: '',
+    BB012_Entrega_CEP: 0,
+    BB012_Entrega_Pais: '',
+    BB012_Entrega_Perimetro: '',
+    bb012_Telefone: '',
+    bb012_Celular: '',
+    bb012_email: ''
+});
+
+const BB01202 = ref<BB01202>({
+    Id: '',
+    BB012_CNPJ: 0,
+    BB012_InscEstadual: 0,
+    BB012_SUFRAMA: '',
+    BB012_RegSUFRAMAValido: 0,
+    BB012_RegJuntaComercial: '',
+    BB012_DataRegJunta: '',
+    BB012_Patrimonio: 0,
+    BB012_Capital_Social: 0,
+    BB012_CPF: 0,
+    BB012_RG: 0,
+    BB012_ComplementoRG: '',
+    BB012_EmissaoRG: '',
+    BB012_PIS: 0,
+    BB012_ResideDesde: '',
+    BB012_NroDependentes: 0,
+    BB012_EmpAdmissao: '',
+    BB012_Emp_Profissao: '',
+    BB012_ValorRemuneracao: 0,
+    BB012_OutrosRendimentos: 0,
+    BB012_OrigemOutrosRend: '',
+    BB012_Insc_Est_SNI_ID: 0,
+    BB012_Sexo_ID: 0,
+    BB012_EstadoCivil_ID: 0,
+    BB012_TipoDomicilio_ID: 0,
+    BB012_CompResid01_ID: 0,
+    BB012_CompResid02_ID: 0,
+    BB012_GEscolaridade_ID: 0,
+    BB012_Ocupacao_Id: 0,
+    BB012_NaturalDe_ID: '',
+    BB012_TpTributacao_ID: 0,
+    BB012_Ident_Estrangeiro: '',
+    BB012_Empresa: '',
+    BB012_Emp_Endereco: '',
+    BB012_Emp_Grupo_ID: 0,
+    BB012_MotDesoneracaoID: 0
+});
 
 //Variaveis do Snackbar
 const snackbar = ref(false);
@@ -156,7 +378,6 @@ function getUserFromLocalStorage(): User | null {
 
     return null;
 }
-
 const user = getUserFromLocalStorage();
 
 const showSnackbar = (message: string, color: string) => {
@@ -169,37 +390,77 @@ const fetchContaById = async (id: string) => {
     try {
         const data: ContaById = await GetContaById(user?.TenantId, id);
 
-        var_BB012_ID.value = data.csicp_bb012.csicp_bb012.ID;
-        var_BB012_Codigo.value = data.csicp_bb012.csicp_bb012.BB012_Codigo;
-        var_BB012_Nome_Cliente.value = data.csicp_bb012.csicp_bb012.BB012_Nome_Cliente;
-        var_BB012_Nome_Fantasia.value = data.csicp_bb012.csicp_bb012.BB012_Nome_Fantasia;
-        var_BB012_Data_Aniversario.value = data.csicp_bb012.csicp_bb012.BB012_Data_Aniversario;
-        var_BB012_Data_Cadastro.value = data.csicp_bb012.csicp_bb012.BB012_Data_Cadastro;
-        var_BB012_Telefone.value = data.csicp_bb012.csicp_bb012.BB012_Telefone;
-        var_BB012_FaxCelular.value = data.csicp_bb012.csicp_bb012.BB012_FaxCelular;
-        var_BB012_Home_Page.value = data.csicp_bb012.csicp_bb012.BB012_Home_Page;
-        var_BB012_Email.value = data.csicp_bb012.csicp_bb012.BB012_Email;
-        var_BB012_Data_Entrada_Sit.value = data.csicp_bb012.csicp_bb012.BB012_Data_Entrada_Sit;
-        var_BB012_Data_Saida_Sit.value = data.csicp_bb012.csicp_bb012.BB012_Data_Saida_Sit;
-        var_BB012_Descricao.value = data.csicp_bb012.csicp_bb012.BB012_Descricao;
-        var_BB012_Is_Active.value = data.csicp_bb012.csicp_bb012.BB012_Is_Active;
-        var_BB012_Tipo_Conta_ID.value = data.csicp_bb012.csicp_bb012.BB012_Tipo_Conta_ID;
-        var_BB012_Grupoconta_ID.value = data.csicp_bb012.csicp_bb012.BB012_Grupoconta_ID;
-        var_BB012_ClasseConta_ID.value = data.csicp_bb012.csicp_bb012.BB012_ClasseConta_ID;
-        var_BB012_StatusConta_ID.value = data.csicp_bb012.csicp_bb012.BB012_StatusConta_ID;
-        var_BB012_Sit_Conta_ID.value = data.csicp_bb012.csicp_bb012.BB012_Sit_Conta_ID;
-        var_BB012_ModRelacao_ID.value = data.csicp_bb012.csicp_bb012.BB012_ModRelacao_ID;
-        var_BB012_Sequence.value = data.csicp_bb012.csicp_bb012.BB012_Sequence;
-        var_bb012_dUltAlteracao.value = data.csicp_bb012.csicp_bb012.bb012_dUltAlteracao;
-        var_bb012_EstabCadID.value = data.csicp_bb012.csicp_bb012.bb012_EstabCadID;
-        var_bb012_KeyAcess.value = data.csicp_bb012.csicp_bb012.bb012_KeyAcess;
-        var_bb012_ID_Indicador.value = data.csicp_bb012.csicp_bb012.bb012_ID_Indicador;
-        var_bb012_CountAppMCon.value = data.csicp_bb012.csicp_bb012.bb012_CountAppMCon;
-        var_bb012_OriCadastroID.value = data.csicp_bb012.csicp_bb012.bb012_OriCadastroID;
+        // Acessa os campos BB012
+        BB012.value.ID = data.csicp_bb012.csicp_bb012.ID;
+        BB012.value.BB012_Codigo = data.csicp_bb012.csicp_bb012.BB012_Codigo;
+        BB012.value.BB012_Nome_Cliente = data.csicp_bb012.csicp_bb012.BB012_Nome_Cliente;
+        BB012.value.BB012_Nome_Fantasia = data.csicp_bb012.csicp_bb012.BB012_Nome_Fantasia;
+        BB012.value.BB012_Data_Aniversario = data.csicp_bb012.csicp_bb012.BB012_Data_Aniversario;
+        BB012.value.BB012_Data_Cadastro = data.csicp_bb012.csicp_bb012.BB012_Data_Cadastro;
+        BB012.value.BB012_Telefone = data.csicp_bb012.csicp_bb012.BB012_Telefone;
+        BB012.value.BB012_FaxCelular = data.csicp_bb012.csicp_bb012.BB012_FaxCelular;
+        BB012.value.BB012_Home_Page = data.csicp_bb012.csicp_bb012.BB012_Home_Page;
+        BB012.value.BB012_Email = data.csicp_bb012.csicp_bb012.BB012_Email;
+        BB012.value.BB012_Data_Entrada_Sit = data.csicp_bb012.csicp_bb012.BB012_Data_Entrada_Sit;
+        BB012.value.BB012_Data_Saida_Sit = data.csicp_bb012.csicp_bb012.BB012_Data_Saida_Sit;
+        BB012.value.BB012_Descricao = data.csicp_bb012.csicp_bb012.BB012_Descricao;
+        BB012.value.BB012_Is_Active = data.csicp_bb012.csicp_bb012.BB012_Is_Active;
+        BB012.value.BB012_Tipo_Conta_ID = data.csicp_bb012.csicp_bb012.BB012_Tipo_Conta_ID;
+        BB012.value.BB012_Grupoconta_ID = data.csicp_bb012.csicp_bb012.BB012_Grupoconta_ID;
+        BB012.value.BB012_ClasseConta_ID = data.csicp_bb012.csicp_bb012.BB012_ClasseConta_ID;
+        BB012.value.BB012_StatusConta_ID = data.csicp_bb012.csicp_bb012.BB012_StatusConta_ID;
+        BB012.value.BB012_Sit_Conta_ID = data.csicp_bb012.csicp_bb012.BB012_Sit_Conta_ID;
+        BB012.value.BB012_ModRelacao_ID = data.csicp_bb012.csicp_bb012.BB012_ModRelacao_ID;
+        BB012.value.BB012_Sequence = data.csicp_bb012.csicp_bb012.BB012_Sequence;
+        BB012.value.bb012_dUltAlteracao = data.csicp_bb012.csicp_bb012.bb012_dUltAlteracao;
+        BB012.value.bb012_EstabCadID = data.csicp_bb012.csicp_bb012.bb012_EstabCadID;
+        BB012.value.bb012_KeyAcess = data.csicp_bb012.csicp_bb012.bb012_KeyAcess;
+        BB012.value.bb012_ID_Indicador = data.csicp_bb012.csicp_bb012.bb012_ID_Indicador;
+        BB012.value.bb012_CountAppMCon = data.csicp_bb012.csicp_bb012.bb012_CountAppMCon;
+        BB012.value.bb012_OriCadastroID = data.csicp_bb012.csicp_bb012.bb012_OriCadastroID;
+
+        //Acessa os campos da BB01206
+        BB01206.value.Id = data.BB01206_Endereco.csicp_bb01206.Id;
+        BB01206.value.BB012_ID = data.BB01206_Endereco.csicp_bb01206.BB012_ID;
+        BB01206.value.BB012J_EnderecoID = data.BB01206_Endereco.csicp_bb01206.BB012J_EnderecoID;
+        BB01206.value.BB012_Logradouro = data.BB01206_Endereco.csicp_bb01206.BB012_Logradouro;
+        BB01206.value.BB012_Numero = data.BB01206_Endereco.csicp_bb01206.BB012_Numero;
+        BB01206.value.BB012_Complemento = data.BB01206_Endereco.csicp_bb01206.BB012_Complemento;
+        BB01206.value.BB012_Perimetro = data.BB01206_Endereco.csicp_bb01206.BB012_Perimetro;
+        BB01206.value.BB012_CodgBairro = data.BB01206_Endereco.csicp_bb01206.BB012_CodgBairro;
+        BB01206.value.BB012_Bairro = data.BB01206_Endereco.csicp_bb01206.BB012_Bairro;
+        BB01206.value.BB012_Codigo_Cidade = data.BB01206_Endereco.csicp_bb01206.BB012_Codigo_Cidade;
+        BB01206.value.BB012_UF = data.BB01206_Endereco.csicp_bb01206.BB012_UF;
+        BB01206.value.BB012_CEP = data.BB01206_Endereco.csicp_bb01206.BB012_CEP;
+        BB01206.value.BB012_Codigo_Pais = data.BB01206_Endereco.csicp_bb01206.BB012_Codigo_Pais;
+        BB01206.value.BB012_Entrega_Logradouro = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Logradouro;
+        BB01206.value.BB012_Entrega_Numero = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Numero;
+        BB01206.value.BB012_Entrega_Complement = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Complement;
+        BB01206.value.BB012_Entrega_CodgBairro = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_CodgBairro;
+        BB01206.value.BB012_Entrega_Bairro = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Bairro;
+        BB01206.value.BB012_Entrega_Cod_Cidade = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Cod_Cidade;
+        BB01206.value.BB012_Entrega_Uf = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Uf;
+        BB01206.value.BB012_Entrega_CEP = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_CEP;
+        BB01206.value.BB012_Entrega_Pais = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Pais;
+        BB01206.value.BB012_Entrega_Perimetro = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Perimetro;
+        BB01206.value.bb012_Telefone = data.BB01206_Endereco.csicp_bb01206.bb012_Telefone;
 
         console.log(data);
     } catch (error) {
         showSnackbar('Erro ao buscar conta.', 'error');
+    }
+};
+
+const redirectToEditCompleto = async (id: string) => {
+    if (id) {
+        await router.push({
+            name: 'ContasEditCompleto',
+            params: {
+                id: id
+            }
+        });
+    } else {
+        console.error('Item indefinido');
     }
 };
 

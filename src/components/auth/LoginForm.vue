@@ -25,9 +25,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useAuthStore } from '@/stores/auth';
 import { Form } from 'vee-validate';
-import { router } from '@/router';
+import router from '@/router';
+
 //import de API's
 import { LoginGeral } from '@/services/login/axios_login';
 
@@ -60,11 +60,8 @@ function validate(values: any, { setErrors }: any) {
 
     return LoginGeral(reg)
         .then((response) => {
-            const authStore = useAuthStore();
             const userData = response.data.Model;
             const userEstabsData = response.data.Lista_Estabs_Usuario;
-            authStore.setUser(userData);
-            authStore.setUserEstab(userEstabsData);
 
             console.log('UserData: ' + userData);
             console.log('UserEstabs: ' + userEstabsData);

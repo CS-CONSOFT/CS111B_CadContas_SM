@@ -1,0 +1,97 @@
+export interface BB012 {
+    ID: string;
+    BB012_Codigo: number;
+    BB012_Nome_Cliente: string;
+    BB012_Nome_Fantasia: string;
+    BB012_Data_Aniversario: string;
+    BB012_Data_Cadastro: string;
+    BB012_Telefone: string;
+    BB012_FaxCelular: string;
+    BB012_Home_Page: string;
+    BB012_Email: string;
+    BB012_Data_Entrada_Sit: string;
+    BB012_Data_Saida_Sit: string;
+    BB012_Descricao: string;
+    BB012_Is_Active: boolean;
+    BB012_Tipo_Conta_ID: number;
+    BB012_Grupoconta_ID: number;
+    BB012_ClasseConta_ID: number;
+    BB012_StatusConta_ID: number;
+    BB012_Sit_Conta_ID: number;
+    BB012_ModRelacao_ID: number;
+    BB012_Sequence: number;
+    bb012_dUltAlteracao: string;
+    bb012_EstabCadID: string;
+    bb012_KeyAcess: string;
+    bb012_ID_Indicador: string;
+    bb012_CountAppMCon: number;
+    bb012_OriCadastroID: number;
+}
+
+export interface BB01206 {
+    Id: string;
+    BB012_ID: string;
+    BB012J_EnderecoID: string;
+    BB012_Logradouro: string;
+    BB012_Numero: string;
+    BB012_Complemento: string;
+    BB012_Perimetro: string;
+    BB012_CodgBairro: string;
+    BB012_Bairro: string;
+    BB012_Codigo_Cidade: string;
+    BB012_UF: string;
+    BB012_CEP: number;
+    BB012_Codigo_Pais: string;
+    BB012_Entrega_Logradouro: string;
+    BB012_Entrega_Numero: string;
+    BB012_Entrega_Complement: string;
+    BB012_Entrega_CodgBairro: string;
+    BB012_Entrega_Bairro: string;
+    BB012_Entrega_Cod_Cidade: string;
+    BB012_Entrega_Uf: string;
+    BB012_Entrega_CEP: number;
+    BB012_Entrega_Pais: string;
+    BB012_Entrega_Perimetro: string;
+    bb012_Telefone: string;
+    bb012_Celular: string;
+    bb012_email: string;
+}
+
+export interface BB01202 {
+    Id: string;
+    BB012_CNPJ: number;
+    BB012_InscEstadual: number;
+    BB012_SUFRAMA: string;
+    BB012_RegSUFRAMAValido: number;
+    BB012_RegJuntaComercial: string;
+    BB012_DataRegJunta: string;
+    BB012_Patrimonio: number;
+    BB012_Capital_Social: number;
+    BB012_CPF: number;
+    BB012_RG: number;
+    BB012_ComplementoRG: string;
+    BB012_EmissaoRG: string;
+    BB012_PIS: number;
+    BB012_ResideDesde: string;
+    BB012_NroDependentes: number;
+    BB012_EmpAdmissao: string;
+    BB012_Emp_Profissao: string;
+    BB012_ValorRemuneracao: number;
+    BB012_OutrosRendimentos: number;
+    BB012_OrigemOutrosRend: string;
+    BB012_Insc_Est_SNI_ID: number;
+    BB012_Sexo_ID: number;
+    BB012_EstadoCivil_ID: number;
+    BB012_TipoDomicilio_ID: number;
+    BB012_CompResid01_ID: number;
+    BB012_CompResid02_ID: number;
+    BB012_GEscolaridade_ID: number;
+    BB012_Ocupacao_Id: number;
+    BB012_NaturalDe_ID: string;
+    BB012_TpTributacao_ID: number;
+    BB012_Ident_Estrangeiro: string;
+    BB012_Empresa: string;
+    BB012_Emp_Endereco: string;
+    BB012_Emp_Grupo_ID: number;
+    BB012_MotDesoneracaoID: number;
+}
