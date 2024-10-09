@@ -22,21 +22,25 @@
                         <v-col cols="12">
                             <p class="px-6 py-3 ma-0 rounded-t bg-primary">Conta</p>
                         </v-col>
-                        <v-row class="d-flex ml-6 justify-space-between">
-                            <v-col cols="2">Select</v-col>
-                            <v-col cols="2">Select</v-col>
-                            <v-col cols="2">Select</v-col>
-                            <v-col cols="2">Select</v-col>
-                            <v-col cols="2">Select</v-col>
-                            <v-col cols="2">Select</v-col>
-                        </v-row>
+                    </v-row>
+                    <v-row class="d-flex justify-space-between pa-2">
+                        <v-col cols="2">Select</v-col>
+                        <v-col cols="2">
+                            <cs_SelectMRelacionamento v-model="BB012_Mrel" Prm_etiqueta="Modalidade" :Prm_isObrigatorio="false" />
+                        </v-col>
+                        <v-col cols="2">Select</v-col>
+                        <v-col cols="2">Select</v-col>
+                        <v-col cols="2">Select</v-col>
+                        <v-col cols="2">Select</v-col>
                     </v-row>
 
+                    <v-divider></v-divider>
+
                     <v-row class="d-flex mt-5 px-4">
-                        <v-col cols="12">
-                            <p class="py-3 ma-0 rounded">Sobre</p>
-                        </v-col>
                         <v-col col="6">
+                            <v-col cols="12" class="pa-0 pb-4">
+                                <p class="text-h5">Sobre</p>
+                            </v-col>
                             <InputTexto
                                 v-model="BB012.BB012_Codigo"
                                 Prm_etiqueta="Código"
@@ -59,21 +63,70 @@
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
                             />
+
+                            <v-col cols="12" class="pa-0 pb-4">
+                                <p class="text-h5">Cadastro</p>
+                            </v-col>
+
+                            <div class="d-flex">
+                                <v-col cols="6" class="pa-0">
+                                    <InputTexto
+                                        v-model="BB012.BB012_Data_Aniversario"
+                                        Prm_etiqueta="Nascimento"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                        type="date"
+                                    />
+                                </v-col>
+                                <v-col cols="6" class="pa-0 pl-4">
+                                    <InputTexto
+                                        v-model="BB012.BB012_Data_Cadastro"
+                                        Prm_etiqueta="Data Cadastro"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                        type="date"
+                                    />
+                                </v-col>
+                            </div>
                         </v-col>
                         <v-col col="6">
-                            <InputTexto
-                                v-model="BB012.BB012_Data_Aniversario"
-                                Prm_etiqueta="Data Aniversario"
-                                :Prm_limpavel="false"
-                                :Prm_isObrigatorio="false"
-                                type="date"
-                            />
+                            <v-col cols="12" class="pa-0 pb-4">
+                                <p class="text-h5">Contatos</p>
+                            </v-col>
+                            <div class="d-flex">
+                                <v-col cols="6" class="pa-0">
+                                    <InputTexto
+                                        v-model="BB012.BB012_Telefone"
+                                        Prm_etiqueta="Telefone"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                    />
+                                </v-col>
+                                <v-col cols="6" class="pa-0 pl-4">
+                                    <InputTexto
+                                        v-model="BB012.BB012_FaxCelular"
+                                        Prm_etiqueta="Fax Celular"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                    />
+                                </v-col>
+                            </div>
 
                             <InputTexto
-                                v-model="BB012.BB012_Data_Cadastro"
-                                Prm_etiqueta="Data Cadastro"
+                                v-model="BB012.BB012_Home_Page"
+                                Prm_etiqueta="Home Page"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
+                            />
+
+                            <InputTexto v-model="BB012.BB012_Email" Prm_etiqueta="Email" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
+
+                            <InputTexto
+                                v-model="BB012.BB012_Descricao"
+                                Prm_etiqueta="Descrição"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                                :PrmTextArea="true"
                             />
                         </v-col>
                     </v-row>
@@ -87,19 +140,15 @@
                     </v-row>
                     <v-row class="d-flex mt-5 px-4">
                         <v-col col="6">
-                            <div class="d-flex justify-between">
-                                <v-col cols="11" class="px-0 py-0">
-                                    <InputTexto
-                                        v-model="BB01206.BB012_CEP"
-                                        Prm_etiqueta="CEP"
-                                        :Prm_limpavel="false"
-                                        :Prm_isObrigatorio="false"
-                                    />
-                                </v-col>
-                                <v-col cols="1" class="py-0">
-                                    <v-btn class="v-btn-icon" icon="mdi-magnify"></v-btn>
-                                </v-col>
-                            </div>
+                            <v-col cols="12" class="d-flex px-0 py-0">
+                                <InputTexto
+                                    v-model="BB01206.BB012_CEP"
+                                    Prm_etiqueta="CEP"
+                                    :Prm_limpavel="false"
+                                    :Prm_isObrigatorio="false"
+                                />
+                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
+                            </v-col>
 
                             <div class="d-flex">
                                 <v-col cols="9" class="pa-0">
@@ -184,27 +233,38 @@
                         <v-col cols="6">
                             <InputTexto v-model="BB01202.BB012_CPF" Prm_etiqueta="CPF" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
 
-                            <InputTexto
-                                v-model="BB01206.BB012_Bairro"
-                                Prm_etiqueta="Zona"
-                                :Prm_limpavel="false"
-                                :Prm_isObrigatorio="false"
-                            />
-
-                            <InputTexto
-                                v-model="BB01206.BB012_Bairro"
-                                Prm_etiqueta="Entrega Montagem Rota"
-                                :Prm_limpavel="false"
-                                :Prm_isObrigatorio="false"
-                            />
+                            <v-col cols="12" class="d-flex px-0 py-0">
+                                <InputTexto
+                                    v-model="BB01206.BB012_Bairro"
+                                    Prm_etiqueta="Zona"
+                                    :Prm_limpavel="false"
+                                    :Prm_isObrigatorio="false"
+                                />
+                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
+                                <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
+                            </v-col>
+                            <v-col cols="12" class="d-flex px-0 py-0">
+                                <InputTexto
+                                    v-model="BB01206.BB012_Bairro"
+                                    Prm_etiqueta="Entrega Montagem Rota"
+                                    :Prm_limpavel="false"
+                                    :Prm_isObrigatorio="false"
+                                />
+                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
+                                <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
+                            </v-col>
                         </v-col>
                         <v-col cols="6">
-                            <InputTexto
-                                v-model="BB01206.BB012_Bairro"
-                                Prm_etiqueta="Venda Rota"
-                                :Prm_limpavel="false"
-                                :Prm_isObrigatorio="false"
-                            />
+                            <v-col cols="12" class="d-flex px-0 py-0">
+                                <InputTexto
+                                    v-model="BB01206.BB012_Bairro"
+                                    Prm_etiqueta="Venda Rota"
+                                    :Prm_limpavel="false"
+                                    :Prm_isObrigatorio="false"
+                                />
+                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
+                                <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
+                            </v-col>
 
                             <InputTexto
                                 v-model="BB01206.BB012_Bairro"
@@ -243,9 +303,10 @@ import { GetContaById } from '../../services/contas/bb012_conta';
 // Import de types
 import type { ContaById } from '../../types/crm/bb012_GetContaById';
 import type { BB01206, BB012, BB01202 } from '../../views/Relacionamento/bb012_Types';
+import type { User } from '../../types/login/Login';
 //Import de componentes
 import InputTexto from '../../components/campos/cs_InputTexto.vue';
-import { User } from '@/types/login/Login';
+import cs_SelectMRelacionamento from '../../components/selects/cs_SelectMRelacionamento.vue';
 
 const props = defineProps<{
     id: string;
@@ -352,6 +413,8 @@ const BB01202 = ref<BB01202>({
     BB012_MotDesoneracaoID: 0
 });
 
+const BB012_Mrel = ref<Number>();
+
 //Variaveis do Snackbar
 const snackbar = ref(false);
 const snackbarMessage = ref('');
@@ -444,6 +507,8 @@ const fetchContaById = async (id: string) => {
         BB01206.value.BB012_Entrega_Pais = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Pais;
         BB01206.value.BB012_Entrega_Perimetro = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Perimetro;
         BB01206.value.bb012_Telefone = data.BB01206_Endereco.csicp_bb01206.bb012_Telefone;
+
+        BB012_Mrel.value = data.csicp_bb012.csicp_bb012_MRel.Id;
 
         console.log(data);
     } catch (error) {
