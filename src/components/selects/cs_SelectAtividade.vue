@@ -1,7 +1,7 @@
 <template>
     <v-select
-        v-model="internalSelectedZona"
-        :items="formattedZona"
+        v-model="internalSelectedAtividade"
+        :items="formattedAtividade"
         item-value="value"
         :rules="props.rules"
         item-text="title"
@@ -19,8 +19,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { getListZonas } from '../../services/basico/zona/bb010_zona';
-import type { Lista_bb010 } from '../../types/basico/bb010_zona';
+import { getListAtividade } from '../../services/basico/atividade/bb011_atividade';
+import type { Csicp_bb011 } from '../../types/basico/bb011_atividade';
 import type { User } from '../../types/login/Login';
 
 function getUserFromLocalStorage(): User | null {
@@ -49,59 +49,59 @@ const props = defineProps<{
     rules?: Array<(v: string) => true | string>;
 }>();
 
-const zona = ref<Lista_bb010[]>([]);
-const internalSelectedZona = ref<string | null>(null);
+const atividade = ref<Csicp_bb011[]>([]);
+const internalSelectedAtividade = ref<string | null>(null);
 const errors = ref<string[]>([]);
 
-const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma zona');
+const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma atividade');
 
-const formattedZona = computed(() => {
+const formattedAtividade = computed(() => {
     return [
         { title: '', value: null },
-        ...zona.value.map((item) => ({
-            title: item.BB010_Zona,
+        ...atividade.value.map((item) => ({
+            title: item.BB011_Atividade,
             value: item.ID
         }))
     ];
 });
 
-const fetchZona = async () => {
+const fetchAtividade = async () => {
     try {
-        const response = await getListZonas(user?.TenantId);
+        const response = await getListAtividade(user?.TenantId);
         if (response.status === 200) {
-            zona.value = response.data.Lista_bb010;
-            if (internalSelectedZona.value) {
-                const selected = zona.value.find((zona) => zona.ID === internalSelectedZona.value);
+            atividade.value = response.data.csicp_bb011;
+            if (internalSelectedAtividade.value) {
+                const selected = atividade.value.find((atividade) => atividade.ID === internalSelectedAtividade.value);
                 if (selected) {
-                    internalSelectedZona.value = selected.ID;
+                    internalSelectedAtividade.value = selected.ID;
                 }
             }
         } else {
-            console.error('Erro ao buscar as zonas', response.statusText);
+            console.error('Erro ao buscar as atividades', response.statusText);
         }
     } catch (error) {
-        console.error('Erro ao buscar as zonas:', error);
+        console.error('Erro ao buscar as atividades:', error);
     }
 };
 
 onMounted(async () => {
     getUserFromLocalStorage();
-    await fetchZona();
+    await fetchAtividade();
 });
 
-watch(internalSelectedZona, (newVal) => {
+watch(internalSelectedAtividade, (newVal) => {
     emit('update:modelValue', newVal);
 });
 
 function emitSelection() {
-    emit('update:modelValue', internalSelectedZona.value);
+    emit('update:modelValue', internalSelectedAtividade.value);
 }
 
 function validate() {
     errors.value = [];
     if (props.rules) {
         for (const rule of props.rules) {
-            const result = rule(internalSelectedZona.value || '');
+            const result = rule(internalSelectedAtividade.value || '');
             if (result !== true) {
                 errors.value.push(result);
             }

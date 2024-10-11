@@ -235,7 +235,8 @@
                                     <v-row class="d-flex mt-5 px-4">
                                         <v-col cols="6">
                                             <v-col cols="12" class="d-flex px-0 py-0">
-                                                <InputTexto
+                                                <cs_SelectZona
+                                                    class="mb-5"
                                                     v-model="BB01201.BB012_ZonaID"
                                                     Prm_etiqueta="Zona"
                                                     :Prm_limpavel="false"
@@ -268,7 +269,8 @@
                                             </v-col>
 
                                             <v-col cols="12" class="d-flex px-0 py-0">
-                                                <InputTexto
+                                                <cs_SelectAtividade
+                                                    class="mb-6"
                                                     v-model="BB01201.BB012_AtividadeID"
                                                     Prm_etiqueta="Atividade"
                                                     :Prm_limpavel="false"
@@ -408,7 +410,8 @@
                                             />
 
                                             <v-col cols="12" class="d-flex px-0 py-0">
-                                                <InputTexto
+                                                <cs_SelectCategoria
+                                                    class="mb-6"
                                                     v-model="BB01201.BB012_CategoriaID"
                                                     Prm_etiqueta="Categoria"
                                                     :Prm_limpavel="false"
@@ -513,9 +516,12 @@ import { GetContaById } from '../../services/contas/bb012_conta';
 // Import de types
 import type { ContaById } from '../../types/crm/bb012_GetContaById';
 import type { BB01202, BB01201 } from '../../views/Relacionamento/bb012_Types';
+import { User } from '../../types/login/Login';
 //Import de componentes
 import InputTexto from '../../components/campos/cs_InputTexto.vue';
-import { User } from '@/types/login/Login';
+import cs_SelectZona from '../../components/selects/cs_SelectZona.vue';
+import cs_SelectAtividade from '../../components/selects/cs_SelectAtividade.vue';
+import cs_SelectCategoria from '../../components/selects/cs_SelectCategoria.vue';
 
 const props = defineProps<{
     id: string;

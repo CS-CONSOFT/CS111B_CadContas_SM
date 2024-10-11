@@ -202,8 +202,8 @@
                                 </v-col>
                                 <v-col cols="6" class="pa-0 pl-4">
                                     <InputTexto
-                                        v-model="BB01206.BB012_Bairro"
-                                        Prm_etiqueta="Bairro"
+                                        v-model="BB01206.BB012_Codigo_Pais"
+                                        Prm_etiqueta="País"
                                         :Prm_limpavel="false"
                                         :Prm_isObrigatorio="false"
                                     />
@@ -212,16 +212,16 @@
                             <div class="d-flex">
                                 <v-col cols="6" class="pa-0">
                                     <InputTexto
-                                        v-model="BB01206.BB012_Bairro"
-                                        Prm_etiqueta="Bairro"
+                                        v-model="BB01206.BB012_UF"
+                                        Prm_etiqueta="UF"
                                         :Prm_limpavel="false"
                                         :Prm_isObrigatorio="false"
                                     />
                                 </v-col>
                                 <v-col cols="6" class="pa-0 pl-4">
                                     <InputTexto
-                                        v-model="BB01206.BB012_Bairro"
-                                        Prm_etiqueta="Bairro"
+                                        v-model="BB01206.BB012_Codigo_Cidade"
+                                        Prm_etiqueta="Cidade"
                                         :Prm_limpavel="false"
                                         :Prm_isObrigatorio="false"
                                     />

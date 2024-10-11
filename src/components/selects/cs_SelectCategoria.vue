@@ -1,7 +1,7 @@
 <template>
     <v-select
-        v-model="internalSelectedZona"
-        :items="formattedZona"
+        v-model="internalSelectedCategoria"
+        :items="formattedCategoria"
         item-value="value"
         :rules="props.rules"
         item-text="title"
@@ -19,8 +19,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { getListZonas } from '../../services/basico/zona/bb010_zona';
-import type { Lista_bb010 } from '../../types/basico/bb010_zona';
+import { getListCategorias } from '../../services/basico/categoria/bb029_categoria';
+import type { Lista_bb029 } from '../../types/basico/bb029_categoria';
 import type { User } from '../../types/login/Login';
 
 function getUserFromLocalStorage(): User | null {
@@ -49,59 +49,59 @@ const props = defineProps<{
     rules?: Array<(v: string) => true | string>;
 }>();
 
-const zona = ref<Lista_bb010[]>([]);
-const internalSelectedZona = ref<string | null>(null);
+const categoria = ref<Lista_bb029[]>([]);
+const internalSelectedCategoria = ref<string | null>(null);
 const errors = ref<string[]>([]);
 
-const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma zona');
+const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma categoria');
 
-const formattedZona = computed(() => {
+const formattedCategoria = computed(() => {
     return [
         { title: '', value: null },
-        ...zona.value.map((item) => ({
-            title: item.BB010_Zona,
+        ...categoria.value.map((item) => ({
+            title: item.BB029_Categoria,
             value: item.ID
         }))
     ];
 });
 
-const fetchZona = async () => {
+const fetchCategoria = async () => {
     try {
-        const response = await getListZonas(user?.TenantId);
+        const response = await getListCategorias(user?.TenantId);
         if (response.status === 200) {
-            zona.value = response.data.Lista_bb010;
-            if (internalSelectedZona.value) {
-                const selected = zona.value.find((zona) => zona.ID === internalSelectedZona.value);
+            categoria.value = response.data.Lista_bb029;
+            if (internalSelectedCategoria.value) {
+                const selected = categoria.value.find((categoria) => categoria.ID === internalSelectedCategoria.value);
                 if (selected) {
-                    internalSelectedZona.value = selected.ID;
+                    internalSelectedCategoria.value = selected.ID;
                 }
             }
         } else {
-            console.error('Erro ao buscar as zonas', response.statusText);
+            console.error('Erro ao buscar as categorias', response.statusText);
         }
     } catch (error) {
-        console.error('Erro ao buscar as zonas:', error);
+        console.error('Erro ao buscar as categorias:', error);
     }
 };
 
 onMounted(async () => {
     getUserFromLocalStorage();
-    await fetchZona();
+    await fetchCategoria();
 });
 
-watch(internalSelectedZona, (newVal) => {
+watch(internalSelectedCategoria, (newVal) => {
     emit('update:modelValue', newVal);
 });
 
 function emitSelection() {
-    emit('update:modelValue', internalSelectedZona.value);
+    emit('update:modelValue', internalSelectedCategoria.value);
 }
 
 function validate() {
     errors.value = [];
     if (props.rules) {
         for (const rule of props.rules) {
-            const result = rule(internalSelectedZona.value || '');
+            const result = rule(internalSelectedCategoria.value || '');
             if (result !== true) {
                 errors.value.push(result);
             }
