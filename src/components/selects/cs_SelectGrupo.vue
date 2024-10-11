@@ -1,7 +1,7 @@
 <template>
     <v-select
-        v-model="internalSelectedModalidade"
-        :items="formattedModalidades"
+        v-model="internalSelectedGrupo"
+        :items="formattedGrupo"
         item-value="value"
         item-text="title"
         variant="solo-filled"
@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { GetEstaticasBB } from '../../services/estaticas/bb012_comboEstaticas';
-import type { Csicp_bb012_MRel } from '../../types/estaticas/estaticas_BB012';
+import type { Csicp_bb012_GruCta } from '../../types/estaticas/estaticas_BB012';
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: number | null): void;
@@ -27,46 +27,46 @@ const emit = defineEmits<{
 
 const props = defineProps<{ Prm_etiqueta?: string; Prm_isObrigatorio: boolean }>();
 
-const modRelacao = ref<Csicp_bb012_MRel[]>([]);
-const internalSelectedModalidade = ref<number | null>(null);
+const grupo = ref<Csicp_bb012_GruCta[]>([]);
+const internalSelectedGrupo = ref<number | null>(null);
 
-const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma modalidade');
+const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione um grupo');
 
-const formattedModalidades = computed(() => {
-    return modRelacao.value.map((item) => ({
+const formattedGrupo = computed(() => {
+    return grupo.value.map((item) => ({
         title: item.Label,
         value: item.Id
     }));
 });
 
-const fetchModalidades = async () => {
+const fetchGrupo = async () => {
     try {
         const response = await GetEstaticasBB();
         if (response.status === 200) {
-            modRelacao.value = response.data.csicp_bb012_MRel;
-            if (internalSelectedModalidade.value) {
-                const selected = modRelacao.value.find((modalidade) => modalidade.Id === internalSelectedModalidade.value);
+            grupo.value = response.data.csicp_bb012_GruCta;
+            if (internalSelectedGrupo.value) {
+                const selected = grupo.value.find((grupo) => grupo.Id === internalSelectedGrupo.value);
                 if (selected) {
-                    internalSelectedModalidade.value = selected.Id;
+                    internalSelectedGrupo.value = selected.Id;
                 }
             }
         } else {
-            console.error('Erro ao buscar as modalidades de relação:', response.statusText);
+            console.error('Erro ao buscar os grupos:', response.statusText);
         }
     } catch (error) {
-        console.error('Erro ao buscar as modalidades de relação:', error);
+        console.error('Erro ao buscar os grupos:', error);
     }
 };
 
 onMounted(async () => {
-    await fetchModalidades();
+    await fetchGrupo();
 });
 
-watch(internalSelectedModalidade, (newVal) => {
+watch(internalSelectedGrupo, (newVal) => {
     emit('update:modelValue', newVal);
 });
 
 function emitSelection() {
-    emit('update:modelValue', internalSelectedModalidade.value);
+    emit('update:modelValue', internalSelectedGrupo.value);
 }
 </script>

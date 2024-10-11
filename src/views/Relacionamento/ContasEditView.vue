@@ -28,10 +28,18 @@
                         <v-col cols="2">
                             <cs_SelectMRelacionamento v-model="BB012_Mrel" Prm_etiqueta="Modalidade" :Prm_isObrigatorio="false" />
                         </v-col>
-                        <v-col cols="2">Select</v-col>
-                        <v-col cols="2">Select</v-col>
-                        <v-col cols="2">Select</v-col>
-                        <v-col cols="2">Select</v-col>
+                        <v-col cols="2">
+                            <cs_SelectGrupo v-model="BB012_Grupo" Prm_etiqueta="Grupo" :Prm_isObrigatorio="false" />
+                        </v-col>
+                        <v-col cols="2">
+                            <cs_SelectClasse v-model="BB012_Classe" Prm_etiqueta="Classe" :Prm_isObrigatorio="false" />
+                        </v-col>
+                        <v-col cols="2">
+                            <cs_SelectStatus v-model="BB012_Status" Prm_etiqueta="Status" :Prm_isObrigatorio="false" />
+                        </v-col>
+                        <v-col cols="2">
+                            <cs_SelectSituacao v-model="BB012_Situacao" Prm_etiqueta="Situação" :Prm_isObrigatorio="false" />
+                        </v-col>
                     </v-row>
 
                     <v-divider></v-divider>
@@ -234,18 +242,20 @@
                             <InputTexto v-model="BB01202.BB012_CPF" Prm_etiqueta="CPF" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
 
                             <v-col cols="12" class="d-flex px-0 py-0">
-                                <InputTexto
-                                    v-model="BB01206.BB012_Bairro"
+                                <cs_SelectZona
+                                    class="mb-5"
+                                    v-model="BB01201.BB012_ZonaID"
                                     Prm_etiqueta="Zona"
                                     :Prm_limpavel="false"
                                     :Prm_isObrigatorio="false"
                                 />
+
                                 <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                             </v-col>
                             <v-col cols="12" class="d-flex px-0 py-0">
                                 <InputTexto
-                                    v-model="BB01206.BB012_Bairro"
+                                    v-model="BB01201.BB012_EntMtgRotaID"
                                     Prm_etiqueta="Entrega Montagem Rota"
                                     :Prm_limpavel="false"
                                     :Prm_isObrigatorio="false"
@@ -257,7 +267,7 @@
                         <v-col cols="6">
                             <v-col cols="12" class="d-flex px-0 py-0">
                                 <InputTexto
-                                    v-model="BB01206.BB012_Bairro"
+                                    v-model="BB01201.BB012_VendaRotaID"
                                     Prm_etiqueta="Venda Rota"
                                     :Prm_limpavel="false"
                                     :Prm_isObrigatorio="false"
@@ -267,7 +277,7 @@
                             </v-col>
 
                             <InputTexto
-                                v-model="BB01206.BB012_Bairro"
+                                v-model="BB01201.BB012_LimiteCredito"
                                 Prm_etiqueta="Limite de Crédito"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
@@ -302,11 +312,16 @@ import { validationRules } from '../../utils/ValidationRules';
 import { GetContaById } from '../../services/contas/bb012_conta';
 // Import de types
 import type { ContaById } from '../../types/crm/bb012_GetContaById';
-import type { BB01206, BB012, BB01202 } from '../../views/Relacionamento/bb012_Types';
+import type { BB01206, BB012, BB01202, BB01201 } from '../../views/Relacionamento/bb012_Types';
 import type { User } from '../../types/login/Login';
 //Import de componentes
 import InputTexto from '../../components/campos/cs_InputTexto.vue';
 import cs_SelectMRelacionamento from '../../components/selects/cs_SelectMRelacionamento.vue';
+import cs_SelectGrupo from '../../components/selects/cs_SelectGrupo.vue';
+import cs_SelectClasse from '../../components/selects/cs_SelectClasse.vue';
+import cs_SelectStatus from '../../components/selects/cs_SelectStatus.vue';
+import cs_SelectSituacao from '../../components/selects/cs_SelectSituacao.vue';
+import cs_SelectZona from '../../components/selects/cs_SelectZona.vue';
 
 const props = defineProps<{
     id: string;
@@ -345,33 +360,69 @@ const BB012 = ref<BB012>({
     bb012_OriCadastroID: 0
 });
 
-const BB01206 = ref<BB01206>({
+const BB01201 = ref<BB01201>({
     Id: '',
-    BB012_ID: '',
-    BB012J_EnderecoID: '',
-    BB012_Logradouro: '',
-    BB012_Numero: '',
-    BB012_Complemento: '',
-    BB012_Perimetro: '',
-    BB012_CodgBairro: '',
-    BB012_Bairro: '',
-    BB012_Codigo_Cidade: '',
-    BB012_UF: '',
-    BB012_CEP: 0,
-    BB012_Codigo_Pais: '',
-    BB012_Entrega_Logradouro: '',
-    BB012_Entrega_Numero: '',
-    BB012_Entrega_Complement: '',
-    BB012_Entrega_CodgBairro: '',
-    BB012_Entrega_Bairro: '',
-    BB012_Entrega_Cod_Cidade: '',
-    BB012_Entrega_Uf: '',
-    BB012_Entrega_CEP: 0,
-    BB012_Entrega_Pais: '',
-    BB012_Entrega_Perimetro: '',
-    bb012_Telefone: '',
-    bb012_Celular: '',
-    bb012_email: ''
+    BB012_ZonaID: '',
+    BB012_AtividadeID: '',
+    BB012_LimiteCredito: 0,
+    BB012_LimCreditoSecun: 0,
+    BB012_LimiteCCredito: 0,
+    BB012_DiaVenctoCartao: 0,
+    BB012_ContaConvenio: '',
+    BB012_DiasPagtoConv: 0,
+    BB012_PadraoBancoID: '',
+    BB012_BcoAgenciaConta: '',
+    BB012_Revenda: 0,
+    BB012_Taxa_Administracao_Con: 0,
+    BB012_Requisicao: 0,
+    BB012_ContaContabil: '',
+    BB012_HistoricoContabilID: '',
+    BB012_ContratoCartao: 0,
+    BB012_DataContratoCartao: '',
+    BB012_DtValidadeCartao: '',
+    BB012_ModalidadeCredCartao: '',
+    BB012_PercLimCredito: 0,
+    BB012_PrazoEntregaFornec: 0,
+    BB012_CondPagtoFornec: '',
+    BB012_NatOperacaoID: '',
+    BB012_CondPagtoID: '',
+    BB012_TextoNotaId: '',
+    BB012_Grau_Risco: '',
+    BB012_Classe_Credito: '',
+    BB012_DtValidCadastro: '',
+    BB012_Perc_ICMS: 0,
+    BB012_CodgCategoria: '',
+    BB012_CategoriaID: '',
+    BB012_LimiteCredParcela: 0,
+    BB012_Num_Ult_Fatura: 0,
+    BB012_TotCompraCarnet: 0,
+    BB012_Valor_Entrada: 0,
+    BB012_Maior_Compra: 0,
+    BB012_Menor_Compra: 0,
+    BB012_TotDiasAtraso: 0,
+    BB012_Maior_Atraso: 0,
+    BB012_Menor_Atraso: 0,
+    BB012_MediaDeAtraso: 0,
+    BB012_MaiorSaldo: 0,
+    BB012_NumCompras: 0,
+    BB012_DtPrimCompra: '',
+    BB012_DtUltCompra: '',
+    BB012_VlrMaiorPagto: 0,
+    BB012_NumPagtoDia: 0,
+    BB012_NumPagtoAtraso: 0,
+    BB012_SaldoDevedor: 0,
+    BB012_SaldoPedido: 0,
+    BB012_QtdTitProtestado: 0,
+    BB012_UltProtesto: '',
+    BB012_QtdChqDevolvido: 0,
+    BB012_UltChqDevolvido: '',
+    BB012_Convenio_ID: 0,
+    BB012_TipoGeracao_ID: 0,
+    BB012_SitEspecial_ID: 0,
+    BB012_EntMtgRotaID: '',
+    BB012_VendaRotaID: '',
+    bb012_DiaVenctoID: '',
+    bb012_CodgBcoDebConta: ''
 });
 
 const BB01202 = ref<BB01202>({
@@ -413,7 +464,40 @@ const BB01202 = ref<BB01202>({
     BB012_MotDesoneracaoID: 0
 });
 
-const BB012_Mrel = ref<Number>();
+const BB01206 = ref<BB01206>({
+    Id: '',
+    BB012_ID: '',
+    BB012J_EnderecoID: '',
+    BB012_Logradouro: '',
+    BB012_Numero: '',
+    BB012_Complemento: '',
+    BB012_Perimetro: '',
+    BB012_CodgBairro: '',
+    BB012_Bairro: '',
+    BB012_Codigo_Cidade: '',
+    BB012_UF: '',
+    BB012_CEP: 0,
+    BB012_Codigo_Pais: '',
+    BB012_Entrega_Logradouro: '',
+    BB012_Entrega_Numero: '',
+    BB012_Entrega_Complement: '',
+    BB012_Entrega_CodgBairro: '',
+    BB012_Entrega_Bairro: '',
+    BB012_Entrega_Cod_Cidade: '',
+    BB012_Entrega_Uf: '',
+    BB012_Entrega_CEP: 0,
+    BB012_Entrega_Pais: '',
+    BB012_Entrega_Perimetro: '',
+    bb012_Telefone: '',
+    bb012_Celular: '',
+    bb012_email: ''
+});
+
+const BB012_Mrel = ref<any>('');
+const BB012_Grupo = ref<any>('');
+const BB012_Classe = ref<any>('');
+const BB012_Status = ref<any>('');
+const BB012_Situacao = ref<any>('');
 
 //Variaveis do Snackbar
 const snackbar = ref(false);
@@ -482,6 +566,108 @@ const fetchContaById = async (id: string) => {
         BB012.value.bb012_CountAppMCon = data.csicp_bb012.csicp_bb012.bb012_CountAppMCon;
         BB012.value.bb012_OriCadastroID = data.csicp_bb012.csicp_bb012.bb012_OriCadastroID;
 
+        // Variáveis do modelo BB01201
+        BB01201.value.Id = data.BB01201.csicp_bb01201.Id;
+        BB01201.value.BB012_ZonaID = data.BB01201.csicp_bb01201.BB012_ZonaID;
+        BB01201.value.BB012_AtividadeID = data.BB01201.csicp_bb01201.BB012_AtividadeID;
+        BB01201.value.BB012_LimiteCredito = data.BB01201.csicp_bb01201.BB012_LimiteCredito;
+        BB01201.value.BB012_LimCreditoSecun = data.BB01201.csicp_bb01201.BB012_LimCreditoSecun;
+        BB01201.value.BB012_LimiteCCredito = data.BB01201.csicp_bb01201.BB012_LimiteCCredito;
+        BB01201.value.BB012_DiaVenctoCartao = data.BB01201.csicp_bb01201.BB012_DiaVenctoCartao;
+        BB01201.value.BB012_ContaConvenio = data.BB01201.csicp_bb01201.BB012_ContaConvenio;
+        BB01201.value.BB012_DiasPagtoConv = data.BB01201.csicp_bb01201.BB012_DiasPagtoConv;
+        BB01201.value.BB012_PadraoBancoID = data.BB01201.csicp_bb01201.BB012_PadraoBancoID;
+        BB01201.value.BB012_BcoAgenciaConta = data.BB01201.csicp_bb01201.BB012_BcoAgenciaConta;
+        BB01201.value.BB012_Revenda = data.BB01201.csicp_bb01201.BB012_Revenda;
+        BB01201.value.BB012_Taxa_Administracao_Con = data.BB01201.csicp_bb01201.BB012_Taxa_Administracao_Con;
+        BB01201.value.BB012_Requisicao = data.BB01201.csicp_bb01201.BB012_Requisicao;
+        BB01201.value.BB012_ContaContabil = data.BB01201.csicp_bb01201.BB012_ContaContabil;
+        BB01201.value.BB012_HistoricoContabilID = data.BB01201.csicp_bb01201.BB012_HistoricoContabilID;
+        BB01201.value.BB012_ContratoCartao = data.BB01201.csicp_bb01201.BB012_ContratoCartao;
+        BB01201.value.BB012_DataContratoCartao = data.BB01201.csicp_bb01201.BB012_DataContratoCartao;
+        BB01201.value.BB012_DtValidadeCartao = data.BB01201.csicp_bb01201.BB012_DtValidadeCartao;
+        BB01201.value.BB012_ModalidadeCredCartao = data.BB01201.csicp_bb01201.BB012_ModalidadeCredCartao;
+        BB01201.value.BB012_PercLimCredito = data.BB01201.csicp_bb01201.BB012_PercLimCredito;
+        BB01201.value.BB012_PrazoEntregaFornec = data.BB01201.csicp_bb01201.BB012_PrazoEntregaFornec;
+        BB01201.value.BB012_CondPagtoFornec = data.BB01201.csicp_bb01201.BB012_CondPagtoFornec;
+        BB01201.value.BB012_NatOperacaoID = data.BB01201.csicp_bb01201.BB012_NatOperacaoID;
+        BB01201.value.BB012_CondPagtoID = data.BB01201.csicp_bb01201.BB012_CondPagtoID;
+        BB01201.value.BB012_TextoNotaId = data.BB01201.csicp_bb01201.BB012_TextoNotaId;
+        BB01201.value.BB012_Grau_Risco = data.BB01201.csicp_bb01201.BB012_Grau_Risco;
+        BB01201.value.BB012_Classe_Credito = data.BB01201.csicp_bb01201.BB012_Classe_Credito;
+        BB01201.value.BB012_DtValidCadastro = data.BB01201.csicp_bb01201.BB012_DtValidCadastro;
+        BB01201.value.BB012_Perc_ICMS = data.BB01201.csicp_bb01201.BB012_Perc_ICMS;
+        BB01201.value.BB012_CodgCategoria = data.BB01201.csicp_bb01201.BB012_CodgCategoria;
+        BB01201.value.BB012_CategoriaID = data.BB01201.csicp_bb01201.BB012_CategoriaID;
+        BB01201.value.BB012_LimiteCredParcela = data.BB01201.csicp_bb01201.BB012_LimiteCredParcela;
+        BB01201.value.BB012_Num_Ult_Fatura = data.BB01201.csicp_bb01201.BB012_Num_Ult_Fatura;
+        BB01201.value.BB012_TotCompraCarnet = data.BB01201.csicp_bb01201.BB012_TotCompraCarnet;
+        BB01201.value.BB012_Valor_Entrada = data.BB01201.csicp_bb01201.BB012_Valor_Entrada;
+        BB01201.value.BB012_Maior_Compra = data.BB01201.csicp_bb01201.BB012_Maior_Compra;
+        BB01201.value.BB012_Menor_Compra = data.BB01201.csicp_bb01201.BB012_Menor_Compra;
+        BB01201.value.BB012_TotDiasAtraso = data.BB01201.csicp_bb01201.BB012_TotDiasAtraso;
+        BB01201.value.BB012_Maior_Atraso = data.BB01201.csicp_bb01201.BB012_Maior_Atraso;
+        BB01201.value.BB012_Menor_Atraso = data.BB01201.csicp_bb01201.BB012_Menor_Atraso;
+        BB01201.value.BB012_MediaDeAtraso = data.BB01201.csicp_bb01201.BB012_MediaDeAtraso;
+        BB01201.value.BB012_MaiorSaldo = data.BB01201.csicp_bb01201.BB012_MaiorSaldo;
+        BB01201.value.BB012_NumCompras = data.BB01201.csicp_bb01201.BB012_NumCompras;
+        BB01201.value.BB012_DtPrimCompra = data.BB01201.csicp_bb01201.BB012_DtPrimCompra;
+        BB01201.value.BB012_DtUltCompra = data.BB01201.csicp_bb01201.BB012_DtUltCompra;
+        BB01201.value.BB012_VlrMaiorPagto = data.BB01201.csicp_bb01201.BB012_VlrMaiorPagto;
+        BB01201.value.BB012_NumPagtoDia = data.BB01201.csicp_bb01201.BB012_NumPagtoDia;
+        BB01201.value.BB012_NumPagtoAtraso = data.BB01201.csicp_bb01201.BB012_NumPagtoAtraso;
+        BB01201.value.BB012_SaldoDevedor = data.BB01201.csicp_bb01201.BB012_SaldoDevedor;
+        BB01201.value.BB012_SaldoPedido = data.BB01201.csicp_bb01201.BB012_SaldoPedido;
+        BB01201.value.BB012_QtdTitProtestado = data.BB01201.csicp_bb01201.BB012_QtdTitProtestado;
+        BB01201.value.BB012_UltProtesto = data.BB01201.csicp_bb01201.BB012_UltProtesto;
+        BB01201.value.BB012_QtdChqDevolvido = data.BB01201.csicp_bb01201.BB012_QtdChqDevolvido;
+        BB01201.value.BB012_UltChqDevolvido = data.BB01201.csicp_bb01201.BB012_UltChqDevolvido;
+        BB01201.value.BB012_Convenio_ID = data.BB01201.csicp_bb01201.BB012_Convenio_ID;
+        BB01201.value.BB012_TipoGeracao_ID = data.BB01201.csicp_bb01201.BB012_TipoGeracao_ID;
+        BB01201.value.BB012_SitEspecial_ID = data.BB01201.csicp_bb01201.BB012_SitEspecial_ID;
+        BB01201.value.BB012_EntMtgRotaID = data.BB01201.csicp_bb01201.BB012_EntMtgRotaID;
+        BB01201.value.BB012_VendaRotaID = data.BB01201.csicp_bb01201.BB012_VendaRotaID;
+        BB01201.value.bb012_DiaVenctoID = data.BB01201.csicp_bb01201.bb012_DiaVenctoID;
+        BB01201.value.bb012_CodgBcoDebConta = data.BB01201.csicp_bb01201.bb012_CodgBcoDebConta;
+
+        //Variáveis de modelo BB01202
+        BB01202.value.Id = data.BB01202.csicp_bb01202.Id;
+        BB01202.value.BB012_CNPJ = data.BB01202.csicp_bb01202.BB012_CNPJ;
+        BB01202.value.BB012_InscEstadual = data.BB01202.csicp_bb01202.BB012_InscEstadual;
+        BB01202.value.BB012_SUFRAMA = data.BB01202.csicp_bb01202.BB012_SUFRAMA;
+        BB01202.value.BB012_RegSUFRAMAValido = data.BB01202.csicp_bb01202.BB012_RegSUFRAMAValido;
+        BB01202.value.BB012_RegJuntaComercial = data.BB01202.csicp_bb01202.BB012_RegJuntaComercial;
+        BB01202.value.BB012_DataRegJunta = data.BB01202.csicp_bb01202.BB012_DataRegJunta;
+        BB01202.value.BB012_Patrimonio = data.BB01202.csicp_bb01202.BB012_Patrimonio;
+        BB01202.value.BB012_Capital_Social = data.BB01202.csicp_bb01202.BB012_Capital_Social;
+        BB01202.value.BB012_CPF = data.BB01202.csicp_bb01202.BB012_CPF;
+        BB01202.value.BB012_RG = data.BB01202.csicp_bb01202.BB012_RG;
+        BB01202.value.BB012_ComplementoRG = data.BB01202.csicp_bb01202.BB012_ComplementoRG;
+        BB01202.value.BB012_EmissaoRG = data.BB01202.csicp_bb01202.BB012_EmissaoRG;
+        BB01202.value.BB012_PIS = data.BB01202.csicp_bb01202.BB012_PIS;
+        BB01202.value.BB012_ResideDesde = data.BB01202.csicp_bb01202.BB012_ResideDesde;
+        BB01202.value.BB012_NroDependentes = data.BB01202.csicp_bb01202.BB012_NroDependentes;
+        BB01202.value.BB012_EmpAdmissao = data.BB01202.csicp_bb01202.BB012_EmpAdmissao;
+        BB01202.value.BB012_Emp_Profissao = data.BB01202.csicp_bb01202.BB012_Emp_Profissao;
+        BB01202.value.BB012_ValorRemuneracao = data.BB01202.csicp_bb01202.BB012_ValorRemuneracao;
+        BB01202.value.BB012_OutrosRendimentos = data.BB01202.csicp_bb01202.BB012_OutrosRendimentos;
+        BB01202.value.BB012_OrigemOutrosRend = data.BB01202.csicp_bb01202.BB012_OrigemOutrosRend;
+        BB01202.value.BB012_Insc_Est_SNI_ID = data.BB01202.csicp_bb01202.BB012_Insc_Est_SNI_ID;
+        BB01202.value.BB012_Sexo_ID = data.BB01202.csicp_bb01202.BB012_Sexo_ID;
+        BB01202.value.BB012_EstadoCivil_ID = data.BB01202.csicp_bb01202.BB012_EstadoCivil_ID;
+        BB01202.value.BB012_TipoDomicilio_ID = data.BB01202.csicp_bb01202.BB012_TipoDomicilio_ID;
+        BB01202.value.BB012_CompResid01_ID = data.BB01202.csicp_bb01202.BB012_CompResid01_ID;
+        BB01202.value.BB012_CompResid02_ID = data.BB01202.csicp_bb01202.BB012_CompResid02_ID;
+        BB01202.value.BB012_GEscolaridade_ID = data.BB01202.csicp_bb01202.BB012_GEscolaridade_ID;
+        BB01202.value.BB012_Ocupacao_Id = data.BB01202.csicp_bb01202.BB012_Ocupacao_Id;
+        BB01202.value.BB012_NaturalDe_ID = data.BB01202.csicp_bb01202.BB012_NaturalDe_ID;
+        BB01202.value.BB012_TpTributacao_ID = data.BB01202.csicp_bb01202.BB012_TpTributacao_ID;
+        BB01202.value.BB012_Ident_Estrangeiro = data.BB01202.csicp_bb01202.BB012_Ident_Estrangeiro;
+        BB01202.value.BB012_Empresa = data.BB01202.csicp_bb01202.BB012_Empresa;
+        BB01202.value.BB012_Emp_Endereco = data.BB01202.csicp_bb01202.BB012_Emp_Endereco;
+        BB01202.value.BB012_Emp_Grupo_ID = data.BB01202.csicp_bb01202.BB012_Emp_Grupo_ID;
+        BB01202.value.BB012_MotDesoneracaoID = data.BB01202.csicp_bb01202.BB012_MotDesoneracaoID;
+
         //Acessa os campos da BB01206
         BB01206.value.Id = data.BB01206_Endereco.csicp_bb01206.Id;
         BB01206.value.BB012_ID = data.BB01206_Endereco.csicp_bb01206.BB012_ID;
@@ -509,6 +695,10 @@ const fetchContaById = async (id: string) => {
         BB01206.value.bb012_Telefone = data.BB01206_Endereco.csicp_bb01206.bb012_Telefone;
 
         BB012_Mrel.value = data.csicp_bb012.csicp_bb012_MRel.Id;
+        BB012_Grupo.value = data.csicp_bb012.csicp_bb012_GruCta.Id;
+        BB012_Classe.value = data.csicp_bb012.csicp_bb012_ClaCta.Id;
+        BB012_Status.value = data.csicp_bb012.csicp_bb012_StaCta.Id;
+        BB012_Situacao.value = data.csicp_bb012.csicp_bb012_SitCta.Id;
 
         console.log(data);
     } catch (error) {

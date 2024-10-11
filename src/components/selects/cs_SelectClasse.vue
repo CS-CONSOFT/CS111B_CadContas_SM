@@ -1,7 +1,7 @@
 <template>
     <v-select
-        v-model="internalSelectedModalidade"
-        :items="formattedModalidades"
+        v-model="internalSelectedClasse"
+        :items="formattedClasse"
         item-value="value"
         item-text="title"
         variant="solo-filled"
@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { GetEstaticasBB } from '../../services/estaticas/bb012_comboEstaticas';
-import type { Csicp_bb012_MRel } from '../../types/estaticas/estaticas_BB012';
+import type { Csicp_bb012_ClaCta } from '../../types/estaticas/estaticas_BB012';
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: number | null): void;
@@ -27,46 +27,46 @@ const emit = defineEmits<{
 
 const props = defineProps<{ Prm_etiqueta?: string; Prm_isObrigatorio: boolean }>();
 
-const modRelacao = ref<Csicp_bb012_MRel[]>([]);
-const internalSelectedModalidade = ref<number | null>(null);
+const classe = ref<Csicp_bb012_ClaCta[]>([]);
+const internalSelectedClasse = ref<number | null>(null);
 
-const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma modalidade');
+const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma classe');
 
-const formattedModalidades = computed(() => {
-    return modRelacao.value.map((item) => ({
+const formattedClasse = computed(() => {
+    return classe.value.map((item) => ({
         title: item.Label,
         value: item.Id
     }));
 });
 
-const fetchModalidades = async () => {
+const fetchClasse = async () => {
     try {
         const response = await GetEstaticasBB();
         if (response.status === 200) {
-            modRelacao.value = response.data.csicp_bb012_MRel;
-            if (internalSelectedModalidade.value) {
-                const selected = modRelacao.value.find((modalidade) => modalidade.Id === internalSelectedModalidade.value);
+            classe.value = response.data.csicp_bb012_ClaCta;
+            if (internalSelectedClasse.value) {
+                const selected = classe.value.find((classe) => classe.Id === internalSelectedClasse.value);
                 if (selected) {
-                    internalSelectedModalidade.value = selected.Id;
+                    internalSelectedClasse.value = selected.Id;
                 }
             }
         } else {
-            console.error('Erro ao buscar as modalidades de relação:', response.statusText);
+            console.error('Erro ao buscar as classes:', response.statusText);
         }
     } catch (error) {
-        console.error('Erro ao buscar as modalidades de relação:', error);
+        console.error('Erro ao buscar as classes:', error);
     }
 };
 
 onMounted(async () => {
-    await fetchModalidades();
+    await fetchClasse();
 });
 
-watch(internalSelectedModalidade, (newVal) => {
+watch(internalSelectedClasse, (newVal) => {
     emit('update:modelValue', newVal);
 });
 
 function emitSelection() {
-    emit('update:modelValue', internalSelectedModalidade.value);
+    emit('update:modelValue', internalSelectedClasse.value);
 }
 </script>

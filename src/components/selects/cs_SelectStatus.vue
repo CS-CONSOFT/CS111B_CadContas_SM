@@ -1,7 +1,7 @@
 <template>
     <v-select
-        v-model="internalSelectedModalidade"
-        :items="formattedModalidades"
+        v-model="internalSelectedStatus"
+        :items="formattedStatus"
         item-value="value"
         item-text="title"
         variant="solo-filled"
@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { GetEstaticasBB } from '../../services/estaticas/bb012_comboEstaticas';
-import type { Csicp_bb012_MRel } from '../../types/estaticas/estaticas_BB012';
+import type { Csicp_bb012_StaCta } from '../../types/estaticas/estaticas_BB012';
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: number | null): void;
@@ -27,46 +27,46 @@ const emit = defineEmits<{
 
 const props = defineProps<{ Prm_etiqueta?: string; Prm_isObrigatorio: boolean }>();
 
-const modRelacao = ref<Csicp_bb012_MRel[]>([]);
-const internalSelectedModalidade = ref<number | null>(null);
+const status = ref<Csicp_bb012_StaCta[]>([]);
+const internalSelectedStatus = ref<number | null>(null);
 
-const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma modalidade');
+const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione um status');
 
-const formattedModalidades = computed(() => {
-    return modRelacao.value.map((item) => ({
+const formattedStatus = computed(() => {
+    return status.value.map((item) => ({
         title: item.Label,
         value: item.Id
     }));
 });
 
-const fetchModalidades = async () => {
+const fetchStatus = async () => {
     try {
         const response = await GetEstaticasBB();
         if (response.status === 200) {
-            modRelacao.value = response.data.csicp_bb012_MRel;
-            if (internalSelectedModalidade.value) {
-                const selected = modRelacao.value.find((modalidade) => modalidade.Id === internalSelectedModalidade.value);
+            status.value = response.data.csicp_bb012_StaCta;
+            if (internalSelectedStatus.value) {
+                const selected = status.value.find((status) => status.Id === internalSelectedStatus.value);
                 if (selected) {
-                    internalSelectedModalidade.value = selected.Id;
+                    internalSelectedStatus.value = selected.Id;
                 }
             }
         } else {
-            console.error('Erro ao buscar as modalidades de relação:', response.statusText);
+            console.error('Erro ao buscar os status:', response.statusText);
         }
     } catch (error) {
-        console.error('Erro ao buscar as modalidades de relação:', error);
+        console.error('Erro ao buscar os status:', error);
     }
 };
 
 onMounted(async () => {
-    await fetchModalidades();
+    await fetchStatus();
 });
 
-watch(internalSelectedModalidade, (newVal) => {
+watch(internalSelectedStatus, (newVal) => {
     emit('update:modelValue', newVal);
 });
 
 function emitSelection() {
-    emit('update:modelValue', internalSelectedModalidade.value);
+    emit('update:modelValue', internalSelectedStatus.value);
 }
 </script>
