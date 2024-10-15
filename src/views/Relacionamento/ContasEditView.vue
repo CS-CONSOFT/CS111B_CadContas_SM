@@ -24,7 +24,7 @@
                         </v-col>
                     </v-row>
                     <v-row class="d-flex justify-space-between pa-2">
-                        <v-col cols="2">Select</v-col>
+                        <v-col cols="2"> </v-col>
                         <v-col cols="2">
                             <cs_SelectMRelacionamento v-model="BB012_Mrel" Prm_etiqueta="Modalidade" :Prm_isObrigatorio="false" />
                         </v-col>
@@ -93,6 +93,7 @@
                                         :Prm_limpavel="false"
                                         :Prm_isObrigatorio="false"
                                         type="date"
+                                        readonly
                                     />
                                 </v-col>
                             </div>
@@ -113,7 +114,7 @@
                                 <v-col cols="6" class="pa-0 pl-4">
                                     <InputTexto
                                         v-model="BB012.BB012_FaxCelular"
-                                        Prm_etiqueta="Fax Celular"
+                                        Prm_etiqueta="Celular"
                                         :Prm_limpavel="false"
                                         :Prm_isObrigatorio="false"
                                     />
@@ -201,30 +202,21 @@
                                     />
                                 </v-col>
                                 <v-col cols="6" class="pa-0 pl-4">
-                                    <InputTexto
+                                    <cs_SelectPaises
                                         v-model="BB01206.BB012_Codigo_Pais"
-                                        Prm_etiqueta="País"
-                                        :Prm_limpavel="false"
-                                        :Prm_isObrigatorio="false"
+                                        @update:modelValue="onPaisSelecionado"
+                                        class="mb-6"
+                                        :Prm_isObrigatorio="true"
+                                        :rules="rules.nome"
                                     />
                                 </v-col>
                             </div>
                             <div class="d-flex">
                                 <v-col cols="6" class="pa-0">
-                                    <InputTexto
-                                        v-model="BB01206.BB012_UF"
-                                        Prm_etiqueta="UF"
-                                        :Prm_limpavel="false"
-                                        :Prm_isObrigatorio="false"
-                                    />
+                                    <cs_SelectUF :selectedPais="BB01206.BB012_Codigo_Pais" v-model="BB01206.BB012_UF" class="mb-6" />
                                 </v-col>
                                 <v-col cols="6" class="pa-0 pl-4">
-                                    <InputTexto
-                                        v-model="BB01206.BB012_Codigo_Cidade"
-                                        Prm_etiqueta="Cidade"
-                                        :Prm_limpavel="false"
-                                        :Prm_isObrigatorio="false"
-                                    />
+                                    <cs_SelectCidades :selectedUF="BB01206.BB012_UF" v-model="BB01206.BB012_Codigo_Cidade" class="mb-5" />
                                 </v-col>
                             </div>
                         </v-col>
@@ -239,8 +231,6 @@
                     </v-row>
                     <v-row class="d-flex mt-5 px-4">
                         <v-col cols="6">
-                            <InputTexto v-model="BB01202.BB012_CPF" Prm_etiqueta="CPF" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
-
                             <v-col cols="12" class="d-flex px-0 py-0">
                                 <cs_SelectZona
                                     class="mb-5"
@@ -250,37 +240,39 @@
                                     :Prm_isObrigatorio="false"
                                 />
 
-                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                             </v-col>
                             <v-col cols="12" class="d-flex px-0 py-0">
-                                <InputTexto
+                                <cs_SelectZona
+                                    class="mb-5"
                                     v-model="BB01201.BB012_EntMtgRotaID"
                                     Prm_etiqueta="Entrega Montagem Rota"
                                     :Prm_limpavel="false"
                                     :Prm_isObrigatorio="false"
                                 />
-                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                             </v-col>
-                        </v-col>
-                        <v-col cols="6">
+
                             <v-col cols="12" class="d-flex px-0 py-0">
-                                <InputTexto
+                                <cs_SelectZona
+                                    class="mb-5"
                                     v-model="BB01201.BB012_VendaRotaID"
                                     Prm_etiqueta="Venda Rota"
                                     :Prm_limpavel="false"
                                     :Prm_isObrigatorio="false"
                                 />
-                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                             </v-col>
+                        </v-col>
+                        <v-col cols="6">
+                            <InputTexto v-model="BB01202.BB012_CPF" Prm_etiqueta="CPF" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
 
-                            <InputTexto
+                            <cs_InputValor
                                 v-model="BB01201.BB012_LimiteCredito"
                                 Prm_etiqueta="Limite de Crédito"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
+                                :Prm_Precision="2"
                             />
                         </v-col>
                     </v-row>
@@ -308,12 +300,12 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
+import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
 import { GetContaById } from '../../services/contas/bb012_conta';
 // Import de types
 import type { ContaById } from '../../types/crm/bb012_GetContaById';
 import type { BB01206, BB012, BB01202, BB01201 } from '../../views/Relacionamento/bb012_Types';
-import type { User } from '../../types/login/Login';
 //Import de componentes
 import InputTexto from '../../components/campos/cs_InputTexto.vue';
 import cs_SelectMRelacionamento from '../../components/selects/cs_SelectMRelacionamento.vue';
@@ -322,6 +314,10 @@ import cs_SelectClasse from '../../components/selects/cs_SelectClasse.vue';
 import cs_SelectStatus from '../../components/selects/cs_SelectStatus.vue';
 import cs_SelectSituacao from '../../components/selects/cs_SelectSituacao.vue';
 import cs_SelectZona from '../../components/selects/cs_SelectZona.vue';
+import cs_SelectPaises from '../../submodules/cs_components/src/components/selects/cs_SelectPaises.vue';
+import cs_SelectUF from '../../submodules/cs_components/src/components/selects/cs_SelectUF.vue';
+import cs_SelectCidades from '../../submodules/cs_components/src/components/selects/cs_SelectCidades.vue';
+import cs_InputValor from '../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
 
 const props = defineProps<{
     id: string;
@@ -499,10 +495,16 @@ const BB012_Classe = ref<any>('');
 const BB012_Status = ref<any>('');
 const BB012_Situacao = ref<any>('');
 
+const user = getUserFromLocalStorage();
+
 //Variaveis do Snackbar
 const snackbar = ref(false);
 const snackbarMessage = ref('');
 const snackbarColor = ref('');
+
+const onPaisSelecionado = (value: any) => {
+    BB01206.value.BB012_Codigo_Pais = value;
+};
 
 const formRef = ref<any>(null);
 const rules = {
@@ -511,22 +513,6 @@ const rules = {
 };
 
 //Funções
-function getUserFromLocalStorage(): User | null {
-    const storedUser = localStorage.getItem('user');
-
-    if (storedUser) {
-        try {
-            return JSON.parse(storedUser) as User;
-        } catch (e) {
-            console.error('Erro ao parsear o usuário do localStorage', e);
-            return null;
-        }
-    }
-
-    return null;
-}
-const user = getUserFromLocalStorage();
-
 const showSnackbar = (message: string, color: string) => {
     snackbarMessage.value = message;
     snackbarColor.value = color;

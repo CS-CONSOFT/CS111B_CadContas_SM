@@ -242,29 +242,28 @@
                                                     :Prm_limpavel="false"
                                                     :Prm_isObrigatorio="false"
                                                 />
-                                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                                             </v-col>
 
                                             <v-col cols="12" class="d-flex px-0 py-0">
-                                                <InputTexto
+                                                <cs_SelectZona
+                                                    class="mb-5"
                                                     v-model="BB01201.BB012_EntMtgRotaID"
                                                     Prm_etiqueta="Entrega Montagem Rota"
                                                     :Prm_limpavel="false"
                                                     :Prm_isObrigatorio="false"
                                                 />
-                                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                                             </v-col>
 
                                             <v-col cols="12" class="d-flex px-0 py-0">
-                                                <InputTexto
+                                                <cs_SelectZona
+                                                    class="mb-5"
                                                     v-model="BB01201.BB012_VendaRotaID"
                                                     Prm_etiqueta="Venda Rota"
                                                     :Prm_limpavel="false"
                                                     :Prm_isObrigatorio="false"
                                                 />
-                                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                                             </v-col>
 
@@ -276,7 +275,6 @@
                                                     :Prm_limpavel="false"
                                                     :Prm_isObrigatorio="false"
                                                 />
-                                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                                             </v-col>
 
@@ -330,18 +328,17 @@
                                                     :Prm_limpavel="false"
                                                     :Prm_isObrigatorio="false"
                                                 />
-                                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                                             </v-col>
 
                                             <v-col cols="12" class="d-flex px-0 py-0">
-                                                <InputTexto
+                                                <cs_SelectCondicaoPagto
+                                                    class="mb-6"
                                                     v-model="BB01201.BB012_CondPagtoID"
                                                     Prm_etiqueta="Condição de Pagamento"
                                                     :Prm_limpavel="false"
                                                     :Prm_isObrigatorio="false"
                                                 />
-                                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                                             </v-col>
 
@@ -388,27 +385,6 @@
 
                                     <v-row class="d-flex mt-5 px-4">
                                         <v-col cols="6">
-                                            <InputTexto
-                                                v-model="BB01201"
-                                                Prm_etiqueta="Status Conta"
-                                                :Prm_limpavel="false"
-                                                :Prm_isObrigatorio="false"
-                                            />
-
-                                            <InputTexto
-                                                v-model="BB01201"
-                                                Prm_etiqueta="Situação Conta"
-                                                :Prm_limpavel="false"
-                                                :Prm_isObrigatorio="false"
-                                            />
-
-                                            <InputTexto
-                                                v-model="BB01201"
-                                                Prm_etiqueta="Entrada Situação"
-                                                :Prm_limpavel="false"
-                                                :Prm_isObrigatorio="false"
-                                            />
-
                                             <v-col cols="12" class="d-flex px-0 py-0">
                                                 <cs_SelectCategoria
                                                     class="mb-6"
@@ -417,7 +393,6 @@
                                                     :Prm_limpavel="false"
                                                     :Prm_isObrigatorio="false"
                                                 />
-                                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                                             </v-col>
 
@@ -441,15 +416,15 @@
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
                                             />
-                                        </v-col>
-                                        <v-col cols="6">
+
                                             <InputTexto
                                                 v-model="BB01201.BB012_LimCreditoSecun"
                                                 Prm_etiqueta="Crédito Secundário"
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
                                             />
-
+                                        </v-col>
+                                        <v-col cols="6">
                                             <InputTexto
                                                 v-model="BB01201.BB012_LimiteCredParcela"
                                                 Prm_etiqueta="Limite de Crédito por Parcelas"
@@ -522,6 +497,7 @@ import InputTexto from '../../components/campos/cs_InputTexto.vue';
 import cs_SelectZona from '../../components/selects/cs_SelectZona.vue';
 import cs_SelectAtividade from '../../components/selects/cs_SelectAtividade.vue';
 import cs_SelectCategoria from '../../components/selects/cs_SelectCategoria.vue';
+import cs_SelectCondicaoPagto from '../../submodules/cs_components/src/components/selects/cs_SelectCondicaoPagto.vue';
 
 const props = defineProps<{
     id: string;
