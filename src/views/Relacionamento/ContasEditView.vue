@@ -12,7 +12,7 @@
             <v-card class="px-4 py-2 border" elevation="0">
                 <v-row class="d-flex flex-row-reverse my-2">
                     <v-col cols="auto">
-                        <v-btn color="primary" @click="">Salvar</v-btn>
+                        <v-btn color="primary" @click="salvarConta()">Salvar</v-btn>
                         <v-btn color="error" :to="'/Contas'" class="ml-4">Cancelar</v-btn>
                     </v-col>
                 </v-row>
@@ -26,19 +26,23 @@
                     <v-row class="d-flex justify-space-between pa-2">
                         <v-col cols="2"> </v-col>
                         <v-col cols="2">
-                            <cs_SelectMRelacionamento v-model="BB012_Mrel" Prm_etiqueta="Modalidade" :Prm_isObrigatorio="false" />
+                            <cs_SelectMRelacionamento
+                                v-model="BB012.BB012_ModRelacao_ID"
+                                Prm_etiqueta="Modalidade"
+                                :Prm_isObrigatorio="false"
+                            />
                         </v-col>
                         <v-col cols="2">
-                            <cs_SelectGrupo v-model="BB012_Grupo" Prm_etiqueta="Grupo" :Prm_isObrigatorio="false" />
+                            <cs_SelectGrupo v-model="BB012.BB012_Grupoconta_ID" Prm_etiqueta="Grupo" :Prm_isObrigatorio="false" />
                         </v-col>
                         <v-col cols="2">
-                            <cs_SelectClasse v-model="BB012_Classe" Prm_etiqueta="Classe" :Prm_isObrigatorio="false" />
+                            <cs_SelectClasse v-model="BB012.BB012_ClasseConta_ID" Prm_etiqueta="Classe" :Prm_isObrigatorio="false" />
                         </v-col>
                         <v-col cols="2">
-                            <cs_SelectStatus v-model="BB012_Status" Prm_etiqueta="Status" :Prm_isObrigatorio="false" />
+                            <cs_SelectStatus v-model="BB012.BB012_StatusConta_ID" Prm_etiqueta="Status" :Prm_isObrigatorio="false" />
                         </v-col>
                         <v-col cols="2">
-                            <cs_SelectSituacao v-model="BB012_Situacao" Prm_etiqueta="Situação" :Prm_isObrigatorio="false" />
+                            <cs_SelectSituacao v-model="BB012.BB012_Sit_Conta_ID" Prm_etiqueta="Situação" :Prm_isObrigatorio="false" />
                         </v-col>
                     </v-row>
 
@@ -287,13 +291,20 @@
                 </v-row>
                 <v-row class="d-flex flex-row-reverse my-2">
                     <v-col cols="auto">
-                        <v-btn color="primary" @click="">Salvar</v-btn>
+                        <v-btn color="primary" @click="salvarConta()">Salvar</v-btn>
                         <v-btn color="error" :to="'/Contas'" class="ml-4">Cancelar</v-btn>
                     </v-col>
                 </v-row>
             </v-card>
         </v-form>
     </v-container>
+
+    <v-snackbar v-model="snackbar" :timeout="3000" top v-bind:color="snackbarColor" multi-line>
+        {{ snackbarMessage }}
+        <template v-slot:actions>
+            <v-btn color="white" icon="mdi-close" @click="snackbar = false"></v-btn>
+        </template>
+    </v-snackbar>
 </template>
 <script setup lang="ts">
 // Import de bibliotecas e etc...
@@ -302,10 +313,11 @@ import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { GetContaById } from '../../services/contas/bb012_conta';
+import { GetContaById, SaveContaCompleto } from '../../services/contas/bb012_conta';
 // Import de types
 import type { ContaById } from '../../types/crm/bb012_GetContaById';
 import type { BB01206, BB012, BB01202, BB01201 } from '../../views/Relacionamento/bb012_Types';
+import type { Csicp_bb012, Csicp_bb01201, Csicp_bb01202, Csicp_bb01206 } from '@/services/contas/saveConta';
 //Import de componentes
 import InputTexto from '../../components/campos/cs_InputTexto.vue';
 import cs_SelectMRelacionamento from '../../components/selects/cs_SelectMRelacionamento.vue';
@@ -322,8 +334,6 @@ import cs_InputValor from '../../submodules/cs_components/src/components/campos/
 const props = defineProps<{
     id: string;
 }>();
-
-const router = useRouter();
 
 //Variáveis de modelo
 const BB012 = ref<BB012>({
@@ -489,28 +499,20 @@ const BB01206 = ref<BB01206>({
     bb012_email: ''
 });
 
-const BB012_Mrel = ref<any>('');
-const BB012_Grupo = ref<any>('');
-const BB012_Classe = ref<any>('');
-const BB012_Status = ref<any>('');
-const BB012_Situacao = ref<any>('');
-
 const user = getUserFromLocalStorage();
+const tenant = user?.TenantId;
+const router = useRouter();
+const formRef = ref<any>(null);
+
+const rules = {
+    codigo: [validationRules.required, validationRules.numeric],
+    nome: [validationRules.required]
+};
 
 //Variaveis do Snackbar
 const snackbar = ref(false);
 const snackbarMessage = ref('');
 const snackbarColor = ref('');
-
-const onPaisSelecionado = (value: any) => {
-    BB01206.value.BB012_Codigo_Pais = value;
-};
-
-const formRef = ref<any>(null);
-const rules = {
-    codigo: [validationRules.required, validationRules.numeric],
-    nome: [validationRules.required]
-};
 
 //Funções
 const showSnackbar = (message: string, color: string) => {
@@ -519,9 +521,13 @@ const showSnackbar = (message: string, color: string) => {
     snackbar.value = true;
 };
 
+const onPaisSelecionado = (value: any) => {
+    BB01206.value.BB012_Codigo_Pais = value;
+};
+
 const fetchContaById = async (id: string) => {
     try {
-        const data: ContaById = await GetContaById(user?.TenantId, id);
+        const data: ContaById = await GetContaById(tenant, id);
 
         // Acessa os campos BB012
         BB012.value.ID = data.csicp_bb012.csicp_bb012.ID;
@@ -679,18 +685,202 @@ const fetchContaById = async (id: string) => {
         BB01206.value.BB012_Entrega_Pais = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Pais;
         BB01206.value.BB012_Entrega_Perimetro = data.BB01206_Endereco.csicp_bb01206.BB012_Entrega_Perimetro;
         BB01206.value.bb012_Telefone = data.BB01206_Endereco.csicp_bb01206.bb012_Telefone;
-
-        BB012_Mrel.value = data.csicp_bb012.csicp_bb012_MRel.Id;
-        BB012_Grupo.value = data.csicp_bb012.csicp_bb012_GruCta.Id;
-        BB012_Classe.value = data.csicp_bb012.csicp_bb012_ClaCta.Id;
-        BB012_Status.value = data.csicp_bb012.csicp_bb012_StaCta.Id;
-        BB012_Situacao.value = data.csicp_bb012.csicp_bb012_SitCta.Id;
-
-        console.log(data);
     } catch (error) {
         showSnackbar('Erro ao buscar conta.', 'error');
     }
 };
+
+async function salvarConta() {
+    if (formRef.value && formRef.value.validate()) {
+        const csicp_bb012: Csicp_bb012 = {
+            ID: BB012.value.ID,
+            BB012_Codigo: BB012.value.BB012_Codigo,
+            BB012_Nome_Cliente: BB012.value.BB012_Nome_Cliente,
+            BB012_Nome_Fantasia: BB012.value.BB012_Nome_Fantasia,
+            BB012_Data_Aniversario: BB012.value.BB012_Data_Aniversario,
+            BB012_Data_Cadastro: BB012.value.BB012_Data_Cadastro,
+            BB012_Telefone: BB012.value.BB012_Telefone,
+            BB012_FaxCelular: BB012.value.BB012_FaxCelular,
+            BB012_Home_Page: BB012.value.BB012_Home_Page,
+            BB012_Email: BB012.value.BB012_Email,
+            BB012_Data_Entrada_Sit: BB012.value.BB012_Data_Entrada_Sit,
+            BB012_Data_Saida_Sit: BB012.value.BB012_Data_Saida_Sit,
+            BB012_Descricao: BB012.value.BB012_Descricao,
+            BB012_Is_Active: BB012.value.BB012_Is_Active,
+            BB012_Tipo_Conta_ID: BB012.value.BB012_Tipo_Conta_ID,
+            BB012_Grupoconta_ID: BB012.value.BB012_Grupoconta_ID,
+            BB012_ClasseConta_ID: BB012.value.BB012_ClasseConta_ID,
+            BB012_StatusConta_ID: BB012.value.BB012_StatusConta_ID,
+            BB012_Sit_Conta_ID: BB012.value.BB012_Sit_Conta_ID,
+            BB012_ModRelacao_ID: BB012.value.BB012_ModRelacao_ID,
+            BB012_Sequence: BB012.value.BB012_Sequence,
+            bb012_dUltAlteracao: BB012.value.bb012_dUltAlteracao,
+            bb012_EstabCadID: BB012.value.bb012_EstabCadID,
+            bb012_KeyAcess: BB012.value.bb012_KeyAcess,
+            bb012_ID_Indicador: BB012.value.bb012_ID_Indicador,
+            bb012_CountAppMCon: BB012.value.bb012_CountAppMCon,
+            bb012_OriCadastroID: BB012.value.bb012_OriCadastroID
+        };
+
+        const csicp_bb01201: Csicp_bb01201 = {
+            Id: BB01201.value.Id,
+            BB012_ZonaID: BB01201.value.BB012_ZonaID,
+            BB012_AtividadeID: BB01201.value.BB012_AtividadeID,
+            BB012_LimiteCredito: BB01201.value.BB012_LimiteCredito,
+            BB012_LimCreditoSecun: BB01201.value.BB012_LimCreditoSecun,
+            BB012_LimiteCCredito: BB01201.value.BB012_LimiteCCredito,
+            BB012_DiaVenctoCartao: BB01201.value.BB012_DiaVenctoCartao,
+            BB012_ContaConvenio: BB01201.value.BB012_ContaConvenio,
+            BB012_DiasPagtoConv: BB01201.value.BB012_DiasPagtoConv,
+            BB012_PadraoBancoID: BB01201.value.BB012_PadraoBancoID,
+            BB012_BcoAgenciaConta: BB01201.value.BB012_BcoAgenciaConta,
+            BB012_Revenda: BB01201.value.BB012_Revenda,
+            BB012_Taxa_Administracao_Con: BB01201.value.BB012_Taxa_Administracao_Con,
+            BB012_Requisicao: BB01201.value.BB012_Requisicao,
+            BB012_ContaContabil: BB01201.value.BB012_ContaContabil,
+            BB012_HistoricoContabilID: BB01201.value.BB012_HistoricoContabilID,
+            BB012_ContratoCartao: BB01201.value.BB012_ContratoCartao,
+            BB012_DataContratoCartao: BB01201.value.BB012_DataContratoCartao,
+            BB012_DtValidadeCartao: BB01201.value.BB012_DtValidadeCartao,
+            BB012_ModalidadeCredCartao: BB01201.value.BB012_ModalidadeCredCartao,
+            BB012_PercLimCredito: BB01201.value.BB012_PercLimCredito,
+            BB012_PrazoEntregaFornec: BB01201.value.BB012_PrazoEntregaFornec,
+            BB012_CondPagtoFornec: BB01201.value.BB012_CondPagtoFornec,
+            BB012_NatOperacaoID: BB01201.value.BB012_NatOperacaoID,
+            BB012_CondPagtoID: BB01201.value.BB012_CondPagtoID,
+            BB012_TextoNotaId: BB01201.value.BB012_TextoNotaId,
+            BB012_Grau_Risco: BB01201.value.BB012_Grau_Risco,
+            BB012_Classe_Credito: BB01201.value.BB012_Classe_Credito,
+            BB012_DtValidCadastro: BB01201.value.BB012_DtValidCadastro,
+            BB012_Perc_ICMS: BB01201.value.BB012_Perc_ICMS,
+            BB012_CodgCategoria: BB01201.value.BB012_CodgCategoria,
+            BB012_CategoriaID: BB01201.value.BB012_CategoriaID,
+            BB012_LimiteCredParcela: BB01201.value.BB012_LimiteCredParcela,
+            BB012_Num_Ult_Fatura: BB01201.value.BB012_Num_Ult_Fatura,
+            BB012_TotCompraCarnet: BB01201.value.BB012_TotCompraCarnet,
+            BB012_Valor_Entrada: BB01201.value.BB012_Valor_Entrada,
+            BB012_Maior_Compra: BB01201.value.BB012_Maior_Compra,
+            BB012_Menor_Compra: BB01201.value.BB012_Menor_Compra,
+            BB012_TotDiasAtraso: BB01201.value.BB012_TotDiasAtraso,
+            BB012_Maior_Atraso: BB01201.value.BB012_Maior_Atraso,
+            BB012_Menor_Atraso: BB01201.value.BB012_Menor_Atraso,
+            BB012_MediaDeAtraso: BB01201.value.BB012_MediaDeAtraso,
+            BB012_MaiorSaldo: BB01201.value.BB012_MaiorSaldo,
+            BB012_NumCompras: BB01201.value.BB012_NumCompras,
+            BB012_DtPrimCompra: BB01201.value.BB012_DtPrimCompra,
+            BB012_DtUltCompra: BB01201.value.BB012_DtUltCompra,
+            BB012_VlrMaiorPagto: BB01201.value.BB012_VlrMaiorPagto,
+            BB012_NumPagtoDia: BB01201.value.BB012_NumPagtoDia,
+            BB012_NumPagtoAtraso: BB01201.value.BB012_NumPagtoAtraso,
+            BB012_SaldoDevedor: BB01201.value.BB012_SaldoDevedor,
+            BB012_SaldoPedido: BB01201.value.BB012_SaldoPedido,
+            BB012_QtdTitProtestado: BB01201.value.BB012_QtdTitProtestado,
+            BB012_UltProtesto: BB01201.value.BB012_UltProtesto,
+            BB012_QtdChqDevolvido: BB01201.value.BB012_QtdChqDevolvido,
+            BB012_UltChqDevolvido: BB01201.value.BB012_UltChqDevolvido,
+            BB012_Convenio_ID: BB01201.value.BB012_Convenio_ID,
+            BB012_TipoGeracao_ID: BB01201.value.BB012_TipoGeracao_ID,
+            BB012_SitEspecial_ID: BB01201.value.BB012_SitEspecial_ID,
+            BB012_EntMtgRotaID: BB01201.value.BB012_EntMtgRotaID,
+            BB012_VendaRotaID: BB01201.value.BB012_VendaRotaID,
+            bb012_DiaVenctoID: BB01201.value.bb012_DiaVenctoID,
+            bb012_CodgBcoDebConta: BB01201.value.bb012_CodgBcoDebConta
+        };
+
+        const csicp_bb01202: Csicp_bb01202 = {
+            Id: BB01202.value.Id,
+            BB012_CNPJ: BB01202.value.BB012_CNPJ,
+            BB012_InscEstadual: BB01202.value.BB012_InscEstadual,
+            BB012_SUFRAMA: BB01202.value.BB012_SUFRAMA,
+            BB012_RegSUFRAMAValido: BB01202.value.BB012_RegSUFRAMAValido,
+            BB012_RegJuntaComercial: BB01202.value.BB012_RegJuntaComercial,
+            BB012_DataRegJunta: BB01202.value.BB012_DataRegJunta,
+            BB012_Patrimonio: BB01202.value.BB012_Patrimonio,
+            BB012_Capital_Social: BB01202.value.BB012_Capital_Social,
+            BB012_CPF: BB01202.value.BB012_CPF,
+            BB012_RG: BB01202.value.BB012_RG,
+            BB012_ComplementoRG: BB01202.value.BB012_ComplementoRG,
+            BB012_EmissaoRG: BB01202.value.BB012_EmissaoRG,
+            BB012_PIS: BB01202.value.BB012_PIS,
+            BB012_ResideDesde: BB01202.value.BB012_ResideDesde,
+            BB012_NroDependentes: BB01202.value.BB012_NroDependentes,
+            BB012_EmpAdmissao: BB01202.value.BB012_EmpAdmissao,
+            BB012_Emp_Profissao: BB01202.value.BB012_Emp_Profissao,
+            BB012_ValorRemuneracao: BB01202.value.BB012_ValorRemuneracao,
+            BB012_OutrosRendimentos: BB01202.value.BB012_OutrosRendimentos,
+            BB012_OrigemOutrosRend: BB01202.value.BB012_OrigemOutrosRend,
+            BB012_Insc_Est_SNI_ID: BB01202.value.BB012_Insc_Est_SNI_ID,
+            BB012_Sexo_ID: BB01202.value.BB012_Sexo_ID,
+            BB012_EstadoCivil_ID: BB01202.value.BB012_EstadoCivil_ID,
+            BB012_TipoDomicilio_ID: BB01202.value.BB012_TipoDomicilio_ID,
+            BB012_CompResid01_ID: BB01202.value.BB012_CompResid01_ID,
+            BB012_CompResid02_ID: BB01202.value.BB012_CompResid02_ID,
+            BB012_GEscolaridade_ID: BB01202.value.BB012_GEscolaridade_ID,
+            BB012_Ocupacao_Id: BB01202.value.BB012_Ocupacao_Id,
+            BB012_NaturalDe_ID: BB01202.value.BB012_NaturalDe_ID,
+            BB012_TpTributacao_ID: BB01202.value.BB012_TpTributacao_ID,
+            BB012_Ident_Estrangeiro: BB01202.value.BB012_Ident_Estrangeiro,
+            BB012_Empresa: BB01202.value.BB012_Empresa,
+            BB012_Emp_Endereco: BB01202.value.BB012_Emp_Endereco,
+            BB012_Emp_Grupo_ID: BB01202.value.BB012_Emp_Grupo_ID,
+            BB012_MotDesoneracaoID: BB01202.value.BB012_MotDesoneracaoID
+        };
+
+        const csicp_bb01206: Csicp_bb01206 = {
+            Id: BB01206.value.Id,
+            BB012_ID: BB01206.value.BB012_ID,
+            BB012J_EnderecoID: BB01206.value.BB012J_EnderecoID,
+            BB012_Logradouro: BB01206.value.BB012_Logradouro,
+            BB012_Numero: BB01206.value.BB012_Numero,
+            BB012_Complemento: BB01206.value.BB012_Complemento,
+            BB012_Perimetro: BB01206.value.BB012_Perimetro,
+            BB012_CodgBairro: BB01206.value.BB012_CodgBairro,
+            BB012_Bairro: BB01206.value.BB012_Bairro,
+            BB012_Codigo_Cidade: BB01206.value.BB012_Codigo_Cidade,
+            BB012_UF: BB01206.value.BB012_UF,
+            BB012_CEP: BB01206.value.BB012_CEP,
+            BB012_Codigo_Pais: BB01206.value.BB012_Codigo_Pais,
+            BB012_Entrega_Logradouro: BB01206.value.BB012_Entrega_Logradouro,
+            BB012_Entrega_Numero: BB01206.value.BB012_Entrega_Numero,
+            BB012_Entrega_Complement: BB01206.value.BB012_Entrega_Complement,
+            BB012_Entrega_CodgBairro: BB01206.value.BB012_Entrega_CodgBairro,
+            BB012_Entrega_Bairro: BB01206.value.BB012_Entrega_Bairro,
+            BB012_Entrega_Cod_Cidade: BB01206.value.BB012_Entrega_Cod_Cidade,
+            BB012_Entrega_Uf: BB01206.value.BB012_Entrega_Uf,
+            BB012_Entrega_CEP: BB01206.value.BB012_Entrega_CEP,
+            BB012_Entrega_Pais: BB01206.value.BB012_Entrega_Pais,
+            BB012_Entrega_Perimetro: BB01206.value.BB012_Entrega_Perimetro,
+            bb012_Telefone: BB01206.value.bb012_Telefone,
+            bb012_Celular: BB01206.value.bb012_Celular,
+            bb012_email: BB01206.value.bb012_email
+        };
+
+        const In_csicp_bb012_Completo = {
+            csicp_bb012,
+            csicp_bb01201,
+            csicp_bb01202,
+            csicp_bb01206
+        };
+
+        try {
+            const response = await SaveContaCompleto(tenant, In_csicp_bb012_Completo);
+            if (response.data.Str_ReturnErro.Out_IsSuccess) {
+                showSnackbar('Conta atualizada com sucesso', 'success');
+                setTimeout(() => {
+                    router.push({
+                        name: 'Contas'
+                    });
+                }, 2000);
+            } else {
+                showSnackbar(response.data.Out_Message || 'Erro ao editar conta', 'error');
+            }
+        } catch (error) {
+            showSnackbar('Erro inesperado ao editar a conta', 'error');
+        }
+    } else {
+        showSnackbar('Corrija os erros do formulário.', 'error');
+    }
+}
 
 const redirectToEditCompleto = async (id: string) => {
     if (id) {
@@ -707,6 +897,5 @@ const redirectToEditCompleto = async (id: string) => {
 
 onMounted(() => {
     fetchContaById(props.id);
-    getUserFromLocalStorage();
 });
 </script>

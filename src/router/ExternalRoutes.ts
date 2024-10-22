@@ -43,6 +43,15 @@ const CrmRoutes = {
                 title: 'Contas'
             },
             props: true
+        },
+        {
+            name: 'ContasExtras',
+            path: 'ContasExtras/:id?',
+            component: () => import('../../src/views/Relacionamento/ContasExtraView.vue'),
+            meta: {
+                title: 'Extras'
+            },
+            props: true
         }
     ]
 };

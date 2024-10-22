@@ -1,8 +1,9 @@
 import { URLBase } from '../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { ContaCompleta, ApiResponse } from '@/types/crm/bb012_conta';
-import type { ContaById, Csicp_bb012 } from '@/types/crm/bb012_GetContaById';
+import type { ContaCompleta, ApiResponse } from '../../types/crm/bb012_conta';
+import type { ContaById, Csicp_bb012 } from '../../types/crm/bb012_GetContaById';
+import type { Csicp_bb012_Completo } from './saveConta';
 
 function GetContasList(
     tenant: number | undefined,
@@ -48,10 +49,10 @@ const GetContaById = async (tenantId: number | undefined, In_BB012_ID: string): 
     }
 };
 
-const SaveConta = async (tenantId: number | undefined, conta: Csicp_bb012): Promise<AxiosResponse<any>> => {
+const SaveContaCompleto = async (tenantId: number | undefined, conta: Csicp_bb012_Completo): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}/CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb012_Save_Conta`, conta, {
-            params: {
+        const response = await axios.post(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb012_Completo_Save_Conta`, conta, {
+            headers: {
                 Tenant_id: tenantId
             }
         });
@@ -92,4 +93,4 @@ const SoftDeleteConta = async (tenantId: number | undefined, bb012_Id: string): 
     }
 };
 
-export { GetContasList, GetContaById, SaveConta, DeleteConta, SoftDeleteConta };
+export { GetContasList, GetContaById, SaveContaCompleto, DeleteConta, SoftDeleteConta };

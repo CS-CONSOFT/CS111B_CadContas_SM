@@ -197,6 +197,8 @@
 // Import de bibliotecas e etc...
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { validationRules } from '../../utils/ValidationRules';
+import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
 import { DeleteConta, GetContasList, SoftDeleteConta } from '../../services/contas/bb012_conta';
 // Import de Types
@@ -278,20 +280,23 @@ const active = ref(true);
 const count = false;
 const search = ref('');
 
-const tenant = 135;
+const rules = {
+    codigo: [validationRules.required, validationRules.numeric],
+    nome: [validationRules.required]
+};
+
+const user = getUserFromLocalStorage();
+const tenant = user?.TenantId;
 const router = useRouter();
 
 //variaveis da paginação
 const currentPage = ref(1);
-const itemsPerPage = ref(10);
+const itemsPerPage = ref(50);
 const totalItems = ref(0);
 const totalPages = ref(0);
 
 //Variavel para controlar o modo de exibição da tela
 const isListView = ref(true);
-
-// Controle do menu
-const menu = ref(false);
 
 //Variaveis do Snackbar
 const snackbar = ref(false);
@@ -329,14 +334,14 @@ const fetchData = async () => {
             search.value,
             currentPage.value,
             itemsPerPage.value,
-            1,
+            3,
             '',
             ''
         );
         const data = response.data;
         items.value = data.Lista_csicp_bb012.map((item: Lista_csicp_bb012) => ({
             ID: item.csicp_bb012.csicp_bb012.ID,
-            Nome: item.csicp_bb012.csicp_bb012.BB012_Nome_Cliente,
+            Nome: `${item.csicp_bb012.csicp_bb012.BB012_Codigo} - ${item.csicp_bb012.csicp_bb012.BB012_Nome_Cliente}`,
             Endereco: item.BB01206_Endereco.csicp_bb01206.BB012_Logradouro,
             Contato: item.csicp_bb012.csicp_bb012.BB012_FaxCelular,
             Modalidade: item.csicp_bb012.csicp_bb012_MRel.Label,
@@ -359,8 +364,17 @@ const opcoesMenu = [
     {
         nome: () => 'Extras',
         icone: () => 'mdi-plus-circle-outline',
-        acao: (item: Item) => {
-            console.log('Ação 1 selecionada para', item);
+        acao: async (item: { ID: any }) => {
+            if (item && item.ID) {
+                await router.push({
+                    name: 'ContasExtras',
+                    params: {
+                        id: item.ID
+                    }
+                });
+            } else {
+                console.error('Item indefinido');
+            }
         }
     },
     {
