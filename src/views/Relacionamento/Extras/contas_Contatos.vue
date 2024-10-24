@@ -27,8 +27,8 @@
                 <template v-slot:progress>
                     <v-progress-linear v-if="loading" color="blue" height="10" indeterminate></v-progress-linear>
                 </template>
-                <template v-slot:item.actions="{ item }">
-                    <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
+                <template v-slot:item.actions="{ item, index }">
+                    <v-icon small @click="openEditDialog(item, index)" class="v-btn-icon">mdi-pencil</v-icon>
                     <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
                 </template>
             </v-data-table>
@@ -208,7 +208,7 @@ const openDialog = () => {
     itemToEdit.value = null;
 };
 
-const openEditDialog = async (item: Item) => {
+const openEditDialog = async (item: Item, index: number) => {
     dialog.value = true;
     itemToEdit.value = item;
     try {

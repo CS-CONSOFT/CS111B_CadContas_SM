@@ -12,28 +12,28 @@
     <v-card class="border-sm border-opacity-50 mt-1 pa-4" elevation="0">
         <v-tabs v-model="tab" align-tabs="start" color="primary" class="rounded">
             <v-tab value="one">
-                <v-icon icon="mdi-paperclip"></v-icon>
-                Imagens Anexos
-            </v-tab>
-            <v-tab value="two">
                 <v-icon icon="mdi-note-outline"></v-icon>
                 Notas
             </v-tab>
-            <v-tab value="three">
+            <v-tab value="two">
                 <v-icon icon="mdi-currency-usd-off"></v-icon>
                 Retenções Imposto
             </v-tab>
-            <v-tab value="four">
+            <v-tab value="three">
                 <v-icon icon="mdi-phone"></v-icon>
                 Contatos
             </v-tab>
-            <v-tab value="five">
+            <v-tab value="four">
                 <v-icon icon="mdi-domain"></v-icon>
                 Convênio
             </v-tab>
-            <v-tab value="six">
+            <v-tab value="five">
                 <v-icon icon="mdi-account-multiple"></v-icon>
                 Membros
+            </v-tab>
+            <v-tab value="six">
+                <v-icon icon="mdi-magnify"></v-icon>
+                Avalistas
             </v-tab>
             <v-tab value="seven">
                 <v-icon icon="mdi-tab"></v-icon>
@@ -44,12 +44,12 @@
                 Endereços
             </v-tab>
             <v-tab value="nine">
-                <v-icon icon="mdi-magnify"></v-icon>
-                Avalistas
-            </v-tab>
-            <v-tab value="ten">
                 <v-icon icon="mdi-bank"></v-icon>
                 Referência Bancaria
+            </v-tab>
+            <v-tab value="ten">
+                <v-icon icon="mdi-paperclip"></v-icon>
+                Imagens Anexos
             </v-tab>
             <v-tab value="eleven">
                 <v-icon icon="mdi-credit-card"></v-icon>
@@ -59,22 +59,22 @@
         <v-card-text>
             <v-window v-model="tab">
                 <v-window-item value="one">
-                    <contas_ImagensAnexos :id="id" />
-                </v-window-item>
-                <v-window-item value="two">
                     <contas_Notas :id="id" />
                 </v-window-item>
-                <v-window-item value="three">
+                <v-window-item value="two">
                     <contas_RetecaoImposto :id="id" />
                 </v-window-item>
-                <v-window-item value="four">
+                <v-window-item value="three">
                     <contas_Contatos :id="id" />
                 </v-window-item>
-                <v-window-item value="five">
+                <v-window-item value="four">
                     <contas_Convenio :id="id" />
                 </v-window-item>
-                <v-window-item value="six">
+                <v-window-item value="five">
                     <contas_Membros :id="id" />
+                </v-window-item>
+                <v-window-item value="six">
+                    <contas_Avalistas :id="id" />
                 </v-window-item>
                 <v-window-item value="seven">
                     <contas_Bens :id="id" />
@@ -83,10 +83,10 @@
                     <contas_Enderecos :id="id" />
                 </v-window-item>
                 <v-window-item value="nine">
-                    <contas_Avalistas :id="id" />
+                    <contas_ReferenciasBancarias :id="id" />
                 </v-window-item>
                 <v-window-item value="ten">
-                    <contas_ReferenciasBancarias :id="id" />
+                    <contas_ImagensAnexos :id="id" />
                 </v-window-item>
                 <v-window-item value="eleven"></v-window-item>
             </v-window>
@@ -95,8 +95,6 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-// Import de API's
-// Import de types
 //Import de componentes
 import contas_ImagensAnexos from './Extras/contas_ImagensAnexos.vue';
 import contas_Notas from './Extras/contas_Notas.vue';
@@ -113,5 +111,5 @@ const props = defineProps<{
     id: string;
 }>();
 
-const tab = ref(null);
+const tab = ref<string>('one');
 </script>

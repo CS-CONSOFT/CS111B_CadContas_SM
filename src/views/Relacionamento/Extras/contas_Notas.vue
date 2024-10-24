@@ -80,7 +80,6 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
@@ -127,17 +126,14 @@ const props = defineProps<{
 const items = ref<Item[]>([]);
 const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
-const router = useRouter();
 const formRef = ref<any>(null);
 
 const loading = ref(false);
 const search = ref('');
 const dialog = ref(false);
 const confirmDialog = ref(false);
-const confirmSoftDeleteDialog = ref(false);
 const itemToDelete = ref<Item | null>(null);
 const itemToEdit = ref<Item | null>(null);
-const itemToSoftDelete = ref<Item | null>(null);
 
 //Variáveis de edição/adição
 const var_Id = ref('');
@@ -211,7 +207,7 @@ const CreateOrUpdateNota = async () => {
     if (formRef.value.validate()) {
         try {
             const data: Csicp_bb01203 = {
-                Id: var_Id.value,
+                Id: var_Id.value ? var_Id.value : '',
                 BB012_ID: var_bb012_Id.value,
                 BB012_ContatoID: '',
                 BB012_CandidatoID: '',

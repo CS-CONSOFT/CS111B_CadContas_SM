@@ -27,8 +27,8 @@
                 <template v-slot:progress>
                     <v-progress-linear v-if="loading" color="blue" height="10" indeterminate></v-progress-linear>
                 </template>
-                <template v-slot:item.actions="{ item }">
-                    <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
+                <template v-slot:item.actions="{ item, index }">
+                    <v-icon small @click="openEditDialog(item, index)" class="v-btn-icon">mdi-pencil</v-icon>
                     <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
                 </template>
             </v-data-table>
@@ -42,18 +42,29 @@
             </v-card-title>
             <v-card-text>
                 <v-form ref="formRef">
-                    <InputTexto
-                        v-model="var_Membro"
-                        Prm_etiqueta="Bem"
+                    <cs_InputTexto
+                        v-model="var_Descricao"
+                        Prm_etiqueta="Descrição"
                         :Prm_limpavel="false"
                         :Prm_isObrigatorio="true"
                         :rules="rules.nome"
                     />
+
+                    <cs_InputTexto
+                        v-model="var_Proprietario"
+                        Prm_etiqueta="Proprietário"
+                        :Prm_limpavel="false"
+                        :Prm_isObrigatorio="false"
+                    />
+
+                    <cs_InputValor v-model="var_ValorMedio" Prm_etiqueta="Valor Médio" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
+
+                    <cs_InputTexto v-model="var_Telefone" Prm_etiqueta="Telefone" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
                 </v-form>
             </v-card-text>
             <v-card-actions class="d-flex justify-space-around">
                 <cs_BtnCancelar @click="closeDialog" />
-                <cs_BtnSalvar @click="CreateOrUpdateImposto" />
+                <cs_BtnSalvar @click="CreateOrUpdateBens" />
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -80,16 +91,16 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
 import { GetContaById } from '../../../services/contas/bb012_conta';
+import { SaveBens, DeleteBens } from '../../../services/contas/bb012c_Bens/bb012c_bens';
 // Import de types
-import type { ContaById, Bens } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, Bens, Csicp_bb012c } from '../../../types/crm/bb012_GetContaById';
 //Import de componentes
-import InputTexto from '../../../components/campos/cs_InputTexto.vue';
-import cs_InputPercentual from '../../../submodules/cs_components/src/components/campos/cs_InputPercentual.vue';
+import cs_InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
+import cs_InputValor from '../../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnSalvar from '../../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
@@ -97,6 +108,7 @@ import cs_BtnExcluir from '../../../submodules/cs_components/src/components/boto
 
 interface Item {
     ID: string;
+    BB012_ID: string;
     Descricao: string;
     Proprietario: string;
     Valor: number;
@@ -151,7 +163,12 @@ const itemToDelete = ref<Item | null>(null);
 const itemToEdit = ref<Item | null>(null);
 
 //Variáveis de edição/adição
-const var_Membro = ref<string>('');
+const var_Id = ref('');
+const var_bb012_Id = ref('');
+const var_Descricao = ref<string>('');
+const var_Proprietario = ref<string>('');
+const var_ValorMedio = ref<number>(0);
+const var_Telefone = ref<string>('');
 
 const rules = {
     codigo: [validationRules.required, validationRules.numeric],
@@ -176,11 +193,14 @@ const fetchData = async (id: string) => {
         const data: ContaById = await GetContaById(tenant, id);
         items.value = data.Bens.map((item: Bens) => ({
             ID: item.csicp_bb012c.ID,
+            BB012_ID: item.csicp_bb012c.BB012_ID,
             Descricao: item.csicp_bb012c.BB012c_DescEmpresa,
             Proprietario: item.csicp_bb012c.BB012c_ProprietRamo,
             Valor: item.csicp_bb012c.BB012c_Valor_Media
         }));
-        console.log(data);
+
+        //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
+        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
     } catch (error) {
         showSnackbar('Erro ao buscar bem.', 'error');
     } finally {
@@ -195,21 +215,52 @@ const closeDialog = () => {
 const openDialog = () => {
     dialog.value = true;
     itemToEdit.value = null;
+    var_Id.value = '';
+    var_Descricao.value = '';
+    var_Proprietario.value = '';
+    var_ValorMedio.value = 0;
+    var_Telefone.value = '';
 };
 
-const openEditDialog = async (item: Item) => {
+const openEditDialog = async (item: Item, index: number) => {
     dialog.value = true;
     itemToEdit.value = item;
     try {
+        const data: ContaById = await GetContaById(tenant, props.id);
+
+        var_Id.value = data.Bens[index].csicp_bb012c.ID;
+        var_bb012_Id.value = data.Bens[index].csicp_bb012c.BB012_ID;
+        var_Descricao.value = data.Bens[index].csicp_bb012c.BB012c_DescEmpresa;
+        var_Proprietario.value = data.Bens[index].csicp_bb012c.BB012c_ProprietRamo;
+        var_ValorMedio.value = data.Bens[index].csicp_bb012c.BB012c_Valor_Media;
+        var_Telefone.value = data.Bens[index].csicp_bb012c.BB012c_Fone;
     } catch (error) {
         showSnackbar('Erro ao buscar dados do bem', 'error');
     }
 };
 
-const CreateOrUpdateImposto = async () => {
+const CreateOrUpdateBens = async () => {
     if (formRef.value.validate()) {
         try {
-            const data = {};
+            const data: Csicp_bb012c = {
+                ID: var_Id.value ? var_Id.value : '',
+                BB012_ID: var_bb012_Id.value,
+                BB012c_DescEmpresa: var_Descricao.value,
+                BB012c_ProprietRamo: var_Proprietario.value,
+                BB012c_Valor_Media: var_ValorMedio.value,
+                BB012c_Fone: var_Telefone.value,
+                BB012c_Is_Active: true
+            };
+
+            const response = await SaveBens(tenant, data);
+
+            if (response.data.Out_IsSuccess) {
+                showSnackbar('Bem salvo com sucesso', 'success');
+                fetchData(props.id);
+                dialog.value = false;
+            } else {
+                showSnackbar(response.data.Out_Message || 'Falha ao salvar o bem.', 'error');
+            }
         } catch (error) {
             showSnackbar('Erro inesperado ao salvar o bem', 'error');
         }
@@ -230,6 +281,7 @@ const cancelDelete = () => {
 const deleteImpostoConfirmed = async () => {
     if (!itemToDelete.value) return;
     try {
+        await DeleteBens(tenant, itemToDelete.value.ID);
         showSnackbar('Bem excluído com sucesso', 'success');
         fetchData(props.id);
         confirmDialog.value = false;

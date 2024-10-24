@@ -1,8 +1,11 @@
 <template>
     <v-card class="px-4 py-2 border" elevation="0">
-        <v-row class="d-flex my-2">
-            <v-col cols="12" class="d-flex justify-end">
-                <cs_BtnAdicionar @click="openDialog" />
+        <v-row class="d-flex justify-end align-center my-2">
+            <v-col cols="4" class="d-flex justify-end">
+                <cs_SelectContas v-model="var_SelectedConta" Prm_etiqueta="Conta" :modRelacao="1" :Prm_isObrigatorio="false" />
+            </v-col>
+            <v-col cols="auto" class="d-flex justify-end">
+                <cs_BtnAdicionar @click="CreateOrUpdateAvalistas" />
             </v-col>
         </v-row>
 
@@ -28,35 +31,11 @@
                     <v-progress-linear v-if="loading" color="blue" height="10" indeterminate></v-progress-linear>
                 </template>
                 <template v-slot:item.actions="{ item }">
-                    <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
                     <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
                 </template>
             </v-data-table>
         </v-card>
     </v-card>
-
-    <v-dialog v-model="dialog" max-width="500">
-        <v-card>
-            <v-card-title class="pa-4 bg-lightprimary">
-                <span class="text-h5">{{ itemToEdit ? 'Editar' : 'Adicionar' }} Avalistas</span>
-            </v-card-title>
-            <v-card-text>
-                <v-form ref="formRef">
-                    <InputTexto
-                        v-model="var_Convenio"
-                        Prm_etiqueta="Convênio"
-                        :Prm_limpavel="false"
-                        :Prm_isObrigatorio="true"
-                        :rules="rules.nome"
-                    />
-                </v-form>
-            </v-card-text>
-            <v-card-actions class="d-flex justify-space-around">
-                <cs_BtnCancelar @click="closeDialog" />
-                <cs_BtnSalvar @click="CreateOrUpdateImposto" />
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
 
     <v-dialog v-model="confirmDialog" max-width="400">
         <v-card>
@@ -80,23 +59,22 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
 import { GetContaById } from '../../../services/contas/bb012_conta';
+import { SaveMembroConvAvalista, DeleteMembroConvAvalista } from '../../../services/contas/bb01207_MembroConvenio/bb1207_membroconvenio';
 // Import de types
-import type { ContaById, Avalistas } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, Avalistas, Csicp_bb01207 } from '../../../types/crm/bb012_GetContaById';
 //Import de componentes
-import InputTexto from '../../../components/campos/cs_InputTexto.vue';
-import cs_InputPercentual from '../../../submodules/cs_components/src/components/campos/cs_InputPercentual.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
-import cs_BtnSalvar from '../../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
 import cs_BtnExcluir from '../../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
+import cs_SelectContas from '../../../submodules/cs_components/src/components/selects/cs_SelectContas.vue';
 
 interface Item {
     ID: string;
+    BB012_ID: string;
     Avalista: string;
 }
 
@@ -125,17 +103,17 @@ const props = defineProps<{
 const items = ref<Item[]>([]);
 const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
-const formRef = ref<any>(null);
 
 const loading = ref(false);
 const search = ref<string>('');
-const dialog = ref<boolean>(false);
 const confirmDialog = ref<boolean>(false);
 const itemToDelete = ref<Item | null>(null);
-const itemToEdit = ref<Item | null>(null);
 
 //Variáveis de edição/adição
-const var_Convenio = ref<string>('');
+const var_Id = ref<string>('');
+const var_bb012_Id = ref<string>('');
+const var_SelectedConta = ref<string>('');
+const var_TipRegistro = ref<number>(3);
 
 const rules = {
     codigo: [validationRules.required, validationRules.numeric],
@@ -160,9 +138,12 @@ const fetchData = async (id: string) => {
         const data: ContaById = await GetContaById(tenant, id);
         items.value = data.Avalistas.map((item: Avalistas) => ({
             ID: item.csicp_bb01207.Id,
+            BB012_ID: item.csicp_bb01207.BB012_ID,
             Avalista: item.csicp_bb012.BB012_Nome_Cliente
         }));
-        console.log(data);
+
+        //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
+        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
     } catch (error) {
         showSnackbar('Erro ao buscar avalista.', 'error');
     } finally {
@@ -170,33 +151,31 @@ const fetchData = async (id: string) => {
     }
 };
 
-const closeDialog = () => {
-    dialog.value = false;
-};
-
-const openDialog = () => {
-    dialog.value = true;
-    itemToEdit.value = null;
-};
-
-const openEditDialog = async (item: Item) => {
-    dialog.value = true;
-    itemToEdit.value = item;
-    try {
-    } catch (error) {
-        showSnackbar('Erro ao buscar dados do avalista', 'error');
-    }
-};
-
-const CreateOrUpdateImposto = async () => {
-    if (formRef.value.validate()) {
+const CreateOrUpdateAvalistas = async () => {
+    if (var_SelectedConta.value != '') {
         try {
-            const data = {};
+            const data: Csicp_bb01207 = {
+                Id: var_Id.value ? var_Id.value : '',
+                BB012_Tipo_Reg_MembroConveni: var_TipRegistro.value,
+                BB012_ID: var_bb012_Id.value,
+                BB012_MembroID: var_SelectedConta.value,
+                BB01207_Is_Active: true
+            };
+
+            const response = await SaveMembroConvAvalista(tenant, data);
+
+            if (response.data.Out_IsSuccess) {
+                showSnackbar('Avalista salva com sucesso', 'success');
+                fetchData(props.id);
+                var_SelectedConta.value = '';
+            } else {
+                showSnackbar(response.data.Out_Message || 'Falha ao salvar o avalista. Verifique os dados.', 'error');
+            }
         } catch (error) {
             showSnackbar('Erro inesperado ao salvar o avalista', 'error');
         }
     } else {
-        showSnackbar('Corrija os erros do formulário.', 'error');
+        showSnackbar('Selecione uma conta antes de adicionar/atualizar.', 'error');
     }
 };
 
@@ -212,6 +191,7 @@ const cancelDelete = () => {
 const deleteImpostoConfirmed = async () => {
     if (!itemToDelete.value) return;
     try {
+        await DeleteMembroConvAvalista(tenant, itemToDelete.value.ID);
         showSnackbar('Avalista excluído com sucesso', 'success');
         fetchData(props.id);
         confirmDialog.value = false;
