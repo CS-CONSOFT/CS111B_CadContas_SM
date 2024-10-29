@@ -1,4 +1,4 @@
-export interface OutrosEnderecos {
+export interface OutrosEnderecosType {
     csicp_bb012j: Csicp_bb012j;
     csicp_bb01206: Csicp_bb01206;
 }

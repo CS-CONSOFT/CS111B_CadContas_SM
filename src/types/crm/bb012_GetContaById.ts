@@ -12,6 +12,8 @@ export interface ContaById {
     Avalistas: Avalistas[];
     Bens: Bens[];
     DadosBancarios: DadosBancarios[];
+    GED_List: GED_List[];
+    MeuCrediario: MeuCrediario[];
 }
 
 export interface Csicp_bb012 {
@@ -1078,4 +1080,32 @@ export interface Csicp_bb012q {
     BB012_HomePage: string;
     BB012_Email: string;
     bb012q_Is_Active: boolean;
+}
+
+export interface GED_List {
+    ID: string;
+    BB012_ID: string;
+    BB012_ContatoID: string;
+    BB012_CandidatoID: string;
+    BB043_CampanhaID: string;
+    BB042_PotencialID: string;
+    BB040_AtividadeID: string;
+    BB041_CasoID: string;
+    BB012m_Codigo_Cliente: number;
+    BB012m_Descricao: string;
+    BB012m_Content: string;
+    BB012m_FileType: string;
+    BB012m_Filename: string;
+    BB012M_Is_Active: boolean;
+    bb012m_TipoDoctoID: number;
+    bb012m_DoctoID: number;
+    bb012m_DataDocto: string;
+    bb012m_Path: string;
+}
+
+export interface MeuCrediario {
+    Id: number;
+    bb012_ContaId: string;
+    bb01209_DataReg: string;
+    bb01209_json: string;
 }

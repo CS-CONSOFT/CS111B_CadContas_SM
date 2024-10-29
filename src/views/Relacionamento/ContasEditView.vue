@@ -154,13 +154,12 @@
                     <v-row class="d-flex mt-5 px-4">
                         <v-col col="6">
                             <v-col cols="12" class="d-flex px-0 py-0">
-                                <InputTexto
-                                    v-model="BB01206.BB012_CEP"
-                                    Prm_etiqueta="CEP"
-                                    :Prm_limpavel="false"
+                                <cs_InputCep
+                                    :initialCep="BB01206.BB012_CEP"
+                                    :readonly="false"
                                     :Prm_isObrigatorio="false"
+                                    @cep-info="handleCepInfo"
                                 />
-                                <v-btn class="v-btn-icon ml-4" icon="mdi-magnify"></v-btn>
                             </v-col>
 
                             <div class="d-flex">
@@ -318,6 +317,7 @@ import { GetContaById, SaveContaCompleto } from '../../services/contas/bb012_con
 import type { ContaById } from '../../types/crm/bb012_GetContaById';
 import type { BB01206, BB012, BB01202, BB01201 } from '../../views/Relacionamento/bb012_Types';
 import type { Csicp_bb012, Csicp_bb01201, Csicp_bb01202, Csicp_bb01206 } from '@/services/contas/saveConta';
+import type { CEP } from '../../submodules/cs_components/src/types/enderecamento/CepTypes';
 //Import de componentes
 import InputTexto from '../../components/campos/cs_InputTexto.vue';
 import cs_SelectMRelacionamento from '../../components/selects/cs_SelectMRelacionamento.vue';
@@ -330,6 +330,7 @@ import cs_SelectPaises from '../../submodules/cs_components/src/components/selec
 import cs_SelectUF from '../../submodules/cs_components/src/components/selects/cs_SelectUF.vue';
 import cs_SelectCidades from '../../submodules/cs_components/src/components/selects/cs_SelectCidades.vue';
 import cs_InputValor from '../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
+import cs_InputCep from '../../submodules/cs_components/src/components/campos/cs_InputCep.vue';
 
 const props = defineProps<{
     id: string;
@@ -519,6 +520,12 @@ const showSnackbar = (message: string, color: string) => {
     snackbarMessage.value = message;
     snackbarColor.value = color;
     snackbar.value = true;
+};
+
+const handleCepInfo = (info: CEP) => {
+    BB01206.value.BB012_Logradouro = info.logradouro || '';
+    BB01206.value.BB012_Bairro = info.bairro || '';
+    BB01206.value.BB012_Complemento = info.complemento || '';
 };
 
 const onPaisSelecionado = (value: any) => {

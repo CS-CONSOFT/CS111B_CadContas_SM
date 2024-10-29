@@ -27,13 +27,6 @@
                 <template v-slot:progress>
                     <v-progress-linear v-if="loading" color="blue" height="10" indeterminate></v-progress-linear>
                 </template>
-                <template v-slot:item.Tipo="{ item }">
-                    <span v-if="item.Tipo === 1">Principal</span>
-                    <span v-else-if="item.Tipo === 2">Entrega</span>
-                    <span v-else-if="item.Tipo === 3">Cobrança</span>
-                    <span v-else>Outros</span>
-                </template>
-
                 <template v-slot:item.actions="{ item, index }">
                     <v-icon small @click="openEditDialog(item, index)" class="v-btn-icon">mdi-pencil</v-icon>
                     <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
@@ -186,6 +179,7 @@ import { SaveOutrosEnderecos, DeleteOutrosEnderecos } from '../../../services/co
 // Import de types
 import type { ContaById, Csicp_bb012062, Csicp_bb012j, Outros_Endereco } from '../../../types/crm/bb012_GetContaById';
 import type { CEP } from '../../../submodules/cs_components/src/types/enderecamento/CepTypes';
+import type { OutrosEnderecosType } from '../../../services/contas/bb012j_OutrosEnderecos/bb012j_enderecoTypes';
 //Import de componentes
 import cs_InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
@@ -201,7 +195,7 @@ import cs_SelectTpEndereco from '../../../submodules/cs_components/src/component
 interface Item {
     ID: string;
     BB012_ID: string;
-    Tipo: number;
+    Tipo: string;
     Cidade: string;
     Logradouro: string;
     Email: string;
@@ -266,7 +260,7 @@ const itemToEdit = ref<Item | null>(null);
 const var_bb012j = ref('');
 const var_bb01206_Id = ref('');
 const var_bb012_Id = ref('');
-const var_TipoEndereco = ref<any>();
+const var_TipoEndereco = ref<number>();
 const var_Logradouro = ref<string>('');
 const var_Numero = ref<string>('');
 const var_Complemento = ref<string>('');
@@ -314,7 +308,7 @@ const fetchData = async (id: string) => {
         items.value = data.Outros_Endereco.map((item: Outros_Endereco) => ({
             ID: item.csicp_bb012j.ID,
             BB012_ID: item.csicp_bb012j.BB012_ID,
-            Tipo: item.csicp_bb012j_TpEnd.Order,
+            Tipo: item.csicp_bb012j_TpEnd.Label,
             Cidade: item.Endereco.csicp_aa028.AA028_Cidade,
             Logradouro: `${item.Endereco.csicp_bb01206.BB012_Logradouro} - ${item.Endereco.csicp_bb01206.BB012_CEP}`,
             Email: item.csicp_bb012j.BB012j_Email
@@ -389,7 +383,7 @@ const CreateOrUpdateOutrosEnderecos = async () => {
                 BB012j_Telefone: var_Telefone.value,
                 BB012j_Fax: var_Fax.value,
                 BB012j_Email: var_Email.value,
-                BB012j_TipoEndereco: var_TipoEndereco.value
+                BB012j_TipoEndereco: var_TipoEndereco.value!
             };
 
             const BB01206: Csicp_bb012062 = {
@@ -421,12 +415,11 @@ const CreateOrUpdateOutrosEnderecos = async () => {
                 bb012_email: var_Email.value
             };
 
-            const data = {
-                BB012j,
-                BB01206
+            const in_bb012j_OutrosEnd: OutrosEnderecosType = {
+                csicp_bb012j: BB012j,
+                csicp_bb01206: BB01206
             };
-
-            const response = await SaveOutrosEnderecos(tenant, data);
+            const response = await SaveOutrosEnderecos(tenant, in_bb012j_OutrosEnd);
 
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Endereço salvo com sucesso', 'success');

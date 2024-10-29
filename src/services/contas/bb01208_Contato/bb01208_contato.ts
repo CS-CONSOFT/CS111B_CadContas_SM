@@ -17,12 +17,12 @@ const SaveContato = async (tenantId: number | undefined, contato: Csicp_bb01208)
     }
 };
 
-const DeleteContato = async (tenantId: number | undefined, bb01203_Id: string): Promise<AxiosResponse<any>> => {
+const DeleteContato = async (tenantId: number | undefined, bb01208_Id: string): Promise<AxiosResponse<any>> => {
     try {
         const response = await axios.delete(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb01208_Delete_Contato`, {
             headers: {
                 Tenant_id: tenantId,
-                In_BB01203_ID: bb01203_Id
+                In_BB01208_ID: bb01208_Id
             }
         });
         return response;

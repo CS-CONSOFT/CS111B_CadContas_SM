@@ -1,8 +1,9 @@
 import { URLBase } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { OutrosEnderecos } from './bb012j_enderecoTypes';
-const SaveOutrosEnderecos = async (tenantId: number | undefined, endereco: any): Promise<AxiosResponse<any>> => {
+import type { OutrosEnderecosType } from './bb012j_enderecoTypes';
+
+const SaveOutrosEnderecos = async (tenantId: number | undefined, endereco: OutrosEnderecosType): Promise<AxiosResponse<any>> => {
     try {
         const response = await axios.post(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb012j_Save_OutrosEndereco`, endereco, {
             headers: {
