@@ -57,7 +57,7 @@ const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma zona')
 
 const formattedZona = computed(() => {
     return [
-        { title: '', value: null },
+        { title: '', value: '' },
         ...zona.value.map((item) => ({
             title: item.BB010_Zona,
             value: item.ID

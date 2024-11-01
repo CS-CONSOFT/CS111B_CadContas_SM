@@ -52,6 +52,30 @@ const CrmRoutes = {
                 title: 'Extras'
             },
             props: true
+        },
+        {
+            name: 'Contatos',
+            path: '/Contatos',
+            component: () => import('../../src/views/Contatos/ContatosView.vue'),
+            meta: {
+                title: 'Contatos'
+            }
+        },
+        {
+            name: 'Zonas',
+            path: '/Zonas',
+            component: () => import('../../src/views/Zonas/ZonasView.vue'),
+            meta: {
+                title: 'Zonas'
+            }
+        },
+        {
+            name: 'Atividades',
+            path: '/Atividades',
+            component: () => import('../../src/views/Atividades/AtividadesView.vue'),
+            meta: {
+                title: 'Atividades'
+            }
         }
     ]
 };

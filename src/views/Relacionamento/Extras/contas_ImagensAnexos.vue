@@ -27,6 +27,17 @@
                 <template v-slot:progress>
                     <v-progress-linear v-if="loading" color="blue" height="10" indeterminate></v-progress-linear>
                 </template>
+                <template v-slot:item.Imagem="{ item }">
+                    <v-row no-gutters class="d-flex justify-center">
+                        <v-col cols="auto">
+                            <v-img v-if="item.ImagemPath" :width="160" aspect-ratio="16/9" cover :src="item.ImagemPath" />
+
+                            <a :href="'data:image/jpeg;base64,' + item.Imagem" target="_blank" download="imagem.jpg">
+                                <v-img :width="160" aspect-ratio="16/9" cover :src="'data:image/jpeg;base64,' + item.Imagem" />
+                            </a>
+                        </v-col>
+                    </v-row>
+                </template>
                 <template v-slot:item.actions="{ item }">
                     <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
                 </template>
@@ -36,24 +47,23 @@
 
     <v-dialog v-model="dialog" max-width="500">
         <v-card>
-            <v-card-title class="pa-4 bg-lightprimary">
-                <span class="text-h5">{{ itemToEdit ? 'Editar' : 'Adicionar' }} Nota</span>
-            </v-card-title>
-            <v-card-text>
-                <v-form ref="formRef">
-                    <InputTexto
-                        v-model="var_Imagem"
-                        Prm_etiqueta="Nota"
-                        :Prm_limpavel="false"
-                        :Prm_isObrigatorio="true"
-                        :rules="rules.nome"
-                    />
-                </v-form>
-            </v-card-text>
-            <v-card-actions class="d-flex justify-space-around">
-                <cs_BtnCancelar @click="closeDialog" />
-                <cs_BtnSalvar @click="" />
-            </v-card-actions>
+            <v-form ref="formRef">
+                <cs_uploadImage :token="ETokenGenericoLabel.CDN_AWS" @close-dialog="close" @on-image-upload="vincularImagem">
+                    >
+                    <template #image-options>
+                        <v-card-subtitle> Selecione o tipo de anexo </v-card-subtitle>
+                        <v-col>
+                            <!-- Seletor para escolher o tipo de imagem -->
+                            <cs_SelectTpAnexos
+                                class="mb-5"
+                                v-model="var_SelectedTpAnexo"
+                                Prm_etiqueta="Tipo de Anexo"
+                                :Prm_isObrigatorio="false"
+                            />
+                        </v-col>
+                    </template>
+                </cs_uploadImage>
+            </v-form>
         </v-card>
     </v-dialog>
 
@@ -64,7 +74,7 @@
             <v-card-actions class="d-flex justify-space-around">
                 <v-spacer></v-spacer>
                 <cs_BtnCancelar @click="cancelDelete" />
-                <cs_BtnExcluir @click="" />
+                <cs_BtnExcluir @click="deleteImg" />
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -81,26 +91,48 @@
 import { ref, onMounted } from 'vue';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
+import { ETokenGenericoLabel } from '@/utils/EnumTokenGenerico';
 // Import de API's
 import { GetContaById } from '../../../services/contas/bb012_conta';
+import GetTokenGenerico from '../../../services/token/token';
+import { helperHandleUploadImg } from '../../../services/cdn/cs_UploadImgHelper';
+import { SaveAnexos, DeleteAnexos } from '../../../services/contas/bb012m_Anexos/bb012m_anexos';
+import { getListEstaticasBB } from '../../../submodules/cs_components/src/services/estaticas/estaticas_bb';
 // Import de types
 import type { ContaById, GED_List } from '../../../types/crm/bb012_GetContaById';
+import type { TokenGenerico } from '../../../types/token/TokenTypes';
+import type { Csicp_bb012m } from '../../../types/crm/bb012_GetContaById';
 //Import de componentes
 import InputTexto from '../../../components/campos/cs_InputTexto.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnSalvar from '../../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
 import cs_BtnExcluir from '../../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
+import cs_uploadImage from '../../../submodules/cs_components/src/components/upload/cs_uploadImage.vue';
+import cs_SelectTpAnexos from '../../../components/selects/cs_SelectTpAnexos.vue';
 
 interface Item {
     ID: string;
     BB012_ID: string;
+    ImagemPath: string;
     Imagem: string;
     Nome: string;
     Documento: string;
     TipoDocumento: number;
     TipoArquivo: string;
 }
+
+// Enum para eventos personalizados
+enum EnumEvents {
+    SUCCESS = 'update-success',
+    FALIED = 'update-falied',
+    CLOSE = 'close'
+}
+
+// Define os eventos emitidos pelo componente
+const emit = defineEmits<{
+    (e: EnumEvents.CLOSE): void;
+}>();
 
 //Declaração do Header para montagem da tabela
 const headers = ref([
@@ -164,6 +196,7 @@ const itemToEdit = ref<Item | null>(null);
 const var_Id = ref('');
 const var_bb012_Id = ref('');
 const var_Imagem = ref<string>('');
+const var_SelectedTpAnexo = ref<number>(0);
 
 const rules = {
     codigo: [validationRules.required, validationRules.numeric],
@@ -190,7 +223,8 @@ const fetchData = async (id: string) => {
         items.value = data.GED_List.map((item: GED_List) => ({
             ID: item.ID,
             BB012_ID: item.BB012_ID,
-            Imagem: item.bb012m_Path,
+            ImagemPath: item.bb012m_Path,
+            Imagem: item.BB012m_Content,
             Nome: item.BB012m_Filename,
             Documento: item.BB012m_Descricao,
             TipoDocumento: item.bb012m_TipoDoctoID,
@@ -206,9 +240,59 @@ const fetchData = async (id: string) => {
     }
 };
 
-const closeDialog = () => {
-    dialog.value = false;
-};
+// Função para vincular a imagem selecionada
+async function vincularImagem(selectedImage: File) {
+    sendImg(selectedImage);
+}
+
+async function sendImg(selectedImage: File) {
+    // Salvando imagem no CDN
+    try {
+        const response = await helperHandleUploadImg(selectedImage, ETokenGenericoLabel.CDN_AWS);
+
+        if (response.Out_Success) {
+            // Cria o corpo da requisição com os dados da imagem
+            const data: Csicp_bb012m = {
+                ID: var_Id.value,
+                BB012_ID: var_bb012_Id.value,
+                BB012_ContatoID: '',
+                BB012_CandidatoID: '',
+                BB043_CampanhaID: '',
+                BB042_PotencialID: '',
+                BB040_AtividadeID: '',
+                BB041_CasoID: '',
+                BB012m_Codigo_Cliente: 0,
+                BB012m_Descricao: selectedImage.name,
+                BB012m_Content: response.binary,
+                BB012m_FileType: selectedImage.type,
+                BB012m_Filename: selectedImage.name,
+                BB012M_Is_Active: true,
+                bb012m_TipoDoctoID: var_SelectedTpAnexo.value,
+                bb012m_DoctoID: 0,
+                bb012m_DataDocto: '',
+                bb012m_Path: response.Out_Path
+            };
+
+            // Envia a imagem para o serviço de backend
+            const res = await SaveAnexos(tenant, data);
+
+            // Exibe uma mensagem de sucesso ou erro
+            if (res.data.Out_IsSuccess) {
+                showSnackbar('Anexo salvo com sucesso', 'success');
+                fetchData(props.id);
+            } else {
+                showSnackbar(res.data.Out_Message || 'Falha ao salvar o anexo. Verifique os dados.', 'error');
+            }
+        }
+    } catch (error) {
+        console.error(error);
+        snackbarMessage.value = 'Erro ao fazer o upload da imagem.';
+        snackbarColor.value = 'error';
+    } finally {
+        // Fecha o diálogo e emite um evento de fechamento
+        emit(EnumEvents.CLOSE);
+    }
+}
 
 const openDialog = () => {
     dialog.value = true;
@@ -225,16 +309,23 @@ const cancelDelete = () => {
     confirmDialog.value = false;
 };
 
-const deleteImpostoConfirmed = async () => {
+const deleteImg = async () => {
     if (!itemToDelete.value) return;
     try {
-        showSnackbar('Avalista excluído com sucesso', 'success');
+        await DeleteAnexos(tenant, itemToDelete.value.ID);
+        showSnackbar('Anexo excluído com sucesso', 'success');
         fetchData(props.id);
         confirmDialog.value = false;
     } catch (error) {
-        showSnackbar('Erro ao excluir o avalista', 'error');
+        showSnackbar('Erro ao excluir o anexo', 'error');
     }
 };
+
+// Função para fechar o diálogo
+function close() {
+    dialog.value = false;
+    emit(EnumEvents.CLOSE);
+}
 
 onMounted(() => {
     fetchData(props.id);

@@ -35,6 +35,8 @@
         </v-card>
     </v-card>
 
+
+
     <v-dialog v-model="dialog" max-width="500">
         <v-card>
             <v-card-title class="pa-4 bg-lightprimary">
@@ -42,7 +44,7 @@
             </v-card-title>
             <v-card-text>
                 <v-form ref="formRef">
-                    <InputTexto
+                    <cs_InputTexto
                         v-model="var_Nota"
                         Prm_etiqueta="Nota"
                         :Prm_limpavel="false"
@@ -88,7 +90,7 @@ import { SaveNota, DeleteNota } from '../../../services/contas/bb01203_Nota/bb01
 // Import de types
 import type { ContaById, Csicp_bb01203, Notas } from '../../../types/crm/bb012_GetContaById';
 //Import de componentes
-import InputTexto from '../../../components/campos/cs_InputTexto.vue';
+import cs_InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnSalvar from '../../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';

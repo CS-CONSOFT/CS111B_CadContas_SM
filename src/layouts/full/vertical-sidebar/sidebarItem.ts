@@ -20,6 +20,21 @@ const sidebarItem: Menu[] = [
         title: 'Contas',
         icon: 'mdi-account-multiple-outline',
         to: '/Contas'
+    },
+    {
+        title: 'Contatos',
+        icon: 'mdi-account-multiple-outline',
+        to: '/Contatos'
+    },
+    {
+        title: 'Zonas',
+        icon: 'mdi-account-multiple-outline',
+        to: '/Zonas'
+    },
+    {
+        title: 'Atividades',
+        icon: 'mdi-account-multiple-outline',
+        to: '/Atividades'
     }
 ];
 

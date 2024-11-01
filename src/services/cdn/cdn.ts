@@ -3,6 +3,7 @@ import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 
 export interface PutCsObjectResponse {
+    binary: string;
     Out_Success: boolean;
     Out_Message: string;
     Out_Path: string;

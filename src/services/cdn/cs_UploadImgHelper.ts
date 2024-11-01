@@ -1,12 +1,12 @@
 // Importa o serviço para enviar o arquivo para o CDN e o tipo de resposta esperado
-import PutCsObject, { PutCsObjectResponse } from "@/services/cdn/cdn";
+import PutCsObject, { PutCsObjectResponse } from '@/services/cdn/cdn';
 
 // Importa o tipo para o token genérico e a função para obter o token
-import GetTokenGenerico from "../token/token";
+import GetTokenGenerico from '../token/token';
 
 // Importa os rótulos dos tokens genéricos
-import { ETokenGenericoLabel } from "@/utils/EnumTokenGenerico";
-import { useAuthStore } from "@/stores/auth";
+import { ETokenGenericoLabel } from '@/utils/EnumTokenGenerico';
+import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 
 /**
  * Função para lidar com a mudança do arquivo selecionado.
@@ -26,11 +26,10 @@ export function helperHandleFileChange(event: Event): File {
         // Verifica o formato da imagem selecionada
         const allowedFormats = ['image/jpeg', 'image/png'];
         if (!allowedFormats.includes(file.type)) {
-            throw new Error("Formato de imagem não suportado. Selecione uma imagem JPEG ou PNG.");
+            throw new Error('Formato de imagem não suportado. Selecione uma imagem JPEG ou PNG.');
         }
-
     } else {
-        throw new Error("Nenhuma imagem selecionada.");
+        throw new Error('Nenhuma imagem selecionada.');
     }
     return file;
 }
@@ -44,8 +43,8 @@ export function helperHandleFileChange(event: Event): File {
  * @throws Se ocorrer um erro durante a leitura do arquivo ou o upload
  */
 export async function helperHandleUploadImg(selectedImg: File, token: ETokenGenericoLabel): Promise<PutCsObjectResponse> {
-    const authStore = useAuthStore();
-    const tenant = authStore.user?.TenantId;
+    const user = getUserFromLocalStorage();
+    const tenant = user?.TenantId;
     return new Promise((resolve, reject) => {
         // Cria um FileReader para ler o conteúdo do arquivo
         const reader = new FileReader();

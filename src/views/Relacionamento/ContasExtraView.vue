@@ -88,7 +88,9 @@
                 <v-window-item value="ten">
                     <contas_ImagensAnexos :id="id" />
                 </v-window-item>
-                <v-window-item value="eleven"></v-window-item>
+                <v-window-item value="eleven">
+                    <contas_Crediario :id="id" />
+                </v-window-item>
             </v-window>
         </v-card-text>
     </v-card>
@@ -106,6 +108,7 @@ import contas_Bens from './Extras/contas_Bens.vue';
 import contas_Enderecos from './Extras/contas_Enderecos.vue';
 import contas_Avalistas from './Extras/contas_Avalistas.vue';
 import contas_ReferenciasBancarias from './Extras/contas_ReferenciasBancarias.vue';
+import contas_Crediario from './Extras/contas_Crediario.vue';
 
 const props = defineProps<{
     id: string;
