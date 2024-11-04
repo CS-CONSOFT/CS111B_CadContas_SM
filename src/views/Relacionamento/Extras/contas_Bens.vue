@@ -111,7 +111,7 @@ interface Item {
     BB012_ID: string;
     Descricao: string;
     Proprietario: string;
-    Valor: number;
+    Valor: string;
 }
 
 //Declaração do Header para montagem da tabela
@@ -196,10 +196,10 @@ const fetchData = async (id: string) => {
             BB012_ID: item.csicp_bb012c.BB012_ID,
             Descricao: item.csicp_bb012c.BB012c_DescEmpresa,
             Proprietario: item.csicp_bb012c.BB012c_ProprietRamo,
-            Valor: item.csicp_bb012c.BB012c_Valor_Media
+            Valor: `R$ ${item.csicp_bb012c.BB012c_Valor_Media.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
         }));
 
-        //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
+        // Solução temporária para sempre ter o ID da BB012 preenchido para usar nas APIs.
         var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
     } catch (error) {
         showSnackbar('Erro ao buscar bem.', 'error');

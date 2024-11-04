@@ -139,7 +139,7 @@ interface Item {
     BB012_ID: string;
     Agencia: string;
     Conta: string;
-    Valor: number;
+    Valor: string;
     Telefone: string;
     Email: string;
 }
@@ -244,7 +244,7 @@ const fetchData = async (id: string) => {
             BB012_ID: item.csicp_bb012q.BB012_ID,
             Agencia: item.csicp_bb012q.BB012_Agencia,
             Conta: item.csicp_bb012q.BB012_Conta,
-            Valor: item.csicp_bb012q.BB012_ValorFinanciamento,
+            Valor: `R$ ${item.csicp_bb012q.BB012_ValorFinanciamento.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
             Telefone: item.csicp_bb012q.BB012_Telefone,
             Email: item.csicp_bb012q.BB012_Email
         }));

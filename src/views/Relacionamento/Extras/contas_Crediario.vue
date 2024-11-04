@@ -116,8 +116,6 @@ const fetchData = async (id: string) => {
 
         // Solução temporária para sempre ter o ID da BB012 preenchido para usar nas APIs.
         var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
-
-        console.log(data);
     } catch (error) {
         showSnackbar('Erro ao buscar conta.', 'error');
     } finally {

@@ -33,10 +33,13 @@ const internalSelectedSituacao = ref<number | null>(null);
 const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma situação');
 
 const formattedSituacao = computed(() => {
-    return situacao.value.map((item) => ({
-        title: item.Label,
-        value: item.Id
-    }));
+    return [
+        { title: '', value: 0 },
+        ...situacao.value.map((item) => ({
+            title: item.Label,
+            value: item.Id
+        }))
+    ];
 });
 
 const fetchSituacao = async () => {

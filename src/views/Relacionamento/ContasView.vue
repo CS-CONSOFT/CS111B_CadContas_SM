@@ -6,32 +6,70 @@
                 <v-divider></v-divider>
             </v-row>
 
-            <div class="px-4 mb-5">
-                <v-row class="align-center">
-                    <v-col cols="3">
-                        <v-text-field
-                            v-model="search"
-                            append-inner-icon="mdi-magnify"
-                            label="Pesquisar"
-                            variant="solo-filled"
-                            single-line
-                            hide-details
-                            clearable
-                        />
+            <div class="px-4 mb-2">
+                <v-row class="align-start">
+                    <v-col cols="8" class="d-flex gap-4">
+                        <cs_InputTexto v-model="search" Prm_etiqueta="Nome Cliente" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
+
+                        <cs_InputTexto v-model="search" Prm_etiqueta="Código" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
+
+                        <cs_InputTexto v-model="search" Prm_etiqueta="CPF" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
                     </v-col>
                     <v-spacer></v-spacer>
 
-                    <v-col cols="auto" class="d-flex align-center">
+                    <v-col cols="4" class="d-flex align-center justify-end">
                         <v-btn v-if="active" prepend-icon="mdi-cancel" flat class="mr-2 bg-error" @click="fetchInactive">Inativos</v-btn>
                         <v-btn v-else prepend-icon="mdi-delete-empty" flat class="bg-secondary mr-2" @click="fetchActive">Ativos</v-btn>
                         <BtnAdicionar @click="redirectToCreate" />
-                    </v-col>
-
-                    <v-col cols="auto" class="d-flex align-center justify-end">
                         <v-btn icon @click="toggleView">
                             <v-icon>{{ isListView ? 'mdi-view-grid' : 'mdi-view-list' }}</v-icon>
                         </v-btn>
                     </v-col>
+                </v-row>
+            </div>
+            <div class="px-4 mb-5">
+                <v-row class="align-center">
+                    <v-expansion-panels variant="accordion">
+                        <v-expansion-panel>
+                            <v-expansion-panel-title> Mais Filtros </v-expansion-panel-title>
+
+                            <v-expansion-panel-text>
+                                <v-row class="d-flex align-start">
+                                    <v-col cols="12" class="d-flex gap-4 justify-between">
+                                        <cs_SelectGrupo
+                                            v-model="filterGrupo"
+                                            Prm_etiqueta="Grupo"
+                                            :Prm_isObrigatorio="false"
+                                            :Prm_limpavel="true"
+                                        />
+                                        <cs_SelectClasse
+                                            v-model="filterClasse"
+                                            Prm_etiqueta="Classe"
+                                            :Prm_isObrigatorio="false"
+                                            :Prm_limpavel="true"
+                                        />
+                                        <cs_SelectStatus
+                                            v-model="filterStatus"
+                                            Prm_etiqueta="Status"
+                                            :Prm_isObrigatorio="false"
+                                            :Prm_limpavel="true"
+                                        />
+                                        <cs_SelectSituacao
+                                            v-model="filterSituacao"
+                                            Prm_etiqueta="Situação"
+                                            :Prm_isObrigatorio="false"
+                                            :Prm_limpavel="true"
+                                        />
+
+                                        <v-btn color="primary" @click="filterList()">
+                                            <v-icon left>mdi-magnify</v-icon>
+                                            Pesquisar
+                                        </v-btn>
+                                    </v-col>
+                                </v-row>
+                            </v-expansion-panel-text>
+                        </v-expansion-panel>
+                    </v-expansion-panels>
                 </v-row>
             </div>
 
@@ -205,11 +243,16 @@ import { DeleteConta, GetContasList, SoftDeleteConta } from '../../services/cont
 import type { AxiosResponse } from 'axios';
 import type { ContaCompleta, ApiResponse, Lista_csicp_bb012 } from '../../types/crm/bb012_conta';
 //Import de componentes
+import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import Pagination from '../../components/navigation/Pagination.vue';
 import BtnAdicionar from '../../components/botoes/cs_BtnAdicionar.vue';
 import BtnExcluir from '../../components/botoes/cs_BtnExcluir.vue';
 import BtnIsActive from '../../components/botoes/cs_BtnIsActive.vue';
 import BtnCancelar from '../../components/botoes/cs_BtnCancelar.vue';
+import cs_SelectGrupo from '../../components/selects/cs_SelectGrupo.vue';
+import cs_SelectClasse from '../../components/selects/cs_SelectClasse.vue';
+import cs_SelectStatus from '../../components/selects/cs_SelectStatus.vue';
+import cs_SelectSituacao from '../../components/selects/cs_SelectSituacao.vue';
 
 interface Item {
     ID: string;
@@ -219,6 +262,10 @@ interface Item {
     Modalidade: string;
     CPF: string;
     Status: string;
+    GrupoId: number;
+    ClasseId: number;
+    StatusId: number;
+    SituacaoId: number;
     IsActive: boolean;
 }
 
@@ -271,6 +318,8 @@ const headers = ref([
 ]);
 
 const items = ref<Item[]>([]);
+const filteredItems = ref<Item[]>([]);
+const backupItems = ref<Item[]>([]);
 const confirmDialog = ref(false);
 const confirmSoftDeleteDialog = ref(false);
 const itemToDelete = ref<Item | null>(null);
@@ -279,6 +328,12 @@ const loading = ref(false);
 const active = ref(true);
 const count = false;
 const search = ref('');
+
+// Definindo os valores para os filtros
+const filterGrupo = ref<number>(0);
+const filterClasse = ref<number>(0);
+const filterStatus = ref<number>(0);
+const filterSituacao = ref<number>(0);
 
 const rules = {
     codigo: [validationRules.required, validationRules.numeric],
@@ -333,30 +388,57 @@ const fetchData = async () => {
             count,
             search.value,
             currentPage.value,
-            itemsPerPage.value,
+            999,
             3,
             '',
             ''
         );
+
         const data = response.data;
-        items.value = data.Lista_csicp_bb012.map((item: Lista_csicp_bb012) => ({
+
+        // Carrega todos os dados para backupItems e filteredItems inicialmente
+        backupItems.value = data.Lista_csicp_bb012.map((item: Lista_csicp_bb012) => ({
             ID: item.csicp_bb012.csicp_bb012.ID,
             Nome: `${item.csicp_bb012.csicp_bb012.BB012_Codigo} - ${item.csicp_bb012.csicp_bb012.BB012_Nome_Cliente}`,
             Endereco: item.BB01206_Endereco.csicp_bb01206.BB012_Logradouro,
             Contato: item.csicp_bb012.csicp_bb012.BB012_FaxCelular,
             Modalidade: item.csicp_bb012.csicp_bb012_MRel.Label,
-            CPF: item.csicp_bb012.csicp_bb001.BB001_CPF_Oficial,
+            CPF: item.BB01202.csicp_bb01202.BB012_CPF || item.BB01202.csicp_bb01202.BB012_CNPJ,
             Status: item.csicp_bb012.csicp_bb012_StaCta.Label,
+            GrupoId: item.csicp_bb012.csicp_bb012_GruCta.Id,
+            ClasseId: item.csicp_bb012.csicp_bb012_ClaCta.Id,
+            StatusId: item.csicp_bb012.csicp_bb012_StaCta.Id,
+            SituacaoId: item.csicp_bb012.csicp_bb012_SitCta.Id,
             IsActive: item.csicp_bb012.csicp_bb012.BB012_Is_Active
         }));
 
-        totalItems.value = data.PageSize.cs_list_total_itens;
+        filteredItems.value = [...backupItems.value]; // Inicializa filteredItems com todos os itens
+        totalItems.value = backupItems.value.length;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
+
+        updatePage(1); // Exibe a primeira página de items após o carregamento
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
     } finally {
         loading.value = false;
     }
+};
+
+const filterList = () => {
+    // Aplica os filtros em backupItems e atualiza filteredItems
+    filteredItems.value = backupItems.value.filter((item) => {
+        return (
+            (!filterGrupo.value || item.GrupoId === filterGrupo.value) &&
+            (!filterClasse.value || item.ClasseId === filterClasse.value) &&
+            (!filterStatus.value || item.StatusId === filterStatus.value) &&
+            (!filterSituacao.value || item.SituacaoId === filterSituacao.value)
+        );
+    });
+
+    // Atualiza dados de paginação com o total de itens filtrados
+    totalItems.value = filteredItems.value.length;
+    totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
+    updatePage(1); // Reinicia para a primeira página com o novo filtro
 };
 
 // Array de opções do menu de ações
@@ -466,7 +548,9 @@ const softDeleteContaConfirmed = async () => {
 
 const updatePage = (page: number) => {
     currentPage.value = page;
-    fetchData();
+    const start = (page - 1) * itemsPerPage.value;
+    const end = start + itemsPerPage.value;
+    items.value = filteredItems.value.slice(start, end); // Mostra a página atual dos itens filtrados
 };
 
 const updateItemsPerPage = (itemsPerPageValue: number) => {

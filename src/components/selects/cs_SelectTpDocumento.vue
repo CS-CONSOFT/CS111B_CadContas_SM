@@ -1,12 +1,13 @@
 <template>
     <v-select
-        v-model="internalSelectedStatus"
-        :items="formattedStatus"
+        v-model="internalSelectedTpDocumento"
+        :items="formattedTpDocumento"
         item-value="value"
         item-text="title"
         variant="solo-filled"
         hide-details
         @change="emitSelection"
+        return-object
     >
         <template v-slot:label>
             <span class="d-flex align-center" style="font-size: 12px; font-weight: 500; padding-bottom: 0.1em; color: #808080">
@@ -19,7 +20,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { GetEstaticasBB } from '../../services/estaticas/bb012_comboEstaticas';
-import type { Csicp_bb012_StaCta } from '../../types/estaticas/estaticas_BB012';
+import type { Csicp_bb012mdc } from '../../types/estaticas/estaticas_BB012';
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: number | null): void;
@@ -27,49 +28,49 @@ const emit = defineEmits<{
 
 const props = defineProps<{ Prm_etiqueta?: string; Prm_isObrigatorio: boolean }>();
 
-const status = ref<Csicp_bb012_StaCta[]>([]);
-const internalSelectedStatus = ref<number | null>(null);
+const tipoDocumento = ref<Csicp_bb012mdc[]>([]);
+const internalSelectedTpDocumento = ref<number | null>(null);
 
-const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione um status');
+const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione um tipo');
 
-const formattedStatus = computed(() => {
+const formattedTpDocumento = computed(() => {
     return [
         { title: '', value: 0 },
-        ...status.value.map((item) => ({
+        ...tipoDocumento.value.map((item) => ({
             title: item.Label,
             value: item.Id
         }))
     ];
 });
 
-const fetchStatus = async () => {
+const fetchClasse = async () => {
     try {
         const response = await GetEstaticasBB();
         if (response.status === 200) {
-            status.value = response.data.csicp_bb012_StaCta;
-            if (internalSelectedStatus.value) {
-                const selected = status.value.find((status) => status.Id === internalSelectedStatus.value);
+            tipoDocumento.value = response.data.csicp_bb012mdc;
+            if (internalSelectedTpDocumento.value) {
+                const selected = tipoDocumento.value.find((documento) => documento.Id === internalSelectedTpDocumento.value);
                 if (selected) {
-                    internalSelectedStatus.value = selected.Id;
+                    internalSelectedTpDocumento.value = selected.Id;
                 }
             }
         } else {
-            console.error('Erro ao buscar os status:', response.statusText);
+            console.error('Erro ao buscar os tipos:', response.statusText);
         }
     } catch (error) {
-        console.error('Erro ao buscar os status:', error);
+        console.error('Erro ao buscar os tipos:', error);
     }
 };
 
 onMounted(async () => {
-    await fetchStatus();
+    await fetchClasse();
 });
 
-watch(internalSelectedStatus, (newVal) => {
+watch(internalSelectedTpDocumento, (newVal) => {
     emit('update:modelValue', newVal);
 });
 
 function emitSelection() {
-    emit('update:modelValue', internalSelectedStatus.value);
+    emit('update:modelValue', internalSelectedTpDocumento.value);
 }
 </script>

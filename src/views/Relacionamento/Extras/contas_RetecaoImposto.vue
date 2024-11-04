@@ -50,7 +50,8 @@
             </v-card-title>
             <v-card-text>
                 <v-form ref="formRef">
-                    <InputTexto
+                    <cs_SelectTpImposto
+                        class="mb-6"
                         v-model="var_Imposto"
                         Prm_etiqueta="Imposto"
                         :Prm_limpavel="false"
@@ -58,7 +59,7 @@
                         :rules="rules.nome"
                     />
 
-                    <Cs_SelectEstaticas
+                    <Cs_selectEstaticas
                         :Tipo="1"
                         v-model="var_Retem"
                         Prm_etiqueta="Retém"
@@ -117,14 +118,15 @@ import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/bo
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnSalvar from '../../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
 import cs_BtnExcluir from '../../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
-import Cs_SelectEstaticas from '../../../submodules/cs_components/src/components/selects/cs_SelectEstaticas.vue';
+import Cs_selectEstaticas from '../../../submodules/cs_components/src/components/selects/cs_SelectEstaticas.vue';
+import cs_SelectTpImposto from '../../../submodules/cs_components/src/components/selects/cs_SelectTpImposto.vue';
 
 interface Item {
     ID: string;
     BB012_ID: string;
     Imposto: string;
     Retem: number;
-    Percentual: number;
+    Percentual: string;
 }
 
 //Declaração do Header para montagem da tabela
@@ -178,7 +180,7 @@ const itemToEdit = ref<Item | null>(null);
 //Variáveis de edição/adição
 const var_Id = ref('');
 const var_bb012_Id = ref('');
-const var_Imposto = ref<string>('');
+const var_Imposto = ref<number>(0);
 const var_Retem = ref<number>(0);
 const var_Percentual = ref<number>(0);
 
@@ -208,10 +210,10 @@ const fetchData = async (id: string) => {
             BB012_ID: item.csicp_bb012o.BB012_ID,
             Imposto: item.csicp_aa037_Imp.Label,
             Retem: item.csicp_bb012o.BB012o_Retem,
-            Percentual: item.csicp_bb012o.BB012o_Percentual
+            Percentual: `${(item.csicp_bb012o.BB012o_Percentual / 100).toFixed(2)}%`
         }));
 
-        //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
+        // Solução temporária para sempre ter o ID da BB012 preenchido para usar nas APIs.
         var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
     } catch (error) {
         showSnackbar('Erro ao buscar conta.', 'error');
@@ -228,7 +230,7 @@ const openDialog = () => {
     dialog.value = true;
     itemToEdit.value = null;
     var_Id.value = '';
-    var_Imposto.value = '';
+    var_Imposto.value = 0;
     var_Retem.value = 0;
     var_Percentual.value = 0;
 };
@@ -241,7 +243,7 @@ const openEditDialog = async (item: Item, index: number) => {
 
         var_Id.value = data.Retencao_Impostos[index].csicp_bb012o.ID;
         var_bb012_Id.value = data.Retencao_Impostos[index].csicp_bb012o.BB012_ID;
-        var_Imposto.value = data.Retencao_Impostos[index].csicp_aa037_Imp.Label;
+        var_Imposto.value = data.Retencao_Impostos[index].csicp_bb012o.bb012o_Imposto_ID;
         var_Retem.value = data.Retencao_Impostos[index].csicp_bb012o.BB012o_Retem;
         var_Percentual.value = data.Retencao_Impostos[index].csicp_bb012o.BB012o_Percentual;
     } catch (error) {
@@ -258,7 +260,7 @@ const CreateOrUpdateImposto = async () => {
                 BB012o_Codigo: 0,
                 BB012o_Retem: var_Retem.value,
                 BB012o_Percentual: var_Percentual.value,
-                bb012o_Imposto_ID: 0
+                bb012o_Imposto_ID: var_Imposto.value
             };
 
             const response = await SaveRetencao(tenant, data);

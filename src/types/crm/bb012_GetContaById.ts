@@ -1083,31 +1083,9 @@ export interface Csicp_bb012q {
 }
 
 export interface GED_List {
-    ID: string;
-    BB012_ID: string;
-    BB012_ContatoID: string;
-    BB012_CandidatoID: string;
-    BB043_CampanhaID: string;
-    BB042_PotencialID: string;
-    BB040_AtividadeID: string;
-    BB041_CasoID: string;
-    BB012m_Codigo_Cliente: number;
-    BB012m_Descricao: string;
-    BB012m_Content: string;
-    BB012m_FileType: string;
-    BB012m_Filename: string;
-    BB012M_Is_Active: boolean;
-    bb012m_TipoDoctoID: number;
-    bb012m_DoctoID: number;
-    bb012m_DataDocto: string;
-    bb012m_Path: string;
-}
-
-export interface MeuCrediario {
-    Id: number;
-    bb012_ContaId: string;
-    bb01209_DataReg: string;
-    bb01209_json: string;
+    csicp_bb012m: Csicp_bb012m;
+    csicp_bb012mdc: Csicp_bb012mdc;
+    csicp_bb012mtd: Csicp_bb012mtd;
 }
 
 export interface Csicp_bb012m {
@@ -1129,4 +1107,25 @@ export interface Csicp_bb012m {
     bb012m_DoctoID: number;
     bb012m_DataDocto: string;
     bb012m_Path: string;
+}
+
+export interface Csicp_bb012mdc {
+    Id: number;
+    Label: string;
+    Order: number;
+    Is_Active: boolean;
+}
+
+export interface Csicp_bb012mtd {
+    Id: number;
+    Label: string;
+    Order: number;
+    Is_Active: boolean;
+}
+
+export interface MeuCrediario {
+    Id: number;
+    bb012_ContaId: string;
+    bb01209_DataReg: string;
+    bb01209_json: string;
 }

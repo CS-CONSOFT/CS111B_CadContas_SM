@@ -33,10 +33,13 @@ const internalSelectedGrupo = ref<number | null>(null);
 const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione um grupo');
 
 const formattedGrupo = computed(() => {
-    return grupo.value.map((item) => ({
-        title: item.Label,
-        value: item.Id
-    }));
+    return [
+        { title: '', value: 0 },
+        ...grupo.value.map((item) => ({
+            title: item.Label,
+            value: item.Id
+        }))
+    ];
 });
 
 const fetchGrupo = async () => {

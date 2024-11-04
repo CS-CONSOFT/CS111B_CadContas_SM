@@ -33,10 +33,13 @@ const internalSelectedClasse = ref<number | null>(null);
 const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma classe');
 
 const formattedClasse = computed(() => {
-    return classe.value.map((item) => ({
-        title: item.Label,
-        value: item.Id
-    }));
+    return [
+        { title: '', value: 0 },
+        ...classe.value.map((item) => ({
+            title: item.Label,
+            value: item.Id
+        }))
+    ];
 });
 
 const fetchClasse = async () => {

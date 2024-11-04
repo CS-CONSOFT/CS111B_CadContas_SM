@@ -498,8 +498,6 @@ const fetchData = async (id: string) => {
 
         //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
         var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
-
-        console.log(data);
     } catch (error) {
         showSnackbar('Erro ao buscar contato.', 'error');
     } finally {
@@ -702,7 +700,6 @@ async function saveContato() {
                 showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar contato. Verifique os dados.', 'error');
             }
         } catch (error) {
-            console.error(error);
             snackbarMessage.value = 'Erro ao atualizar o contato. Verifique sua conexão ou tente novamente.';
         }
     }

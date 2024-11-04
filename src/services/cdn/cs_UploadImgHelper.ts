@@ -45,6 +45,7 @@ export function helperHandleFileChange(event: Event): File {
 export async function helperHandleUploadImg(selectedImg: File, token: ETokenGenericoLabel): Promise<PutCsObjectResponse> {
     const user = getUserFromLocalStorage();
     const tenant = user?.TenantId;
+
     return new Promise((resolve, reject) => {
         // Cria um FileReader para ler o conteúdo do arquivo
         const reader = new FileReader();

@@ -51,13 +51,15 @@
                 <cs_uploadImage :token="ETokenGenericoLabel.CDN_AWS" @close-dialog="close" @on-image-upload="vincularImagem">
                     >
                     <template #image-options>
-                        <v-card-subtitle> Selecione o tipo de anexo </v-card-subtitle>
+                        <v-card-subtitle> Selecione o tipo de anexo e o documento </v-card-subtitle>
                         <v-col>
-                            <!-- Seletor para escolher o tipo de imagem -->
-                            <cs_SelectTpAnexos
+                            <cs_SelectTpAnexos v-model="var_SelectedTpAnexo" Prm_etiqueta="Tipo de Anexo" :Prm_isObrigatorio="false" />
+                        </v-col>
+                        <v-col>
+                            <cs_SelectTpDocumento
                                 class="mb-5"
-                                v-model="var_SelectedTpAnexo"
-                                Prm_etiqueta="Tipo de Anexo"
+                                v-model="var_SelectedDocumento"
+                                Prm_etiqueta="Documento"
                                 :Prm_isObrigatorio="false"
                             />
                         </v-col>
@@ -94,22 +96,18 @@ import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 import { ETokenGenericoLabel } from '@/utils/EnumTokenGenerico';
 // Import de API's
 import { GetContaById } from '../../../services/contas/bb012_conta';
-import GetTokenGenerico from '../../../services/token/token';
 import { helperHandleUploadImg } from '../../../services/cdn/cs_UploadImgHelper';
 import { SaveAnexos, DeleteAnexos } from '../../../services/contas/bb012m_Anexos/bb012m_anexos';
-import { getListEstaticasBB } from '../../../submodules/cs_components/src/services/estaticas/estaticas_bb';
 // Import de types
 import type { ContaById, GED_List } from '../../../types/crm/bb012_GetContaById';
-import type { TokenGenerico } from '../../../types/token/TokenTypes';
 import type { Csicp_bb012m } from '../../../types/crm/bb012_GetContaById';
 //Import de componentes
-import InputTexto from '../../../components/campos/cs_InputTexto.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
-import cs_BtnSalvar from '../../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
 import cs_BtnExcluir from '../../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
 import cs_uploadImage from '../../../submodules/cs_components/src/components/upload/cs_uploadImage.vue';
 import cs_SelectTpAnexos from '../../../components/selects/cs_SelectTpAnexos.vue';
+import cs_SelectTpDocumento from '../../../components/selects/cs_SelectTpDocumento.vue';
 
 interface Item {
     ID: string;
@@ -118,7 +116,7 @@ interface Item {
     Imagem: string;
     Nome: string;
     Documento: string;
-    TipoDocumento: number;
+    TipoDocumento: string;
     TipoArquivo: string;
 }
 
@@ -140,7 +138,7 @@ const headers = ref([
         title: 'Imagem',
         value: 'Imagem',
         sortable: false,
-        width: '20%',
+        width: '15%',
         align: 'start'
     },
     {
@@ -159,7 +157,7 @@ const headers = ref([
         title: 'Tipo Documento',
         value: 'TipoDocumento',
         sortable: false,
-        width: '10%'
+        width: '15%'
     },
     {
         title: 'Tipo Arquivo',
@@ -197,6 +195,7 @@ const var_Id = ref('');
 const var_bb012_Id = ref('');
 const var_Imagem = ref<string>('');
 const var_SelectedTpAnexo = ref<number>(0);
+const var_SelectedDocumento = ref<{ title: string; value: number } | any>(null);
 
 const rules = {
     codigo: [validationRules.required, validationRules.numeric],
@@ -221,18 +220,20 @@ const fetchData = async (id: string) => {
     try {
         const data: ContaById = await GetContaById(tenant, id);
         items.value = data.GED_List.map((item: GED_List) => ({
-            ID: item.ID,
-            BB012_ID: item.BB012_ID,
-            ImagemPath: item.bb012m_Path,
-            Imagem: item.BB012m_Content,
-            Nome: item.BB012m_Filename,
-            Documento: item.BB012m_Descricao,
-            TipoDocumento: item.bb012m_TipoDoctoID,
-            TipoArquivo: item.BB012m_FileType
+            ID: item.csicp_bb012m.ID,
+            BB012_ID: item.csicp_bb012m.BB012_ID,
+            ImagemPath: item.csicp_bb012m.bb012m_Path,
+            Imagem: item.csicp_bb012m.BB012m_Content,
+            Nome: item.csicp_bb012m.BB012m_Filename,
+            Documento: item.csicp_bb012mdc.Label,
+            TipoDocumento: item.csicp_bb012mtd.Label,
+            TipoArquivo: item.csicp_bb012m.BB012m_FileType
         }));
 
         //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
         var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+
+        console.log(data);
     } catch (error) {
         showSnackbar('Erro ao buscar conta.', 'error');
     } finally {
@@ -262,13 +263,13 @@ async function sendImg(selectedImage: File) {
                 BB040_AtividadeID: '',
                 BB041_CasoID: '',
                 BB012m_Codigo_Cliente: 0,
-                BB012m_Descricao: selectedImage.name,
+                BB012m_Descricao: var_SelectedDocumento.value.title,
                 BB012m_Content: response.binary,
                 BB012m_FileType: selectedImage.type,
                 BB012m_Filename: selectedImage.name,
                 BB012M_Is_Active: true,
                 bb012m_TipoDoctoID: var_SelectedTpAnexo.value,
-                bb012m_DoctoID: 0,
+                bb012m_DoctoID: var_SelectedDocumento.value.value,
                 bb012m_DataDocto: '',
                 bb012m_Path: response.Out_Path
             };
@@ -285,12 +286,12 @@ async function sendImg(selectedImage: File) {
             }
         }
     } catch (error) {
-        console.error(error);
         snackbarMessage.value = 'Erro ao fazer o upload da imagem.';
         snackbarColor.value = 'error';
     } finally {
         // Fecha o diálogo e emite um evento de fechamento
         emit(EnumEvents.CLOSE);
+        dialog.value = false;
     }
 }
 
