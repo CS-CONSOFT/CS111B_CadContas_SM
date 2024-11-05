@@ -33,10 +33,13 @@ const internalSelectedModalidade = ref<number | null>(null);
 const computedLabel = computed(() => props.Prm_etiqueta || 'Selecione uma modalidade');
 
 const formattedModalidades = computed(() => {
-    return modRelacao.value.map((item) => ({
-        title: item.Label,
-        value: item.Id
-    }));
+    return [
+        { title: '', value: 0 },
+        ...modRelacao.value.map((item) => ({
+            title: item.Label,
+            value: item.Id
+        }))
+    ];
 });
 
 const fetchModalidades = async () => {

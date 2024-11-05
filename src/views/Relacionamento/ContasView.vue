@@ -36,6 +36,12 @@
                             <v-expansion-panel-text>
                                 <v-row class="d-flex align-start">
                                     <v-col cols="12" class="d-flex gap-4 justify-between">
+                                        <cs_SelectMRelacionamento
+                                            v-model="filterMrel"
+                                            Prm_etiqueta="Modelo de Relação"
+                                            :Prm_isObrigatorio="false"
+                                            :Prm_limpavel="true"
+                                        />
                                         <cs_SelectGrupo
                                             v-model="filterGrupo"
                                             Prm_etiqueta="Grupo"
@@ -61,9 +67,12 @@
                                             :Prm_limpavel="true"
                                         />
 
-                                        <v-btn color="primary" @click="filterList()">
-                                            <v-icon left>mdi-magnify</v-icon>
-                                            Pesquisar
+                                        <v-btn color="primary" prepend-icon="mdi-filter" variant="flat" @click="filterList()">
+                                            Filtrar
+                                        </v-btn>
+
+                                        <v-btn color="warning" prepend-icon="mdi-broom" variant="flat" @click="clearFilters()">
+                                            Limpar
                                         </v-btn>
                                     </v-col>
                                 </v-row>
@@ -76,7 +85,7 @@
             <v-card class="border-sm mt-1" elevation="0" v-if="isListView">
                 <v-data-table
                     :headers="headers"
-                    :items="items"
+                    :items="filteredItems"
                     :items-per-page="itemsPerPage"
                     :loading="loading"
                     @update:items-per-page="updateItemsPerPage"
@@ -85,6 +94,33 @@
                     class="month-table"
                     :search="search"
                 >
+                    <template v-slot:column.header.GrupoClasse>
+                        <div>Grupo<br />Classe</div>
+                    </template>
+
+                    <template v-slot:column.header.StatusSituacao>
+                        <div>Status<br />Situação</div>
+                    </template>
+
+                    <template v-slot:item.EnderecoContato="{ item }">
+                        <div>
+                            <div>{{ item.Endereco }}</div>
+                            <div>{{ item.Contato }}</div>
+                        </div>
+                    </template>
+
+                    <template v-slot:item.GrupoClasse="{ item }">
+                        <div>
+                            <div>{{ item.Grupo }}</div>
+                            <div>{{ item.Classe }}</div>
+                        </div>
+                    </template>
+                    <template v-slot:item.StatusSituacao="{ item }">
+                        <div>
+                            <div>{{ item.Status }}</div>
+                            <div>{{ item.Situacao }}</div>
+                        </div>
+                    </template>
                     <template v-slot:bottom>
                         <v-row class="d-flex align-center">
                             <v-col cols="2">
@@ -253,6 +289,7 @@ import cs_SelectGrupo from '../../components/selects/cs_SelectGrupo.vue';
 import cs_SelectClasse from '../../components/selects/cs_SelectClasse.vue';
 import cs_SelectStatus from '../../components/selects/cs_SelectStatus.vue';
 import cs_SelectSituacao from '../../components/selects/cs_SelectSituacao.vue';
+import cs_SelectMRelacionamento from '@/components/selects/cs_SelectMRelacionamento.vue';
 
 interface Item {
     ID: string;
@@ -260,8 +297,12 @@ interface Item {
     Endereco: string;
     Contato: string;
     Modalidade: string;
-    CPF: string;
+    Grupo: string;
+    Classe: string;
     Status: string;
+    Situacao: string;
+    CPF: string;
+    MrelId: number;
     GrupoId: number;
     ClasseId: number;
     StatusId: number;
@@ -279,22 +320,10 @@ const headers = ref([
         align: 'start'
     },
     {
-        title: 'Endereço',
-        value: 'Endereco',
-        width: '25%',
+        title: 'Endereço / Contato',
+        value: 'EnderecoContato',
+        width: '20%',
         align: 'start'
-    },
-    {
-        title: 'Contato',
-        value: 'Contato',
-        width: '10%',
-        align: 'start'
-    },
-    {
-        title: 'Modalidade',
-        value: 'Modalidade',
-        width: '10%',
-        align: 'center'
     },
     {
         title: 'CPF / IE / CNPJ',
@@ -303,10 +332,22 @@ const headers = ref([
         align: 'center'
     },
     {
-        title: 'Status',
-        value: 'Status',
+        title: 'Modalidade',
+        value: 'Modalidade',
         width: '10%',
         align: 'center'
+    },
+    {
+        title: 'Grupo / Classe',
+        value: 'GrupoClasse',
+        width: '10%',
+        align: 'start'
+    },
+    {
+        title: 'Status / Situação',
+        value: 'StatusSituacao',
+        width: '10%',
+        align: 'start'
     },
     {
         title: 'Ações',
@@ -319,7 +360,6 @@ const headers = ref([
 
 const items = ref<Item[]>([]);
 const filteredItems = ref<Item[]>([]);
-const backupItems = ref<Item[]>([]);
 const confirmDialog = ref(false);
 const confirmSoftDeleteDialog = ref(false);
 const itemToDelete = ref<Item | null>(null);
@@ -330,6 +370,7 @@ const count = false;
 const search = ref('');
 
 // Definindo os valores para os filtros
+const filterMrel = ref<number>(0);
 const filterGrupo = ref<number>(0);
 const filterClasse = ref<number>(0);
 const filterStatus = ref<number>(0);
@@ -388,7 +429,7 @@ const fetchData = async () => {
             count,
             search.value,
             currentPage.value,
-            999,
+            itemsPerPage.value,
             3,
             '',
             ''
@@ -396,15 +437,18 @@ const fetchData = async () => {
 
         const data = response.data;
 
-        // Carrega todos os dados para backupItems e filteredItems inicialmente
-        backupItems.value = data.Lista_csicp_bb012.map((item: Lista_csicp_bb012) => ({
+        items.value = data.Lista_csicp_bb012.map((item: Lista_csicp_bb012) => ({
             ID: item.csicp_bb012.csicp_bb012.ID,
             Nome: `${item.csicp_bb012.csicp_bb012.BB012_Codigo} - ${item.csicp_bb012.csicp_bb012.BB012_Nome_Cliente}`,
             Endereco: item.BB01206_Endereco.csicp_bb01206.BB012_Logradouro,
             Contato: item.csicp_bb012.csicp_bb012.BB012_FaxCelular,
-            Modalidade: item.csicp_bb012.csicp_bb012_MRel.Label,
             CPF: item.BB01202.csicp_bb01202.BB012_CPF || item.BB01202.csicp_bb01202.BB012_CNPJ,
+            Modalidade: item.csicp_bb012.csicp_bb012_MRel.Label,
+            Grupo: item.csicp_bb012.csicp_bb012_GruCta.Label,
+            Classe: item.csicp_bb012.csicp_bb012_ClaCta.Label,
             Status: item.csicp_bb012.csicp_bb012_StaCta.Label,
+            Situacao: item.csicp_bb012.csicp_bb012_SitCta.Label,
+            MrelId: item.csicp_bb012.csicp_bb012_MRel.Id,
             GrupoId: item.csicp_bb012.csicp_bb012_GruCta.Id,
             ClasseId: item.csicp_bb012.csicp_bb012_ClaCta.Id,
             StatusId: item.csicp_bb012.csicp_bb012_StaCta.Id,
@@ -412,11 +456,13 @@ const fetchData = async () => {
             IsActive: item.csicp_bb012.csicp_bb012.BB012_Is_Active
         }));
 
-        filteredItems.value = [...backupItems.value]; // Inicializa filteredItems com todos os itens
-        totalItems.value = backupItems.value.length;
+        totalItems.value = data.PageSize.cs_list_total_itens;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
 
-        updatePage(1); // Exibe a primeira página de items após o carregamento
+        filteredItems.value = [...items.value];
+
+        // Aplique o filtro aos novos dados
+        filterList();
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
     } finally {
@@ -425,20 +471,26 @@ const fetchData = async () => {
 };
 
 const filterList = () => {
-    // Aplica os filtros em backupItems e atualiza filteredItems
-    filteredItems.value = backupItems.value.filter((item) => {
+    filteredItems.value = items.value.filter((item) => {
         return (
+            (!filterMrel.value || item.MrelId === filterMrel.value) &&
             (!filterGrupo.value || item.GrupoId === filterGrupo.value) &&
             (!filterClasse.value || item.ClasseId === filterClasse.value) &&
             (!filterStatus.value || item.StatusId === filterStatus.value) &&
             (!filterSituacao.value || item.SituacaoId === filterSituacao.value)
         );
     });
+};
 
-    // Atualiza dados de paginação com o total de itens filtrados
-    totalItems.value = filteredItems.value.length;
-    totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
-    updatePage(1); // Reinicia para a primeira página com o novo filtro
+const clearFilters = () => {
+    filterMrel.value = 0;
+    filterGrupo.value = 0;
+    filterClasse.value = 0;
+    filterStatus.value = 0;
+    filterSituacao.value = 0;
+
+    // Restaura a lista completa
+    filteredItems.value = [...items.value];
 };
 
 // Array de opções do menu de ações
@@ -548,9 +600,7 @@ const softDeleteContaConfirmed = async () => {
 
 const updatePage = (page: number) => {
     currentPage.value = page;
-    const start = (page - 1) * itemsPerPage.value;
-    const end = start + itemsPerPage.value;
-    items.value = filteredItems.value.slice(start, end); // Mostra a página atual dos itens filtrados
+    fetchData();
 };
 
 const updateItemsPerPage = (itemsPerPageValue: number) => {
