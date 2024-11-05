@@ -289,7 +289,7 @@ import cs_SelectGrupo from '../../components/selects/cs_SelectGrupo.vue';
 import cs_SelectClasse from '../../components/selects/cs_SelectClasse.vue';
 import cs_SelectStatus from '../../components/selects/cs_SelectStatus.vue';
 import cs_SelectSituacao from '../../components/selects/cs_SelectSituacao.vue';
-import cs_SelectMRelacionamento from '@/components/selects/cs_SelectMRelacionamento.vue';
+import cs_SelectMRelacionamento from '../../components/selects/cs_SelectMRelacionamento.vue';
 
 interface Item {
     ID: string;
