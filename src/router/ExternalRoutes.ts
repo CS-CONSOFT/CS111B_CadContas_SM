@@ -76,6 +76,14 @@ const CrmRoutes = {
             meta: {
                 title: 'Atividades'
             }
+        },
+        {
+            name: 'Categorias',
+            path: '/Categorias',
+            component: () => import('../../src/views/Categoria/CategoriaView.vue'),
+            meta: {
+                title: 'Categorias'
+            }
         }
     ]
 };

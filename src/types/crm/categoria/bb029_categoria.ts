@@ -1,4 +1,4 @@
-export interface CategoriaSimples {
+export interface CategoriaCompleta {
     PageSize: PageSize;
     Lista_bb029: Lista_bb029[];
     Code_Erro: Code_Erro;
@@ -23,7 +23,7 @@ export interface Code_Erro {
 }
 
 export interface ApiResponse<T> {
-    Lista_bb029: { ID: string; BB029_CodgCategoria: number; BB029_Categoria: string; BB029_Is_Active: boolean }[];
+    Lista_bb029: any;
     PageSize: any;
     data: T;
     status: number;

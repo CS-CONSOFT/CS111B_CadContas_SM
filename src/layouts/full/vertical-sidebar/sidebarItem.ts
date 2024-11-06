@@ -35,6 +35,11 @@ const sidebarItem: Menu[] = [
         title: 'Atividades',
         icon: 'mdi-account-multiple-outline',
         to: '/Atividades'
+    },
+    {
+        title: 'Categorias',
+        icon: 'mdi-account-multiple-outline',
+        to: '/Categorias'
     }
 ];
 

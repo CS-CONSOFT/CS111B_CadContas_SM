@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { getListCategorias } from '../../services/basico/categoria/bb029_categoria';
+import { getCategoriasCombo } from '../../services/basico/categoria/bb029_categoria';
 import type { Lista_bb029 } from '../../types/basico/bb029_categoria';
 import type { User } from '../../types/login/Login';
 
@@ -67,7 +67,7 @@ const formattedCategoria = computed(() => {
 
 const fetchCategoria = async () => {
     try {
-        const response = await getListCategorias(user?.TenantId);
+        const response = await getCategoriasCombo(user?.TenantId);
         if (response.status === 200) {
             categoria.value = response.data.Lista_bb029;
             if (internalSelectedCategoria.value) {

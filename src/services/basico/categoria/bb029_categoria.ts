@@ -3,7 +3,7 @@ import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { CategoriaSimples, ApiResponse } from '../../../types/basico/bb029_categoria';
 
-function getListCategorias(tenant_id: number | undefined): Promise<AxiosResponse<ApiResponse<CategoriaSimples>>> {
+function getCategoriasCombo(tenant_id: number | undefined): Promise<AxiosResponse<ApiResponse<CategoriaSimples>>> {
     return axios.get<ApiResponse<CategoriaSimples>>(
         `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb029_Get_List_Categoria`,
         {
@@ -19,4 +19,4 @@ function getListCategorias(tenant_id: number | undefined): Promise<AxiosResponse
     );
 }
 
-export { getListCategorias };
+export { getCategoriasCombo };

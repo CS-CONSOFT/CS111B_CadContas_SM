@@ -2,7 +2,7 @@
     <v-container fluid class="border-sm rounded bg- ma-0">
         <div>
             <v-row class="pa-4 pt-7">
-                <p class="text-h2 mb-5">Atividades</p>
+                <p class="text-h2 mb-5">Categoria</p>
                 <v-divider></v-divider>
             </v-row>
 
@@ -22,8 +22,6 @@
                     <v-spacer></v-spacer>
 
                     <v-col cols="auto" class="d-flex align-center">
-                        <v-btn v-if="active" prepend-icon="mdi-cancel" flat class="mr-2 bg-error" @click="fetchInactive">Inativos</v-btn>
-                        <v-btn v-else prepend-icon="mdi-delete-empty" flat class="bg-secondary mr-2" @click="fetchActive">Ativos</v-btn>
                         <cs_BtnAdicionar @click="openDialog" />
                     </v-col>
 
@@ -83,7 +81,6 @@
                     <template v-slot:item.actions="{ item }">
                         <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
                         <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
-                        <v-icon small @click="confirmSoftDelete(item)" class="v-btn-icon">{{ active ? 'mdi-cancel' : 'mdi-check' }}</v-icon>
                     </template>
                 </v-data-table>
             </v-card>
@@ -94,7 +91,7 @@
                         <v-row class="d-flex">
                             <v-col cols="12" md="4" v-for="item in items" :key="item.ID" class="mb-1">
                                 <v-card class="border-sm border-opacity-50 pa-0 mt-1" flat elevation="2">
-                                    <v-card-title class="font-weight-bold bg-lightprimary rounded-t-sm">{{ item.Atividade }}</v-card-title>
+                                    <v-card-title class="font-weight-bold bg-lightprimary rounded-t-sm">{{ item.Categoria }}</v-card-title>
                                     <v-card-subtitle class="mt-5 text-h6">{{ item.Codigo }}</v-card-subtitle>
                                     <v-card-text class="pl-4">
                                         <v-chip
@@ -108,9 +105,6 @@
                                     <v-card-actions class="pl-4">
                                         <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
                                         <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
-                                        <v-icon small @click="confirmSoftDelete(item)" class="v-btn-icon">{{
-                                            active ? 'mdi-cancel' : 'mdi-check'
-                                        }}</v-icon>
                                     </v-card-actions>
                                 </v-card>
                             </v-col>
@@ -144,14 +138,14 @@
     <v-dialog v-model="dialog" max-width="400">
         <v-card>
             <v-card-title class="pa-4 bg-lightprimary">
-                <span class="text-h5">{{ itemToEdit ? 'Editar' : 'Adicionar' }} Atividade</span>
+                <span class="text-h5">{{ itemToEdit ? 'Editar' : 'Adicionar' }} Categoria</span>
             </v-card-title>
             <v-card-text>
                 <v-form ref="formRef">
                     <div class="d-flex">
                         <v-col cols="12">
                             <cs_InputTexto
-                                v-model="var_BB011_Codigo"
+                                v-model="var_BB029_Codigo"
                                 Prm_etiqueta="Código"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="true"
@@ -159,8 +153,8 @@
                             />
 
                             <cs_InputTexto
-                                v-model="var_BB011_Atividade"
-                                Prm_etiqueta="Atividade"
+                                v-model="var_BB029_Categoria"
+                                Prm_etiqueta="Categoria"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="true"
                                 :rules="rules.nome"
@@ -171,7 +165,7 @@
             </v-card-text>
             <v-card-actions class="d-flex justify-space-around">
                 <cs_BtnCancelar @click="closeDialog" />
-                <cs_BtnSalvar @click="CreateOrUpdateAtividade" />
+                <cs_BtnSalvar @click="CreateOrUpdateCategoria" />
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -179,22 +173,11 @@
     <v-dialog v-model="confirmDialog" max-width="400">
         <v-card>
             <v-card-title class="text-h5 pa-4 bg-error">Confirmar Exclusão</v-card-title>
-            <v-card-text>Tem certeza de que deseja excluir esta atividade?</v-card-text>
+            <v-card-text>Tem certeza de que deseja excluir esta categoria?</v-card-text>
             <v-card-actions class="d-flex justify-space-around">
                 <v-spacer></v-spacer>
                 <cs_BtnCancelar @click="cancelDelete" />
-                <cs_BtnExcluir @click="deleteAtividadeConfirmed" />
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="confirmSoftDeleteDialog" max-width="400">
-        <v-card>
-            <v-card-title class="text-h5 pa-4 bg-error"> Confirmar {{ active ? 'Inativação' : 'Ativação' }} </v-card-title>
-            <v-card-text> Tem certeza de que deseja {{ active ? 'inativar' : 'ativar' }} esta atividade? </v-card-text>
-            <v-card-actions class="d-flex justify-space-around">
-                <cs_BtnCancelar @click="cancelSoftDelete" />
-                <cs_BtnIsActive :IsActive="active" @click="softDeleteAtividadeConfirmed" />
+                <cs_BtnExcluir @click="deleteCategoriaConfirmed" />
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -209,34 +192,31 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
 import {
-    GetAtividadeCompleto,
-    GetAtividadeById,
-    SaveAtividade,
-    DeleteAtividade,
-    SoftDeleteAtividade
-} from '../../services/contas/bb011_Atividades/bb011_atividade';
+    GetCategoriaCompleto,
+    GetCategoriaById,
+    SaveCategoria,
+    DeleteCategoria
+} from '../../services/contas/bb029_Categoria/bb029_categoria';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { AtividadeCompleto, Csicp_bb0112, ApiResponse, Lista_bb011_Completo } from '../../types/crm/atividades/bb011_atividades';
-import type { AtividadeById } from '../../types/crm/atividades/bb011_GetAtividadesById';
+import type { CategoriaCompleta, ApiResponse, Lista_bb029 } from '../../types/crm/categoria/bb029_categoria';
+import type { CategoriaById } from '../../types/crm/categoria/bb029_GetCategoriaById';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import Pagination from '../../components/navigation/Pagination.vue';
 import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
 import cs_BtnAdicionar from '../../components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnExcluir from '../../components/botoes/cs_BtnExcluir.vue';
-import cs_BtnIsActive from '../../components/botoes/cs_BtnIsActive.vue';
 import cs_BtnCancelar from '../../components/botoes/cs_BtnCancelar.vue';
 
 interface Item {
     ID: string;
     Codigo: string;
-    Atividade: string;
+    Categoria: string;
     Ativo: boolean;
 }
 
@@ -246,20 +226,14 @@ const headers = ref([
         title: 'Código',
         value: 'Codigo',
         sortable: true,
-        width: '10%',
-        align: 'start'
-    },
-    {
-        title: 'Atividade',
-        value: 'Atividade',
-        width: '50%',
-        align: 'start'
-    },
-    {
-        title: 'Ativo',
-        value: 'Ativo',
         width: '20%',
-        align: 'center'
+        align: 'start'
+    },
+    {
+        title: 'Categoria',
+        value: 'Categoria',
+        width: '60%',
+        align: 'start'
     },
     {
         title: 'Ações',
@@ -275,19 +249,17 @@ const items = ref<Item[]>([]);
 const loading = ref(false);
 const dialog = ref(false);
 const confirmDialog = ref(false);
-const confirmSoftDeleteDialog = ref(false);
 const itemToDelete = ref<Item | null>(null);
 const itemToEdit = ref<Item | null>(null);
-const itemToSoftDelete = ref<Item | null>(null);
 const active = ref(true);
 const count = false;
 const search = ref('');
 
 //Variáveis de edição para csicp_bb011
 const var_ID = ref<string>('');
-const var_BB011_Codigo = ref<number>(0);
-const var_BB011_Atividade = ref<string>('');
-const var_BB011_Is_Active = ref<boolean>(false);
+const var_BB029_Codigo = ref<number>(0);
+const var_BB029_Categoria = ref<string>('');
+const var_BB029_Is_Active = ref<boolean>(false);
 
 const rules = {
     codigo: [validationRules.required, validationRules.numeric],
@@ -296,12 +268,11 @@ const rules = {
 
 const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
-const router = useRouter();
 const formRef = ref<any>(null);
 
 //variaveis da paginação
 const currentPage = ref(1);
-const itemsPerPage = ref(50);
+const itemsPerPage = ref(15);
 const totalItems = ref(0);
 const totalPages = ref(0);
 
@@ -324,20 +295,10 @@ const toggleView = () => {
     isListView.value = !isListView.value;
 };
 
-const fetchActive = () => {
-    active.value = true;
-    fetchData();
-};
-
-const fetchInactive = () => {
-    active.value = false;
-    fetchData();
-};
-
 const fetchData = async () => {
     loading.value = true;
     try {
-        const response: AxiosResponse<ApiResponse<AtividadeCompleto>> = await GetAtividadeCompleto(
+        const response: AxiosResponse<ApiResponse<CategoriaCompleta>> = await GetCategoriaCompleto(
             tenant,
             active.value,
             count,
@@ -346,11 +307,11 @@ const fetchData = async () => {
             itemsPerPage.value
         );
         const data = response.data;
-        items.value = data.Lista_bb011_Completo.map((item: Lista_bb011_Completo) => ({
-            ID: item.csicp_bb011.csicp_bb011.ID,
-            Codigo: item.csicp_bb011.csicp_bb011.BB011_Codigo,
-            Atividade: item.csicp_bb011.csicp_bb011.BB011_Atividade,
-            Ativo: item.csicp_bb011.csicp_bb011.BB011_Is_Active
+        items.value = data.Lista_bb029.map((item: Lista_bb029) => ({
+            ID: item.ID,
+            Codigo: item.BB029_CodgCategoria,
+            Categoria: item.BB029_Categoria,
+            Ativo: item.BB029_Is_Active
         }));
 
         totalItems.value = data.PageSize.cs_list_total_itens;
@@ -370,11 +331,11 @@ const openDialog = () => {
     dialog.value = true;
     itemToEdit.value = null;
 
-    // Zerar variáveis para csicp_bb011
+    // Zerar variáveis para csicp_bb029
     var_ID.value = '';
-    var_BB011_Codigo.value = 0;
-    var_BB011_Atividade.value = '';
-    var_BB011_Is_Active.value = true;
+    var_BB029_Codigo.value = 0;
+    var_BB029_Categoria.value = '';
+    var_BB029_Is_Active.value = true;
 };
 
 const openEditDialog = async (item: Item) => {
@@ -382,39 +343,38 @@ const openEditDialog = async (item: Item) => {
     itemToEdit.value = item;
 
     try {
-        const data: AtividadeById = await GetAtividadeById(tenant, item.ID);
-        // Atribuindo os valores da resposta aos campos da BB011
-        var_ID.value = data.csicp_bb011.csicp_bb011.ID;
-        var_BB011_Codigo.value = data.csicp_bb011.csicp_bb011.BB011_Codigo;
-        var_BB011_Atividade.value = data.csicp_bb011.csicp_bb011.BB011_Atividade;
-        var_BB011_Is_Active.value = data.csicp_bb011.csicp_bb011.BB011_Is_Active;
+        const data: CategoriaById = await GetCategoriaById(tenant, item.ID);
+        // Atribuindo os valores da resposta aos campos da BB029
+        var_ID.value = data.ID;
+        var_BB029_Codigo.value = data.BB029_CodgCategoria;
+        var_BB029_Categoria.value = data.BB029_Categoria;
+        var_BB029_Is_Active.value = data.BB029_Is_Active;
     } catch (error) {
-        showSnackbar('Erro ao buscar dados da atividade', 'error');
+        showSnackbar('Erro ao buscar dados da categoria', 'error');
     }
 };
 
-async function CreateOrUpdateAtividade() {
+async function CreateOrUpdateCategoria() {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb0112 = {
+            const data: Lista_bb029 = {
                 ID: var_ID.value ? var_ID.value : '',
-                BB011_Codigo: var_BB011_Codigo.value,
-                BB011_Atividade: var_BB011_Atividade.value,
-                BB011_Is_Active: true
+                BB029_CodgCategoria: var_BB029_Codigo.value,
+                BB029_Categoria: var_BB029_Categoria.value,
+                BB029_Is_Active: true
             };
 
-            const response = await SaveAtividade(tenant, data);
+            const response = await SaveCategoria(tenant, data);
 
             if (response.data.Out_IsSuccess) {
-                showSnackbar('Atividade salva com sucesso', 'success');
+                showSnackbar('Categoria salva com sucesso', 'success');
                 fetchData();
                 dialog.value = false;
             } else {
-                showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar atividade. Verifique os dados.', 'error');
+                showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar categoria. Verifique os dados.', 'error');
             }
         } catch (error) {
-            console.error(error);
-            snackbarMessage.value = 'Erro ao atualizar a atividade. Verifique sua conexão ou tente novamente.';
+            showSnackbar('Erro ao atualizar a categoria. Verifique sua conexão ou tente novamente.', 'error');
         }
     }
 }
@@ -428,36 +388,15 @@ const cancelDelete = () => {
     confirmDialog.value = false;
 };
 
-const deleteAtividadeConfirmed = async () => {
+const deleteCategoriaConfirmed = async () => {
     if (!itemToDelete.value) return;
     try {
-        await DeleteAtividade(tenant, itemToDelete.value.ID);
-        showSnackbar('Atividade excluída com sucesso', 'success');
+        await DeleteCategoria(tenant, itemToDelete.value.ID);
+        showSnackbar('Categoria excluída com sucesso', 'success');
         fetchData();
         confirmDialog.value = false;
     } catch (error) {
-        showSnackbar('Erro ao excluir a atividade', 'error');
-    }
-};
-
-const confirmSoftDelete = (item: Item) => {
-    confirmSoftDeleteDialog.value = true;
-    itemToSoftDelete.value = item;
-};
-
-const cancelSoftDelete = () => {
-    confirmSoftDeleteDialog.value = false;
-};
-
-const softDeleteAtividadeConfirmed = async () => {
-    if (!itemToSoftDelete.value) return;
-    try {
-        await SoftDeleteAtividade(tenant, itemToSoftDelete.value.ID);
-        showSnackbar(`Atividade ${active.value ? 'inativado' : 'ativado'} com sucesso`, 'success');
-        fetchData();
-        confirmSoftDeleteDialog.value = false;
-    } catch (error) {
-        showSnackbar(`Erro ao ${active.value ? 'inativar' : 'ativar'} a atividade`, 'error');
+        showSnackbar('Erro ao excluir a categoria', 'error');
     }
 };
 
