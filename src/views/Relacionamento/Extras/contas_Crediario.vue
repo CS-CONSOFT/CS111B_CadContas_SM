@@ -40,13 +40,8 @@ import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
 import { GetContaById } from '../../../services/contas/bb012_conta';
 // Import de types
-import type { ContaById, Csicp_bb01203, MeuCrediario } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, MeuCrediario } from '../../../types/crm/bb012_GetContaById';
 //Import de componentes
-import cs_InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
-import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
-import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
-import cs_BtnSalvar from '../../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
-import cs_BtnExcluir from '../../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
 
 interface Item {
     ID: number;

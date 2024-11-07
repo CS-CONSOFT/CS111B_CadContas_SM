@@ -106,8 +106,8 @@ import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/bo
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnExcluir from '../../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
 import cs_uploadImage from '../../../submodules/cs_components/src/components/upload/cs_uploadImage.vue';
-import cs_SelectTpAnexos from '../../../components/selects/cs_SelectTpAnexos.vue';
-import cs_SelectTpDocumento from '../../../components/selects/cs_SelectTpDocumento.vue';
+import cs_SelectTpAnexos from '../../../submodules/cs_components/src/components/selects/cs_SelectTpAnexos.vue';
+import cs_SelectTpDocumento from '../../../submodules/cs_components/src/components/selects/cs_SelectTpDocumento.vue';
 
 interface Item {
     ID: string;
@@ -232,8 +232,6 @@ const fetchData = async (id: string) => {
 
         //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
         var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
-
-        console.log(data);
     } catch (error) {
         showSnackbar('Erro ao buscar conta.', 'error');
     } finally {

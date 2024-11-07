@@ -98,7 +98,7 @@
                             </v-col>
                             <div class="d-flex">
                                 <v-col cols="6" class="pa-0">
-                                    <InputTexto
+                                    <cs_InputTelefone
                                         v-model="BB012.BB012_Telefone"
                                         Prm_etiqueta="Telefone"
                                         :Prm_limpavel="false"
@@ -106,7 +106,7 @@
                                     />
                                 </v-col>
                                 <v-col cols="6" class="pa-0 pl-4">
-                                    <InputTexto
+                                    <cs_InputCelular
                                         v-model="BB012.BB012_FaxCelular"
                                         Prm_etiqueta="Celular"
                                         :Prm_limpavel="false"
@@ -258,7 +258,7 @@
                             </v-col>
                         </v-col>
                         <v-col cols="6">
-                            <InputTexto v-model="BB01202.BB012_CPF" Prm_etiqueta="CPF" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
+                            <cs_InputCPF v-model="BB01202.BB012_CPF" Prm_etiqueta="CPF" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
 
                             <cs_InputValor
                                 v-model="BB01201.BB012_LimiteCredito"
@@ -301,18 +301,21 @@ import type { BB01206, BB012, BB01202, BB01201 } from '../../views/Relacionament
 import type { Csicp_bb012, Csicp_bb01201, Csicp_bb01202, Csicp_bb01206 } from '../../services/contas/saveConta';
 import type { CEP } from '../../submodules/cs_components/src/types/enderecamento/CepTypes';
 //Import de componentes
-import InputTexto from '../../components/campos/cs_InputTexto.vue';
-import cs_SelectMRelacionamento from '../../components/selects/cs_SelectMRelacionamento.vue';
-import cs_SelectGrupo from '../../components/selects/cs_SelectGrupo.vue';
-import cs_SelectClasse from '../../components/selects/cs_SelectClasse.vue';
-import cs_SelectStatus from '../../components/selects/cs_SelectStatus.vue';
-import cs_SelectSituacao from '../../components/selects/cs_SelectSituacao.vue';
-import cs_SelectZona from '../../components/selects/cs_SelectZona.vue';
+import InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
+import cs_SelectMRelacionamento from '../../submodules/cs_components/src/components/selects/cs_SelectMRelacionamento.vue';
+import cs_SelectGrupo from '../../submodules/cs_components/src/components/selects/cs_SelectGrupo.vue';
+import cs_SelectClasse from '../../submodules/cs_components/src/components/selects/cs_SelectClasse.vue';
+import cs_SelectStatus from '../../submodules/cs_components/src/components/selects/cs_SelectStatus.vue';
+import cs_SelectSituacao from '../../submodules/cs_components/src/components/selects/cs_SelectSituacao.vue';
+import cs_SelectZona from '../../submodules/cs_components/src/components/selects/cs_SelectZona.vue';
 import cs_SelectPaises from '../../submodules/cs_components/src/components/selects/cs_SelectPaises.vue';
 import cs_SelectUF from '../../submodules/cs_components/src/components/selects/cs_SelectUF.vue';
 import cs_SelectCidades from '../../submodules/cs_components/src/components/selects/cs_SelectCidades.vue';
 import cs_InputValor from '../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
 import cs_InputCep from '../../submodules/cs_components/src/components/campos/cs_InputCep.vue';
+import cs_InputCelular from '../../submodules/cs_components/src/components/campos/cs_InputCelular.vue';
+import cs_InputTelefone from '@/submodules/cs_components/src/components/campos/cs_InputTelefone.vue';
+import cs_InputCPF from '../../submodules/cs_components/src/components/campos/cs_InputCPF.vue';
 
 //Variáveis de modelo
 const BB012 = ref<BB012>({

@@ -127,7 +127,7 @@ import { SaveDadosBancarios, DeleteDadosBancarios } from '../../../services/cont
 // Import de types
 import type { ContaById, DadosBancarios, Csicp_bb012q } from '../../../types/crm/bb012_GetContaById';
 //Import de componentes
-import InputTexto from '../../../components/campos/cs_InputTexto.vue';
+import InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_InputValor from '../../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';

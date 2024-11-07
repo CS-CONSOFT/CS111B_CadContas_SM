@@ -112,7 +112,6 @@ import { SaveRetencao, DeleteRetencao } from '../../../services/contas/bb012o_Re
 // Import de types
 import type { ContaById, Retencao_Impostos, Csicp_bb012o } from '../../../types/crm/bb012_GetContaById';
 //Import de componentes
-import InputTexto from '../../../components/campos/cs_InputTexto.vue';
 import cs_InputPercentual from '../../../submodules/cs_components/src/components/campos/cs_InputPercentual.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';

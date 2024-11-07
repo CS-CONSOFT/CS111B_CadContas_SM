@@ -9,14 +9,12 @@
             <div class="px-4 mb-5">
                 <v-row class="align-center">
                     <v-col cols="3">
-                        <v-text-field
+                        <cs_InputTexto
                             v-model="search"
                             append-inner-icon="mdi-magnify"
-                            label="Pesquisar"
-                            variant="solo-filled"
-                            single-line
-                            hide-details
-                            clearable
+                            Prm_etiqueta="Pesquisar"
+                            :Prm_limpavel="false"
+                            :Prm_isObrigatorio="false"
                         />
                     </v-col>
                     <v-spacer></v-spacer>
@@ -209,7 +207,7 @@
                         <v-col cols="6">
                             <cs_InputTexto v-model="var_BB010_Km" Prm_etiqueta="Km" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
 
-                            <cs_InputTexto
+                            <cs_InputCelular
                                 v-model="var_BB010_Fone_Contato"
                                 Prm_etiqueta="Fone Contato"
                                 :Prm_limpavel="false"
@@ -298,15 +296,16 @@ import type { ZonaCompleto, Csicp_bb0102, Lista_bb010_Completo, ApiResponse } fr
 import type { ZonaById } from '../../types/crm/zona/bb010_GetZonaById';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
-import Pagination from '../../components/navigation/Pagination.vue';
+import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
 import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
-import cs_BtnAdicionar from '../../components/botoes/cs_BtnAdicionar.vue';
-import cs_BtnExcluir from '../../components/botoes/cs_BtnExcluir.vue';
-import cs_BtnIsActive from '../../components/botoes/cs_BtnIsActive.vue';
-import cs_BtnCancelar from '../../components/botoes/cs_BtnCancelar.vue';
+import cs_BtnAdicionar from '../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
+import cs_BtnExcluir from '../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
+import cs_BtnIsActive from '../../submodules/cs_components/src/components/botoes/cs_BtnIsActive.vue';
+import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_SelectCentroDeCusto from '../../submodules/cs_components/src/components/selects/cs_SelectCentroDeCusto.vue';
 import cs_SelectResponsaveis from '../../submodules/cs_components/src/components/selects/cs_SelectResponsaveis.vue';
 import cs_SelectBancos from '../../submodules/cs_components/src/components/selects/cs_SelectBancos.vue';
+import cs_InputCelular from '../../submodules/cs_components/src/components/campos/cs_InputCelular.vue';
 
 interface Item {
     ID: string;

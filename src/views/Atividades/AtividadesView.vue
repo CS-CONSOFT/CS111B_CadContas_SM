@@ -226,12 +226,12 @@ import type { AtividadeCompleto, Csicp_bb0112, ApiResponse, Lista_bb011_Completo
 import type { AtividadeById } from '../../types/crm/atividades/bb011_GetAtividadesById';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
-import Pagination from '../../components/navigation/Pagination.vue';
+import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
 import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
-import cs_BtnAdicionar from '../../components/botoes/cs_BtnAdicionar.vue';
-import cs_BtnExcluir from '../../components/botoes/cs_BtnExcluir.vue';
-import cs_BtnIsActive from '../../components/botoes/cs_BtnIsActive.vue';
-import cs_BtnCancelar from '../../components/botoes/cs_BtnCancelar.vue';
+import cs_BtnAdicionar from '../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
+import cs_BtnExcluir from '../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
+import cs_BtnIsActive from '../../submodules/cs_components/src/components/botoes/cs_BtnIsActive.vue';
+import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 
 interface Item {
     ID: string;

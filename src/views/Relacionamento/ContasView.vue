@@ -280,16 +280,17 @@ import type { AxiosResponse } from 'axios';
 import type { ContaCompleta, ApiResponse, Lista_csicp_bb012 } from '../../types/crm/bb012_conta';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
-import Pagination from '../../components/navigation/Pagination.vue';
-import BtnAdicionar from '../../components/botoes/cs_BtnAdicionar.vue';
-import BtnExcluir from '../../components/botoes/cs_BtnExcluir.vue';
-import BtnIsActive from '../../components/botoes/cs_BtnIsActive.vue';
-import BtnCancelar from '../../components/botoes/cs_BtnCancelar.vue';
-import cs_SelectGrupo from '../../components/selects/cs_SelectGrupo.vue';
-import cs_SelectClasse from '../../components/selects/cs_SelectClasse.vue';
-import cs_SelectStatus from '../../components/selects/cs_SelectStatus.vue';
-import cs_SelectSituacao from '../../components/selects/cs_SelectSituacao.vue';
-import cs_SelectMRelacionamento from '../../components/selects/cs_SelectMRelacionamento.vue';
+import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
+import BtnAdicionar from '../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
+import BtnExcluir from '../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
+import BtnIsActive from '../../submodules/cs_components/src/components/botoes/cs_BtnIsActive.vue';
+import BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
+import cs_SelectGrupo from '../../submodules/cs_components/src/components/selects/cs_SelectGrupo.vue';
+import cs_SelectClasse from '../../submodules/cs_components/src/components/selects/cs_SelectClasse.vue';
+import cs_SelectStatus from '../../submodules/cs_components/src/components/selects/cs_SelectStatus.vue';
+import cs_SelectSituacao from '../../submodules/cs_components/src/components/selects/cs_SelectSituacao.vue';
+import cs_SelectMRelacionamento from '../../submodules/cs_components/src/components/selects/cs_SelectMRelacionamento.vue';
+
 
 interface Item {
     ID: string;

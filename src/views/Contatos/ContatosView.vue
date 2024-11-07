@@ -222,7 +222,7 @@
 
                             <div class="d-flex">
                                 <v-col cols="6" class="pa-0">
-                                    <cs_InputTexto
+                                    <cs_InputTelefone
                                         v-model="var_BB035_Telefone"
                                         Prm_etiqueta="Telefone"
                                         :Prm_limpavel="false"
@@ -230,7 +230,7 @@
                                     />
                                 </v-col>
                                 <v-col cols="6" class="pa-0 pl-4">
-                                    <cs_InputTexto
+                                    <cs_InputTelefone
                                         v-model="var_BB035_OutroTelefone"
                                         Prm_etiqueta="Outro Telefone"
                                         :Prm_limpavel="false"
@@ -239,7 +239,7 @@
                                 </v-col>
                             </div>
 
-                            <cs_InputTexto
+                            <cs_InputCelular
                                 v-model="var_BB035_Celular"
                                 Prm_etiqueta="Celular"
                                 :Prm_limpavel="false"
@@ -248,7 +248,7 @@
 
                             <cs_InputTexto v-model="var_BB035_Fax" Prm_etiqueta="Fax" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
 
-                            <cs_InputTexto
+                            <cs_InputTelefone
                                 v-model="var_BB035_TelefoneResidencia"
                                 Prm_etiqueta="Telefone Residencial"
                                 :Prm_limpavel="false"
@@ -421,16 +421,18 @@ import type { ContatosTypes } from '../../services/contas/bb035_Contato/bb035_co
 import type { CEP } from '../../submodules/cs_components/src/types/enderecamento/CepTypes';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
-import Pagination from '../../components/navigation/Pagination.vue';
+import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
 import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
-import cs_BtnAdicionar from '../../components/botoes/cs_BtnAdicionar.vue';
-import cs_BtnExcluir from '../../components/botoes/cs_BtnExcluir.vue';
-import cs_BtnIsActive from '../../components/botoes/cs_BtnIsActive.vue';
-import cs_BtnCancelar from '../../components/botoes/cs_BtnCancelar.vue';
+import cs_BtnAdicionar from '../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
+import cs_BtnExcluir from '../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
+import cs_BtnIsActive from '../../submodules/cs_components/src/components/botoes/cs_BtnIsActive.vue';
+import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_InputCep from '../../submodules/cs_components/src/components/campos/cs_InputCep.vue';
 import cs_SelectPaises from '../../submodules/cs_components/src/components/selects/cs_SelectPaises.vue';
 import cs_SelectUF from '../../submodules/cs_components/src/components/selects/cs_SelectUF.vue';
 import cs_SelectCidades from '../../submodules/cs_components/src/components/selects/cs_SelectCidades.vue';
+import cs_InputTelefone from '../../submodules/cs_components/src/components/campos/cs_InputTelefone.vue';
+import cs_InputCelular from '../../submodules/cs_components/src/components/campos/cs_InputCelular.vue';
 
 interface Item {
     ID: string;

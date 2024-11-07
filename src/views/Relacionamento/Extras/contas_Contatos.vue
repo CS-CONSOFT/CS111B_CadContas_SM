@@ -349,7 +349,7 @@ import cs_BtnCancelar from '../../../submodules/cs_components/src/components/bot
 import cs_BtnSalvar from '../../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
 import cs_BtnExcluir from '../../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
 import cs_SelectContatos from '../../../submodules/cs_components/src/components/selects/cs_SelectContatos.vue';
-import cs_SelectGrauParentesco from '../../../components/selects/cs_SelectGrauParentesco.vue';
+import cs_SelectGrauParentesco from '../../../submodules/cs_components/src/components/selects/cs_SelectGrauParentesco.vue';
 import cs_InputCep from '../../../submodules/cs_components/src/components/campos/cs_InputCep.vue';
 import cs_SelectPaises from '../../../submodules/cs_components/src/components/selects/cs_SelectPaises.vue';
 import cs_SelectUF from '../../../submodules/cs_components/src/components/selects/cs_SelectUF.vue';

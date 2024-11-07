@@ -494,10 +494,10 @@ import type { ContaById } from '../../types/crm/bb012_GetContaById';
 import type { Csicp_bb012, Csicp_bb01201, Csicp_bb01202, Csicp_bb01206 } from '@/services/contas/saveConta';
 import type { BB01206, BB012, BB01202, BB01201 } from '../../views/Relacionamento/bb012_Types';
 //Import de componentes
-import InputTexto from '../../components/campos/cs_InputTexto.vue';
-import cs_SelectZona from '../../components/selects/cs_SelectZona.vue';
-import cs_SelectAtividade from '../../components/selects/cs_SelectAtividade.vue';
-import cs_SelectCategoria from '../../components/selects/cs_SelectCategoria.vue';
+import InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
+import cs_SelectZona from '../../submodules/cs_components/src/components/selects/cs_SelectZona.vue';
+import cs_SelectAtividade from '../../submodules/cs_components/src/components/selects/cs_SelectAtividade.vue';
+import cs_SelectCategoria from '../../submodules/cs_components/src/components/selects/cs_SelectCategoria.vue';
 import cs_SelectCondicaoPagto from '../../submodules/cs_components/src/components/selects/cs_SelectCondicaoPagto.vue';
 
 const props = defineProps<{
