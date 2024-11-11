@@ -10,10 +10,16 @@
 
         <v-form ref="formRef">
             <v-card class="px-4 py-2 border" elevation="0">
-                <v-row class="d-flex flex-row-reverse my-2">
+                <v-row class="d-flex my-2">
                     <v-col cols="auto">
-                        <v-btn color="primary" @click="salvarConta()">Salvar</v-btn>
-                        <v-btn color="error" :to="'/Contas'" class="ml-4">Cancelar</v-btn>
+                        <v-btn color="success" @click="abrirPopup">Consultar CNPJ</v-btn>
+                    </v-col>
+
+                    <v-spacer></v-spacer>
+
+                    <v-col cols="auto" class="d-flex justify-end">
+                        <cs_BtnSalvar @click="salvarConta()" />
+                        <cs_BtnCancelar class="ml-4" @click="redirectToContas" />
                     </v-col>
                 </v-row>
 
@@ -24,7 +30,6 @@
                         </v-col>
                     </v-row>
                     <v-row class="d-flex justify-space-between pa-2">
-                        <v-col cols="2"> </v-col>
                         <v-col cols="2">
                             <cs_SelectMRelacionamento
                                 v-model="BB012.BB012_ModRelacao_ID"
@@ -53,15 +58,37 @@
                             <v-col cols="12" class="pa-0 pb-4">
                                 <p class="text-h5">Sobre</p>
                             </v-col>
-                            <InputTexto
-                                v-model="BB012.BB012_Codigo"
-                                Prm_etiqueta="Código"
-                                :Prm_limpavel="false"
-                                :Prm_isObrigatorio="true"
-                                :rules="rules.codigo"
-                            />
+                            <div class="d-flex">
+                                <v-col cols="3" class="pa-0">
+                                    <cs_InputTexto
+                                        v-model="BB012.BB012_Codigo"
+                                        Prm_etiqueta="Código"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="true"
+                                        :rules="rules.codigo"
+                                    />
+                                </v-col>
+                                <v-col cols="4" class="pa-0 pl-4">
+                                    <cs_InputCPF
+                                        v-model="BB01202.BB012_CPF"
+                                        Prm_etiqueta="CPF"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                        :disabled="disableCPF"
+                                    />
+                                </v-col>
+                                <v-col cols="5" class="pa-0 pl-4">
+                                    <cs_InputCnpj
+                                        v-model="BB01202.BB012_CNPJ"
+                                        Prm_etiqueta="CNPJ"
+                                        :Prm_limpavel="false"
+                                        :Prm_isObrigatorio="false"
+                                        :disabled="disableCNPJ"
+                                    />
+                                </v-col>
+                            </div>
 
-                            <InputTexto
+                            <cs_InputTexto
                                 v-model="BB012.BB012_Nome_Cliente"
                                 Prm_etiqueta="Nome da Conta"
                                 :Prm_limpavel="false"
@@ -69,7 +96,7 @@
                                 :rules="rules.nome"
                             />
 
-                            <InputTexto
+                            <cs_InputTexto
                                 v-model="BB012.BB012_Nome_Fantasia"
                                 Prm_etiqueta="Nome Fantasia"
                                 :Prm_limpavel="false"
@@ -82,7 +109,7 @@
 
                             <div class="d-flex">
                                 <v-col cols="6" class="pa-0">
-                                    <InputTexto
+                                    <cs_InputTexto
                                         v-model="BB012.BB012_Data_Aniversario"
                                         Prm_etiqueta="Nascimento"
                                         :Prm_limpavel="false"
@@ -91,7 +118,7 @@
                                     />
                                 </v-col>
                                 <v-col cols="6" class="pa-0 pl-4">
-                                    <InputTexto
+                                    <cs_InputTexto
                                         v-model="BB012.BB012_Data_Cadastro"
                                         Prm_etiqueta="Data Cadastro"
                                         :Prm_limpavel="false"
@@ -108,7 +135,7 @@
                             </v-col>
                             <div class="d-flex">
                                 <v-col cols="6" class="pa-0">
-                                    <InputTexto
+                                    <cs_InputTexto
                                         v-model="BB012.BB012_Telefone"
                                         Prm_etiqueta="Telefone"
                                         :Prm_limpavel="false"
@@ -125,16 +152,21 @@
                                 </v-col>
                             </div>
 
-                            <InputTexto
+                            <cs_InputTexto
                                 v-model="BB012.BB012_Home_Page"
                                 Prm_etiqueta="Home Page"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
                             />
 
-                            <InputTexto v-model="BB012.BB012_Email" Prm_etiqueta="Email" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
+                            <cs_InputTexto
+                                v-model="BB012.BB012_Email"
+                                Prm_etiqueta="Email"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                            />
 
-                            <InputTexto
+                            <cs_InputTexto
                                 v-model="BB012.BB012_Descricao"
                                 Prm_etiqueta="Descrição"
                                 :Prm_limpavel="false"
@@ -164,7 +196,7 @@
 
                             <div class="d-flex">
                                 <v-col cols="9" class="pa-0">
-                                    <InputTexto
+                                    <cs_InputTexto
                                         v-model="BB01206.BB012_Logradouro"
                                         Prm_etiqueta="Logradouro"
                                         :Prm_limpavel="false"
@@ -172,7 +204,7 @@
                                     />
                                 </v-col>
                                 <v-col cols="3" class="pa-0 pl-4">
-                                    <InputTexto
+                                    <cs_InputTexto
                                         v-model="BB01206.BB012_Numero"
                                         Prm_etiqueta="Número"
                                         :Prm_limpavel="false"
@@ -181,7 +213,7 @@
                                 </v-col>
                             </div>
 
-                            <InputTexto
+                            <cs_InputTexto
                                 v-model="BB01206.BB012_Complemento"
                                 Prm_etiqueta="Complemento"
                                 :Prm_limpavel="false"
@@ -189,7 +221,7 @@
                             />
                         </v-col>
                         <v-col col="6">
-                            <InputTexto
+                            <cs_InputTexto
                                 v-model="BB01206.BB012_Perimetro"
                                 Prm_etiqueta="Perímetro"
                                 :Prm_limpavel="false"
@@ -197,7 +229,7 @@
                             />
                             <div class="d-flex">
                                 <v-col cols="6" class="pa-0">
-                                    <InputTexto
+                                    <cs_InputTexto
                                         v-model="BB01206.BB012_Bairro"
                                         Prm_etiqueta="Bairro"
                                         :Prm_limpavel="false"
@@ -268,8 +300,6 @@
                             </v-col>
                         </v-col>
                         <v-col cols="6">
-                            <cs_InputCPF v-model="BB01202.BB012_CPF" Prm_etiqueta="CPF" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
-
                             <cs_InputValor
                                 v-model="BB01201.BB012_LimiteCredito"
                                 Prm_etiqueta="Limite de Crédito"
@@ -290,13 +320,16 @@
                 </v-row>
                 <v-row class="d-flex flex-row-reverse my-2">
                     <v-col cols="auto">
-                        <v-btn color="primary" @click="salvarConta()">Salvar</v-btn>
-                        <v-btn color="error" :to="'/Contas'" class="ml-4">Cancelar</v-btn>
+                        <cs_BtnSalvar @click="salvarConta()" />
+                        <cs_BtnCancelar class="ml-4" @click="redirectToContas" />
                     </v-col>
                 </v-row>
             </v-card>
         </v-form>
     </v-container>
+
+    <!-- Componente de Popup de Consulta CNPJ -->
+    <cs_PopUpRecuperarDados v-model="mostrarPopup" @enviarDadosCnpj="receberDadosCnpj" />
 
     <v-snackbar v-model="snackbar" :timeout="3000" top v-bind:color="snackbarColor" multi-line>
         {{ snackbarMessage }}
@@ -307,7 +340,7 @@
 </template>
 <script setup lang="ts">
 // Import de bibliotecas e etc...
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
@@ -319,7 +352,7 @@ import type { BB01206, BB012, BB01202, BB01201 } from '../../views/Relacionament
 import type { Csicp_bb012, Csicp_bb01201, Csicp_bb01202, Csicp_bb01206 } from '@/services/contas/saveConta';
 import type { CEP } from '../../submodules/cs_components/src/types/enderecamento/CepTypes';
 //Import de componentes
-import InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
+import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_SelectMRelacionamento from '../../submodules/cs_components/src/components/selects/cs_SelectMRelacionamento.vue';
 import cs_SelectGrupo from '../../submodules/cs_components/src/components/selects/cs_SelectGrupo.vue';
 import cs_SelectClasse from '../../submodules/cs_components/src/components/selects/cs_SelectClasse.vue';
@@ -333,6 +366,10 @@ import cs_InputValor from '../../submodules/cs_components/src/components/campos/
 import cs_InputCep from '../../submodules/cs_components/src/components/campos/cs_InputCep.vue';
 import cs_InputCelular from '../../submodules/cs_components/src/components/campos/cs_InputCelular.vue';
 import cs_InputCPF from '../../submodules/cs_components/src/components/campos/cs_InputCPF.vue';
+import cs_InputCnpj from '../../submodules/cs_components/src/components/campos/cs_InputCnpj.vue';
+import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
+import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
+import cs_PopUpRecuperarDados from '../../submodules/cs_components/src/components/popup/cs_PopUpRecuperarDados.vue';
 
 const props = defineProps<{
     id: string;
@@ -506,6 +543,9 @@ const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
 const router = useRouter();
 const formRef = ref<any>(null);
+const mostrarPopup = ref(false);
+const disableCPF = ref(false);
+const disableCNPJ = ref(false);
 
 const rules = {
     codigo: [validationRules.required, validationRules.numeric],
@@ -524,8 +564,38 @@ const showSnackbar = (message: string, color: string) => {
     snackbar.value = true;
 };
 
+function abrirPopup() {
+    mostrarPopup.value = true;
+}
+
+// Função para lidar com o recebimento dos dados
+function receberDadosCnpj(dados: any) {
+    console.log('Dados recebidos do popup:', dados);
+
+    BB012.value.BB012_Nome_Cliente = dados.razao_social;
+    BB012.value.BB012_Nome_Fantasia;
+    BB012.value.BB012_Data_Aniversario;
+    BB012.value.BB012_Data_Cadastro;
+    BB012.value.BB012_Telefone = dados.ddd_telefone_1;
+    BB012.value.BB012_FaxCelular = dados.ddd_fax;
+    BB012.value.BB012_Home_Page;
+    BB012.value.BB012_Email = dados.email;
+    BB012.value.BB012_Nome_Fantasia = dados.nome_fantasia;
+    BB012.value.BB012_Data_Cadastro = dados.data_inicio_atividade;
+
+    BB01206.value.BB012_Logradouro = dados.logradouro;
+    BB01206.value.BB012_Numero = dados.numero;
+    BB01206.value.BB012_Complemento = dados.complemento;
+    BB01206.value.BB012_Bairro = dados.bairro;
+    BB01206.value.BB012_UF = dados.uf;
+    BB01206.value.BB012_CEP = dados.cep;
+
+    BB01202.value.BB012_CNPJ = dados.cnpj;
+
+    mostrarPopup.value = false;
+}
+
 const handleCepInfo = (info: CEP) => {
-    console.log(info);
     BB01206.value.BB012_Logradouro = info.logradouro;
     BB01206.value.BB012_Bairro = info.bairro;
     BB01206.value.BB012_Complemento = info.complemento;
@@ -904,6 +974,28 @@ const redirectToEditCompleto = async (id: string) => {
         console.error('Item indefinido');
     }
 };
+
+function redirectToContas() {
+    router.push({ name: 'Contas' });
+}
+
+// Observa mudanças em BB012_CPF
+watch(
+    () => BB01202.value.BB012_CPF,
+    (newCPF) => {
+        disableCNPJ.value = !!newCPF; // Desabilita o campo CNPJ se CPF tiver algum valor
+        if (!newCPF) disableCNPJ.value = false; // Habilita CNPJ caso CPF seja vazio
+    }
+);
+
+// Observa mudanças em BB012_CNPJ
+watch(
+    () => BB01202.value.BB012_CNPJ,
+    (newCNPJ) => {
+        disableCPF.value = !!newCNPJ; // Desabilita o campo CPF se CNPJ tiver algum valor
+        if (!newCNPJ) disableCPF.value = false; // Habilita CPF caso CNPJ seja vazio
+    }
+);
 
 onMounted(() => {
     fetchContaById(props.id);
