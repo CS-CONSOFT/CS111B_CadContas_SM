@@ -84,6 +84,14 @@ const CrmRoutes = {
             meta: {
                 title: 'Categorias'
             }
+        },
+        {
+            name: 'Convenio',
+            path: '/Convenio',
+            component: () => import('../../src/views/Convenio/ConvenioView.vue'),
+            meta: {
+                title: 'Convênio'
+            }
         }
     ]
 };

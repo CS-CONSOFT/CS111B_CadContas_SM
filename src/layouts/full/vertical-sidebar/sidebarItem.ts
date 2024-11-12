@@ -40,6 +40,11 @@ const sidebarItem: Menu[] = [
         title: 'Categorias',
         icon: 'mdi-account-multiple-outline',
         to: '/Categorias'
+    },
+    {
+        title: 'Convenio',
+        icon: 'mdi-account-multiple-outline',
+        to: '/Convenio'
     }
 ];
 
