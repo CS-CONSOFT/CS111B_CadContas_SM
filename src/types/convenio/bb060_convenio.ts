@@ -719,6 +719,7 @@ export interface Code_Erro {
 }
 
 export interface ApiResponse<T> {
+    Convenio_List: any;
     PageSize: any;
     data: T;
     status: number;

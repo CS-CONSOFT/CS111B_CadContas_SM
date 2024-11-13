@@ -92,6 +92,39 @@ const CrmRoutes = {
             meta: {
                 title: 'Convênio'
             }
+        },
+        {
+            name: 'ConvenioEdit',
+            path: 'ConvenioEdit/:id?',
+            component: () => import('../../src/views/Convenio/ConvenioEditView.vue'),
+            meta: {
+                title: 'Convênio'
+            },
+            props: true
+        },
+        {
+            name: 'ConvenioCreate',
+            path: '/ConvenioCreate',
+            component: () => import('../../src/views/Convenio/ConvenioCreateView.vue'),
+            meta: {
+                title: 'Convênio'
+            }
+        },
+        {
+            name: 'ConvenioMaster',
+            path: '/ConvenioMaster',
+            component: () => import('../../src/views/ConvenioMaster/ConvenioMasterView.vue'),
+            meta: {
+                title: 'Convênio Master'
+            }
+        },
+        {
+            name: 'FaixaEtaria',
+            path: '/FaixaEtaria',
+            component: () => import('../../src/views/FaixaEtaria/FaixaEtariaView.vue'),
+            meta: {
+                title: 'Faixa Etária'
+            }
         }
     ]
 };

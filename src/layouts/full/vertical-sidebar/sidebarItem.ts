@@ -45,6 +45,16 @@ const sidebarItem: Menu[] = [
         title: 'Convenio',
         icon: 'mdi-account-multiple-outline',
         to: '/Convenio'
+    },
+    {
+        title: 'Convênio Master',
+        icon: 'mdi-account-multiple-outline',
+        to: '/ConvenioMaster'
+    },
+    {
+        title: 'Faixa Etária',
+        icon: 'mdi-account-multiple-outline',
+        to: '/FaixaEtaria'
     }
 ];
 

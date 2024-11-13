@@ -62,8 +62,8 @@ const SaveConvenio = async (tenantId: number | undefined, convenio: Csicp_bb060)
 const DeleteConvenio = async (tenantId: number | undefined, in_bb060_id: string): Promise<AxiosResponse<any>> => {
     try {
         const response = await axios.delete(`${URLBase}/CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb060_Delete_Convenio`, {
-            params: {
-                Tenant_id: tenantId,
+            headers: {
+                tenant_id: tenantId,
                 in_bb060_id: in_bb060_id
             }
         });
