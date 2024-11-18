@@ -125,6 +125,15 @@ const CrmRoutes = {
             meta: {
                 title: 'Faixa Etária'
             }
+        },
+        {
+            name: 'FaixaEtariaEdit',
+            path: 'FaixaEtariaEdit/:id?',
+            component: () => import('../../src/views/FaixaEtaria/FaixaEtariaEditView.vue'),
+            meta: {
+                title: 'Faixa Etária'
+            },
+            props: true
         }
     ]
 };

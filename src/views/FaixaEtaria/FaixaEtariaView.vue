@@ -23,7 +23,7 @@
                 <v-spacer></v-spacer>
 
                 <v-col cols="auto" class="d-flex align-center">
-                    <cs_BtnAdicionar @click="openDialog" />
+                    <cs_BtnAdicionar @click="redirectToCreate" />
                 </v-col>
             </v-row>
         </div>
@@ -74,40 +74,12 @@
                     }}</v-chip>
                 </template>
                 <template v-slot:item.actions="{ item }">
-                    <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
+                    <v-icon small @click="redirectToEdit(item)" class="v-btn-icon">mdi-pencil</v-icon>
                     <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
                 </template>
             </v-data-table>
         </v-card>
     </v-container>
-
-    <v-dialog v-model="dialog" max-width="400">
-        <v-card>
-            <v-card-title class="pa-4 bg-lightprimary">
-                <span class="text-h5">{{ itemToEdit ? 'Editar' : 'Adicionar' }} Faixa Etária</span>
-            </v-card-title>
-            <v-card-text>
-                <v-form ref="formRef">
-                    <div class="d-flex">
-                        <v-col cols="12">
-                            <cs_InputTexto
-                                v-model="var_bb064_Descricao"
-                                Prm_etiqueta="Descrição"
-                                :Prm_limpavel="false"
-                                :Prm_isObrigatorio="false"
-                                :rules="rules.nome"
-                            />
-                            <v-checkbox v-model="var_bb064_IsActive" label="Ativo?"></v-checkbox>
-                        </v-col>
-                    </div>
-                </v-form>
-            </v-card-text>
-            <v-card-actions class="d-flex justify-space-around">
-                <cs_BtnCancelar @click="closeDialog" />
-                <cs_BtnSalvar @click="CreateOrUpdateFaixaEtaria" />
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
 
     <v-dialog v-model="confirmDialog" max-width="400">
         <v-card>
@@ -131,18 +103,16 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { GetFaixaEtariaList, GetFaixaEtariaById, SaveFaixaEtaria, DeleteFaixaEtaria } from '../../services/faixa_etaria/bb064_faixaEtaria';
+import { GetFaixaEtariaList, DeleteFaixaEtaria } from '../../services/faixa_etaria/bb064_faixaEtaria';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { FaixaEtariaCompleto, ApiResponse, Csicp_bb064, TabelaFaixaEtaria } from '../../types/faixa_etaria/bb064_faixaEtaria';
-import type { FaixaEtariaById } from '../../types/faixa_etaria/bb064_GetFaixaEtariaById';
+import type { FaixaEtariaCompleto, ApiResponse, TabelaFaixaEtaria } from '../../types/faixa_etaria/bb064_faixaEtaria';
 //Import de componentes
-import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
-import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
 import cs_BtnAdicionar from '../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnExcluir from '../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
 import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
@@ -180,18 +150,11 @@ const headers = ref([
 //Declaração de variaveis
 const items = ref<Item[]>([]);
 const loading = ref(false);
-const dialog = ref(false);
 const confirmDialog = ref(false);
 const itemToDelete = ref<Item | null>(null);
-const itemToEdit = ref<Item | null>(null);
 const active = ref(true);
 const count = false;
 const search = ref('');
-
-//Variáveis de edição para csicp_bb067
-const var_ID = ref<number>(0);
-const var_bb064_Descricao = ref<string>('');
-const var_bb064_IsActive = ref<boolean>(false);
 
 const rules = {
     codigo: [validationRules.required, validationRules.numeric],
@@ -200,6 +163,7 @@ const rules = {
 
 const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
+const router = useRouter();
 const formRef = ref<any>(null);
 
 //variaveis da paginação
@@ -247,59 +211,6 @@ const fetchData = async () => {
     }
 };
 
-const closeDialog = () => {
-    dialog.value = false;
-};
-
-const openDialog = () => {
-    dialog.value = true;
-    itemToEdit.value = null;
-
-    // Zerar variáveis para csicp_bb067
-    var_ID.value = 0;
-    var_bb064_Descricao.value = '';
-    var_bb064_IsActive.value = false;
-};
-
-const openEditDialog = async (item: Item) => {
-    dialog.value = true;
-    itemToEdit.value = item;
-
-    try {
-        const data: FaixaEtariaById = await GetFaixaEtariaById(tenant, item.ID);
-        // Atribuindo os valores da resposta aos campos da BB067
-        var_ID.value = data.bb064_FxEtariaId;
-        var_bb064_Descricao.value = data.bb064_Descricao;
-        var_bb064_IsActive.value = data.bb064_IsActive;
-    } catch (error) {
-        showSnackbar('Erro ao buscar dados da faixa etária', 'error');
-    }
-};
-
-async function CreateOrUpdateFaixaEtaria() {
-    if (formRef.value.validate()) {
-        try {
-            const data: Csicp_bb064 = {
-                bb064_FxEtariaId: var_ID.value ? var_ID.value : 0,
-                bb064_Descricao: var_bb064_Descricao.value,
-                bb064_IsActive: var_bb064_IsActive.value
-            };
-
-            const response = await SaveFaixaEtaria(tenant, data);
-
-            if (response.data.Out_IsSuccess) {
-                showSnackbar('Faixa etária master salva com sucesso', 'success');
-                fetchData();
-                dialog.value = false;
-            } else {
-                showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar faixa etária. Verifique os dados.', 'error');
-            }
-        } catch (error) {
-            showSnackbar('Erro ao atualizar a faixa etária. Verifique sua conexão ou tente novamente.', 'error');
-        }
-    }
-}
-
 const confirmDelete = (item: Item) => {
     confirmDialog.value = true;
     itemToDelete.value = item;
@@ -318,6 +229,25 @@ const deleteFaixaEtariaConfirmed = async () => {
         confirmDialog.value = false;
     } catch (error) {
         showSnackbar('Erro ao excluir a faixa etária', 'error');
+    }
+};
+
+const redirectToCreate = async () => {
+    await router.push({
+        name: 'FaixaEtariaCreate'
+    });
+};
+
+const redirectToEdit = async (item: { ID: any }) => {
+    if (item && item.ID) {
+        await router.push({
+            name: 'FaixaEtariaEdit',
+            params: {
+                id: item.ID
+            }
+        });
+    } else {
+        console.error('Item indefinido');
     }
 };
 
