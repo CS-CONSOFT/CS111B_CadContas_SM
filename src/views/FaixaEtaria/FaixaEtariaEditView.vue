@@ -60,12 +60,14 @@
                                 />
                             </v-col>
                             <v-col cols="3">
-                                <cs_InputTexto
+                                <cs_InputValor
                                     v-model="var_bb066_Valor"
                                     Prm_etiqueta="Valor"
-                                    :Prm_limpavel="false"
                                     :Prm_isObrigatorio="false"
+                                    :Prm_Precision="2"
                                 />
+
+                                {{ var_bb066_Valor }}
                             </v-col>
                             <v-col cols="3" class="d-flex justify-end">
                                 <v-btn color="primary" @click="saveDetalhes()"> Adicionar</v-btn>
@@ -122,8 +124,9 @@
                             <p class="text-h5">Vincular Convênios</p>
                         </v-row>
                         <v-row class="pb-4">
-                            <v-col cols="5" class="d-inline-flex align-center">
-                                <v-btn class="ml-4" color="primary" @click=""> Adicionar</v-btn>
+                            <v-col cols="5" class="d-inline-flex align-start">
+                                <cs_SelectConvenios class="mb-6" v-model="selectedConvenio" :Prm_isObrigatorio="false" />
+                                <v-btn class="ml-4" color="primary" @click="saveConvenio()"> Adicionar</v-btn>
                             </v-col>
                         </v-row>
 
@@ -211,9 +214,7 @@ import cs_InputTexto from '../../submodules/cs_components/src/components/campos/
 import cs_InputValor from '../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
 import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
-import cs_BtnAdicionar from '../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
-import cs_BtnExcluir from '../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
-import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
+import cs_SelectConvenios from '../../submodules/cs_components/src/components/selects/cs_SelectConvenios.vue';
 
 interface ItemBB066 {
     ID: number;
@@ -288,9 +289,11 @@ const var_bb064_IsActive = ref<boolean>(false);
 //Variáveis de modelo bb066
 const var_bb066_ID = ref<number>(0);
 const var_bb066_FxEtariaID = ref<number>(0);
-const var_bb066_FaixaDe = ref<number>(0);
-const var_bb066_FaixaAte = ref<number>(0);
-const var_bb066_Valor = ref<number>(0);
+const var_bb066_FaixaDe = ref<any>('');
+const var_bb066_FaixaAte = ref<any>('');
+const var_bb066_Valor = ref<any>('');
+
+const selectedConvenio = ref<number>(0);
 
 const faixaEtaria = ref<Csicp_bb066_List[]>([]);
 const convenioVinculados = ref<Vinculo_FxEtaria_Convenio[]>([]);
@@ -382,31 +385,39 @@ async function CreateOrUpdateFaixaEtaria() {
 }
 
 const saveDetalhes = async () => {
-    // Transformar os dados antes de enviar
+    // Limpar o valor formatado antes de enviar para a API
+    const cleanValue = var_bb066_Valor.value.replace(/\D/g, ''); // Remove tudo que não for número
+
+    // Converte para número com a precisão
+    const numericValue = Number(cleanValue) / Math.pow(10, 2); // Certifique-se de usar a precisão correta
+
+    // Atualiza o valor limpo para a variável
+    var_bb066_Valor.value = numericValue;
+
+    // Monta o objeto de dados para enviar à API
     const data: Csicp_bb066_List = {
         bb066_ID: 0,
         bb066_FxEtariaID: var_ID.value,
         bb066_FaixaDe: Number(var_bb066_FaixaDe.value) || 0,
         bb066_FaixaAte: Number(var_bb066_FaixaAte.value) || 0,
-        bb066_Valor: var_bb066_Valor.value
+        bb066_Valor: numericValue // Envia o valor limpo (sem formatação)
     };
 
     try {
         // Envia os dados para a API
         await SaveDetalhesFaixaEtaria(tenant, data);
 
-        // Exibe mensagem de sucesso
         showSnackbar('Detalhes da faixa etária adicionados com sucesso', 'success');
 
-        // Atualiza os dados locais
+        // Atualiza a lista após a operação
         const updatedData = await GetFaixaEtariaById(tenant, var_ID.value.toString());
         faixaEtaria.value = updatedData.csicp_bb066_List;
         itemsBB066.value = mapFaixaEtariaToItems(updatedData.csicp_bb066_List);
 
-        // Reseta os campos do formulário
-        var_bb066_FaixaDe.value = 0;
-        var_bb066_FaixaAte.value = 0;
-        var_bb066_Valor.value = 0;
+        // Limpa os campos após a operação
+        var_bb066_FaixaDe.value = '';
+        var_bb066_FaixaAte.value = '';
+        var_bb066_Valor.value = ''; // Limpa o valor de var_bb066_Valor
     } catch (error) {
         showSnackbar('Erro ao salvar detalhes da faixa etária', 'error');
     }
@@ -423,24 +434,22 @@ const deleteDetalhes = async (id: string) => {
 };
 
 const saveConvenio = async () => {
-    // Transformar os dados antes de enviar
     const data: Csicp_bb065 = {
         bb065_ID: 0,
-        bb064_FxEtariaID: 0,
-        bb062_ConvenioID: 0
+        bb064_FxEtariaID: var_ID.value,
+        bb062_ConvenioID: selectedConvenio.value
     };
 
     try {
-        // Envia os dados para a API
         await SaveVinculoConvenioFaixaEtaria(tenant, data);
 
-        // Exibe mensagem de sucesso
         showSnackbar('Vínculo adicionado com sucesso', 'success');
 
-        // Atualiza os dados locais
         const updatedData = await GetFaixaEtariaById(tenant, var_ID.value.toString());
         convenioVinculados.value = updatedData.Vinculo_FxEtaria_Convenio;
         itemsBB065.value = mapConvenioVinculadosToItems(updatedData.Vinculo_FxEtaria_Convenio);
+
+        selectedConvenio.value = 0;
     } catch (error) {
         showSnackbar('Erro ao salvar vínculo', 'error');
     }
