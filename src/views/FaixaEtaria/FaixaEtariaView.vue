@@ -261,7 +261,7 @@ const atualizarFaixaConfirmed = async () => {
     if (!itemToFaixaEtaria.value) return;
     console.log(itemToFaixaEtaria.value);
     try {
-        await AtualizarFaixaEtaria(itemToFaixaEtaria.value.ID);
+        await AtualizarFaixaEtaria(tenant, itemToFaixaEtaria.value.ID);
         showSnackbar('Faixa atualizada com sucesso', 'success');
         fetchData();
     } catch (error) {

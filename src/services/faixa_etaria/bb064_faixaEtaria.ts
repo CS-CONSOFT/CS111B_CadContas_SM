@@ -138,10 +138,11 @@ const DeleteVinculoConvenioFaixaEtaria = async (tenantId: number | undefined, in
 
 // Atualizar Faixa Etária
 
-const AtualizarFaixaEtaria = async (In_bb064_ID: string): Promise<AxiosResponse<any>> => {
+const AtualizarFaixaEtaria = async (tenantId: number | undefined, In_bb064_ID: string): Promise<AxiosResponse<any>> => {
     try {
         const response = await axios.get(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_Pro_AtualizaFxEtaria`, {
             headers: {
+                tenant_id: tenantId,
                 In_bb064_ID: In_bb064_ID
             }
         });

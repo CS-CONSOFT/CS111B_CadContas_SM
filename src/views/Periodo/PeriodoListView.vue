@@ -76,7 +76,7 @@
                         <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
                         <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
                         <v-icon small @click="confirmAtualizarStatus(item)" class="v-btn-icon">mdi-calendar</v-icon>
-                        <v-icon small @click="confirmTitulo(item)" class="v-btn-icon">mdi-arrow-right-thick</v-icon>
+                        <v-icon small @click="confirmTitulo(item)" class="v-btn-icon">mdi-cash-check</v-icon>
                     </template>
                 </v-data-table>
             </v-card>
@@ -121,8 +121,9 @@
                                 type="date"
                             />
 
-                            <cs_InputTexto
+                            <cs_SelectVencimento
                                 v-model="var_bb062_DiaVenctoID"
+                                class="mb-5"
                                 Prm_etiqueta="Dia Vencimento"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
@@ -187,6 +188,7 @@ import cs_BtnAdicionar from '../../submodules/cs_components/src/components/botoe
 import cs_BtnExcluir from '../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
 import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
+import cs_SelectVencimento from '../../submodules/cs_components/src/components/selects/cs_SelectVencimento.vue';
 
 interface Item {
     ID: string;
@@ -433,9 +435,15 @@ const confirmTitulo = (item: Item) => {
 const gerarTituloConfirmed = async () => {
     if (!itemToGerarTitulo.value) return;
     try {
-        await GerarTitulo(tenant, itemToGerarTitulo.value.ID);
-        showSnackbar('Título gerado com sucesso', 'success');
-        fetchData();
+        const response = await GerarTitulo(tenant, itemToGerarTitulo.value.ID);
+
+        if (response.data.Out_IsSuccess) {
+            showSnackbar('Título gerado com sucesso', 'success');
+            fetchData();
+        } else {
+            showSnackbar(response.data.Out_Message, 'error');
+            fetchData();
+        }
     } catch (error) {
         showSnackbar('Erro ao gerar título', 'error');
     }
