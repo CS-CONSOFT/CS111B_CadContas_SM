@@ -1,4 +1,4 @@
-export interface EstaticasBB {
+export interface EstaticasBB012 {
     csicp_bb012_ClaCta: Csicp_bb012_ClaCta[];
     csicp_bb012_GruCta: Csicp_bb012_GruCta[];
     csicp_bb012j_TpEnd: Csicp_bb012j_TpEnd[];

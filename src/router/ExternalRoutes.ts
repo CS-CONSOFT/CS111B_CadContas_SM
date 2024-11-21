@@ -1,3 +1,5 @@
+import { title } from 'process';
+
 const CrmRoutes = {
     path: '/',
     component: () => import('@/layouts/full/FullLayout.vue'),
@@ -32,6 +34,15 @@ const CrmRoutes = {
             component: () => import('../../src/views/Relacionamento/ContasEditView.vue'),
             meta: {
                 title: 'Contas'
+            },
+            props: true
+        },
+        {
+            name: 'VinculoConta',
+            path: '/VinculoConta',
+            component: () => import('../../src/views/Convenio/ConvenioVinculoContaView.vue'),
+            meta: {
+                title: 'Vínculo Conta'
             },
             props: true
         },
@@ -134,6 +145,22 @@ const CrmRoutes = {
                 title: 'Faixa Etária'
             },
             props: true
+        },
+        {
+            name: 'FaixaEtariaCreate',
+            path: '/FaixaEtariaCreate',
+            component: () => import('../../src/views/FaixaEtaria/FaixaEtariaCreateView.vue'),
+            meta: {
+                title: 'Faixa Etária'
+            }
+        },
+        {
+            name: 'Periodo',
+            path: '/Periodo',
+            component: () => import('../../src/views/Periodo/PeriodoListView.vue'),
+            meta: {
+                title: 'Período Cobrança'
+            }
         }
     ]
 };

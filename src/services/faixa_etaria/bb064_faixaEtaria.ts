@@ -136,6 +136,22 @@ const DeleteVinculoConvenioFaixaEtaria = async (tenantId: number | undefined, in
     }
 };
 
+// Atualizar Faixa Etária
+
+const AtualizarFaixaEtaria = async (In_bb064_ID: string): Promise<AxiosResponse<any>> => {
+    try {
+        const response = await axios.get(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_Pro_AtualizaFxEtaria`, {
+            headers: {
+                In_bb064_ID: In_bb064_ID
+            }
+        });
+        return response;
+    } catch (error) {
+        console.error('Erro ao atualizar a faixa etária:', error);
+        throw error;
+    }
+};
+
 export {
     GetFaixaEtariaList,
     GetFaixaEtariaById,
@@ -144,5 +160,6 @@ export {
     SaveDetalhesFaixaEtaria,
     DeleteDetalhesFaixaEtaria,
     SaveVinculoConvenioFaixaEtaria,
-    DeleteVinculoConvenioFaixaEtaria
+    DeleteVinculoConvenioFaixaEtaria,
+    AtualizarFaixaEtaria
 };

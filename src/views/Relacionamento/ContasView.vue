@@ -160,7 +160,7 @@
                                 <v-icon small v-bind="props" class="v-btn-icon">mdi-dots-vertical</v-icon>
                             </template>
 
-                            <v-list style="width: 210px">
+                            <v-list style="width: 250px">
                                 <v-list-item v-for="(opcao, index) in opcoesMenu" :key="index" @click="opcao.acao(item)">
                                     <div class="d-flex">
                                         <v-col cols="3">
@@ -290,7 +290,6 @@ import cs_SelectClasse from '../../submodules/cs_components/src/components/selec
 import cs_SelectStatus from '../../submodules/cs_components/src/components/selects/cs_SelectStatus.vue';
 import cs_SelectSituacao from '../../submodules/cs_components/src/components/selects/cs_SelectSituacao.vue';
 import cs_SelectMRelacionamento from '../../submodules/cs_components/src/components/selects/cs_SelectMRelacionamento.vue';
-
 
 interface Item {
     ID: string;
@@ -542,6 +541,22 @@ const opcoesMenu = [
         acao: (item: Item) => {
             confirmDialog.value = true;
             itemToDelete.value = item;
+        }
+    },
+    {
+        nome: () => 'Vínculo Convênio',
+        icone: () => 'mdi-link-variant',
+        acao: async (item: { ID: any }) => {
+            if (item && item.ID) {
+                await router.push({
+                    name: 'VinculoConta',
+                    params: {
+                        id: item.ID
+                    }
+                });
+            } else {
+                console.error('Item indefinido');
+            }
         }
     },
     {

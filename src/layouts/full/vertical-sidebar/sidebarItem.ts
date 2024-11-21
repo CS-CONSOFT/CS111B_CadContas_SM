@@ -55,6 +55,11 @@ const sidebarItem: Menu[] = [
         title: 'Faixa Etária',
         icon: 'mdi-account-multiple-outline',
         to: '/FaixaEtaria'
+    },
+    {
+        title: 'Período',
+        icon: 'mdi-account-multiple-outline',
+        to: '/Periodo'
     }
 ];
 

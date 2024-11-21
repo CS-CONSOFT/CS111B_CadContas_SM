@@ -76,6 +76,7 @@
                 <template v-slot:item.actions="{ item }">
                     <v-icon small @click="redirectToEdit(item)" class="v-btn-icon">mdi-pencil</v-icon>
                     <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
+                    <v-icon small @click="atualizarFaixa(item)" class="v-btn-icon">mdi-arrow-right-thick</v-icon>
                 </template>
             </v-data-table>
         </v-card>
@@ -107,7 +108,7 @@ import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { GetFaixaEtariaList, DeleteFaixaEtaria } from '../../services/faixa_etaria/bb064_faixaEtaria';
+import { GetFaixaEtariaList, DeleteFaixaEtaria, AtualizarFaixaEtaria } from '../../services/faixa_etaria/bb064_faixaEtaria';
 // Import de Types
 import type { AxiosResponse } from 'axios';
 import type { FaixaEtariaCompleto, ApiResponse, TabelaFaixaEtaria } from '../../types/faixa_etaria/bb064_faixaEtaria';
@@ -152,6 +153,7 @@ const items = ref<Item[]>([]);
 const loading = ref(false);
 const confirmDialog = ref(false);
 const itemToDelete = ref<Item | null>(null);
+const itemToFaixaEtaria = ref<Item | null>(null);
 const active = ref(true);
 const count = false;
 const search = ref('');
@@ -164,7 +166,6 @@ const rules = {
 const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
 const router = useRouter();
-const formRef = ref<any>(null);
 
 //variaveis da paginação
 const currentPage = ref(1);
@@ -248,6 +249,23 @@ const redirectToEdit = async (item: { ID: any }) => {
         });
     } else {
         console.error('Item indefinido');
+    }
+};
+
+const atualizarFaixa = (item: Item) => {
+    itemToFaixaEtaria.value = item;
+    atualizarFaixaConfirmed();
+};
+
+const atualizarFaixaConfirmed = async () => {
+    if (!itemToFaixaEtaria.value) return;
+    console.log(itemToFaixaEtaria.value);
+    try {
+        await AtualizarFaixaEtaria(itemToFaixaEtaria.value.ID);
+        showSnackbar('Faixa atualizada com sucesso', 'success');
+        fetchData();
+    } catch (error) {
+        showSnackbar('Erro ao atualizar faixa etária', 'error');
     }
 };
 

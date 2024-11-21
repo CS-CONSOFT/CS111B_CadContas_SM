@@ -65,9 +65,8 @@
                                     Prm_etiqueta="Valor"
                                     :Prm_isObrigatorio="false"
                                     :Prm_Precision="2"
+                                    @clean-value="handleCleanValue"
                                 />
-
-                                {{ var_bb066_Valor }}
                             </v-col>
                             <v-col cols="3" class="d-flex justify-end">
                                 <v-btn color="primary" @click="saveDetalhes()"> Adicionar</v-btn>
@@ -293,6 +292,9 @@ const var_bb066_FaixaDe = ref<any>('');
 const var_bb066_FaixaAte = ref<any>('');
 const var_bb066_Valor = ref<any>('');
 
+//Variável para armazenar o var_bb066_Valor limpo
+const cleanValue = ref<number | null>(null);
+
 const selectedConvenio = ref<number>(0);
 
 const faixaEtaria = ref<Csicp_bb066_List[]>([]);
@@ -320,6 +322,11 @@ const showSnackbar = (message: string, color: string) => {
     snackbarColor.value = color;
     snackbar.value = true;
 };
+
+// Função para capturar o valor limpo emitido pelo filho
+function handleCleanValue(value: number | null) {
+    cleanValue.value = value;
+}
 
 const fetchFaixaEtariaById = async (id: string) => {
     try {
@@ -385,22 +392,13 @@ async function CreateOrUpdateFaixaEtaria() {
 }
 
 const saveDetalhes = async () => {
-    // Limpar o valor formatado antes de enviar para a API
-    const cleanValue = var_bb066_Valor.value.replace(/\D/g, ''); // Remove tudo que não for número
-
-    // Converte para número com a precisão
-    const numericValue = Number(cleanValue) / Math.pow(10, 2); // Certifique-se de usar a precisão correta
-
-    // Atualiza o valor limpo para a variável
-    var_bb066_Valor.value = numericValue;
-
     // Monta o objeto de dados para enviar à API
     const data: Csicp_bb066_List = {
         bb066_ID: 0,
         bb066_FxEtariaID: var_ID.value,
         bb066_FaixaDe: Number(var_bb066_FaixaDe.value) || 0,
         bb066_FaixaAte: Number(var_bb066_FaixaAte.value) || 0,
-        bb066_Valor: numericValue // Envia o valor limpo (sem formatação)
+        bb066_Valor: cleanValue.value!
     };
 
     try {
