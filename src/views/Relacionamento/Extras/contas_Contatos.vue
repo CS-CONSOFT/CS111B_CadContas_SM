@@ -718,7 +718,7 @@ const deleteContatoConfirmed = async () => {
     if (!itemToDelete.value) return;
     try {
         await DeleteContato(tenant, itemToDelete.value.ID);
-        showSnackbar('Contato excluída com sucesso', 'success');
+        showSnackbar('Contato excluído com sucesso', 'success');
         fetchData(props.id);
         confirmDialog.value = false;
     } catch (error) {

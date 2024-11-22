@@ -544,22 +544,6 @@ const opcoesMenu = [
         }
     },
     {
-        nome: () => 'Vínculo Convênio',
-        icone: () => 'mdi-link-variant',
-        acao: async (item: { ID: any }) => {
-            if (item && item.ID) {
-                await router.push({
-                    name: 'VinculoConta',
-                    params: {
-                        id: item.ID
-                    }
-                });
-            } else {
-                console.error('Item indefinido');
-            }
-        }
-    },
-    {
         nome: () => 'Ficha',
         icone: () => 'mdi-clipboard-outline',
         acao: (item: Item) => {

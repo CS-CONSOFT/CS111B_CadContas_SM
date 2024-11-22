@@ -55,6 +55,10 @@
                 <v-icon icon="mdi-credit-card"></v-icon>
                 Crediario
             </v-tab>
+            <v-tab value="twelve">
+                <v-icon icon="mdi-link-variant"></v-icon>
+                Associado
+            </v-tab>
         </v-tabs>
         <v-card-text>
             <v-window v-model="tab">
@@ -91,6 +95,9 @@
                 <v-window-item value="eleven">
                     <contas_Crediario :id="id" />
                 </v-window-item>
+                <v-window-item value="twelve">
+                    <contas_VincularConvenio :id="id" />
+                </v-window-item>
             </v-window>
         </v-card-text>
     </v-card>
@@ -109,6 +116,7 @@ import contas_Enderecos from './Extras/contas_Enderecos.vue';
 import contas_Avalistas from './Extras/contas_Avalistas.vue';
 import contas_ReferenciasBancarias from './Extras/contas_ReferenciasBancarias.vue';
 import contas_Crediario from './Extras/contas_Crediario.vue';
+import contas_VincularConvenio from './Extras/contas_VincularConvenio.vue';
 
 const props = defineProps<{
     id: string;

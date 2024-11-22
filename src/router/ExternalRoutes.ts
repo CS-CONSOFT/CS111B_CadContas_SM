@@ -38,15 +38,6 @@ const CrmRoutes = {
             props: true
         },
         {
-            name: 'VinculoConta',
-            path: '/VinculoConta',
-            component: () => import('../../src/views/Convenio/ConvenioVinculoContaView.vue'),
-            meta: {
-                title: 'Vínculo Conta'
-            },
-            props: true
-        },
-        {
             name: 'ContasEditCompleto',
             path: 'ContasEditCompleto/:id?',
             component: () => import('../../src/views/Relacionamento/ContasEditAvancadoView.vue'),
