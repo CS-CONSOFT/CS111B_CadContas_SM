@@ -75,6 +75,7 @@
                                         :Prm_limpavel="false"
                                         :Prm_isObrigatorio="false"
                                         :disabled="disableCPF"
+                                        @cpf-limpo="capturarCpfLimpo"
                                     />
                                 </v-col>
                                 <v-col cols="5" class="pa-0 pl-4">
@@ -349,7 +350,7 @@ import { GetContaById, SaveContaCompleto } from '../../services/contas/bb012_con
 // Import de types
 import type { ContaById } from '../../types/crm/bb012_GetContaById';
 import type { BB01206, BB012, BB01202, BB01201 } from '../../views/Relacionamento/bb012_Types';
-import type { Csicp_bb012, Csicp_bb01201, Csicp_bb01202, Csicp_bb01206 } from '@/services/contas/saveConta';
+import type { Csicp_bb012, Csicp_bb01201, Csicp_bb01202, Csicp_bb01206, Csicp_bb012_Completo } from '@/services/contas/saveConta';
 import type { CEP } from '../../submodules/cs_components/src/types/enderecamento/CepTypes';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
@@ -545,7 +546,7 @@ const tenant = user?.TenantId;
 const router = useRouter();
 const formRef = ref<any>(null);
 const isPopupOpen = ref(false);
-const cnpjData = ref<any | null>(null);
+const cpfClear = ref<number>(0);
 const disableCPF = ref(false);
 const disableCNPJ = ref(false);
 
@@ -565,6 +566,10 @@ const showSnackbar = (message: string, color: string) => {
     snackbarColor.value = color;
     snackbar.value = true;
 };
+
+function capturarCpfLimpo(cpf: any) {
+    cpfClear.value = cpf;
+}
 
 // Abre o popup
 function abrirPopup() {
@@ -773,7 +778,7 @@ const fetchContaById = async (id: string) => {
 
 async function salvarConta() {
     if (formRef.value && formRef.value.validate()) {
-        const csicp_bb012: Csicp_bb012 = {
+        const bb012: Csicp_bb012 = {
             ID: BB012.value.ID,
             BB012_Codigo: BB012.value.BB012_Codigo,
             BB012_Nome_Cliente: BB012.value.BB012_Nome_Cliente,
@@ -803,7 +808,7 @@ async function salvarConta() {
             bb012_OriCadastroID: BB012.value.bb012_OriCadastroID
         };
 
-        const csicp_bb01201: Csicp_bb01201 = {
+        const bb01201: Csicp_bb01201 = {
             Id: BB01201.value.Id,
             BB012_ZonaID: BB01201.value.BB012_ZonaID,
             BB012_AtividadeID: BB01201.value.BB012_AtividadeID,
@@ -868,7 +873,7 @@ async function salvarConta() {
             bb012_CodgBcoDebConta: BB01201.value.bb012_CodgBcoDebConta
         };
 
-        const csicp_bb01202: Csicp_bb01202 = {
+        const bb01202: Csicp_bb01202 = {
             Id: BB01202.value.Id,
             BB012_CNPJ: BB01202.value.BB012_CNPJ,
             BB012_InscEstadual: BB01202.value.BB012_InscEstadual,
@@ -878,7 +883,7 @@ async function salvarConta() {
             BB012_DataRegJunta: BB01202.value.BB012_DataRegJunta,
             BB012_Patrimonio: BB01202.value.BB012_Patrimonio,
             BB012_Capital_Social: BB01202.value.BB012_Capital_Social,
-            BB012_CPF: BB01202.value.BB012_CPF,
+            BB012_CPF: cpfClear.value,
             BB012_RG: BB01202.value.BB012_RG,
             BB012_ComplementoRG: BB01202.value.BB012_ComplementoRG,
             BB012_EmissaoRG: BB01202.value.BB012_EmissaoRG,
@@ -907,7 +912,7 @@ async function salvarConta() {
             BB012_MotDesoneracaoID: BB01202.value.BB012_MotDesoneracaoID
         };
 
-        const csicp_bb01206: Csicp_bb01206 = {
+        const bb01206: Csicp_bb01206 = {
             Id: BB01206.value.Id,
             BB012_ID: BB01206.value.BB012_ID,
             BB012J_EnderecoID: BB01206.value.BB012J_EnderecoID,
@@ -936,11 +941,11 @@ async function salvarConta() {
             bb012_email: BB01206.value.bb012_email
         };
 
-        const In_csicp_bb012_Completo = {
-            csicp_bb012,
-            csicp_bb01201,
-            csicp_bb01202,
-            csicp_bb01206
+        const In_csicp_bb012_Completo: Csicp_bb012_Completo = {
+            csicp_bb012: bb012,
+            csicp_bb01201: bb01201,
+            csicp_bb01202: bb01202,
+            csicp_bb01206: bb01206
         };
 
         try {
