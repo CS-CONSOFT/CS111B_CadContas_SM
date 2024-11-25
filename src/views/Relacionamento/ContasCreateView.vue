@@ -352,7 +352,7 @@ import cs_InputCPF from '../../submodules/cs_components/src/components/campos/cs
 import cs_InputCnpj from '../../submodules/cs_components/src/components/campos/cs_InputCnpj.vue';
 import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
-import cs_PopUpRecuperarDados from '../../submodules/cs_components/src/components/popup/cs_PopUpRecuperarDados.vue';
+import cs_PopUpRecuperarDados from '../../submodules/cs_components/src/components/popup/cs_PopUpConsultarCnpj.vue';
 
 //Variáveis de modelo
 const BB012 = ref<BB012>({
