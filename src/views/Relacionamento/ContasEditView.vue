@@ -135,7 +135,7 @@
                             </v-col>
                             <div class="d-flex">
                                 <v-col cols="6" class="pa-0">
-                                    <cs_InputTexto
+                                    <cs_InputTelefone
                                         v-model="BB012.BB012_Telefone"
                                         Prm_etiqueta="Telefone"
                                         :Prm_limpavel="false"
@@ -329,7 +329,7 @@
     </v-container>
 
     <!-- Componente de Popup de Consulta CNPJ -->
-    <cs_PopUpRecuperarDados v-model="mostrarPopup" @enviarDadosCnpj="receberDadosCnpj" />
+    <cs_PopUpConsultarCnpj :Prm_isVisivel="isPopupOpen" @close="isPopupOpen = false" @cnpjData="handleCnpjData" />
 
     <v-snackbar v-model="snackbar" :timeout="3000" top v-bind:color="snackbarColor" multi-line>
         {{ snackbarMessage }}
@@ -364,12 +364,13 @@ import cs_SelectUF from '../../submodules/cs_components/src/components/selects/c
 import cs_SelectCidades from '../../submodules/cs_components/src/components/selects/cs_SelectCidades.vue';
 import cs_InputValor from '../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
 import cs_InputCep from '../../submodules/cs_components/src/components/campos/cs_InputCep.vue';
+import cs_InputTelefone from '../../submodules/cs_components/src/components/campos/cs_InputTelefone.vue';
 import cs_InputCelular from '../../submodules/cs_components/src/components/campos/cs_InputCelular.vue';
 import cs_InputCPF from '../../submodules/cs_components/src/components/campos/cs_InputCPF.vue';
 import cs_InputCnpj from '../../submodules/cs_components/src/components/campos/cs_InputCnpj.vue';
 import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
-import cs_PopUpRecuperarDados from '../../submodules/cs_components/src/components/popup/cs_PopUpRecuperarDados.vue';
+import cs_PopUpConsultarCnpj from '../../submodules/cs_components/src/components/popup/cs_PopUpConsultarCnpj.vue';
 
 const props = defineProps<{
     id: string;
@@ -543,7 +544,8 @@ const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
 const router = useRouter();
 const formRef = ref<any>(null);
-const mostrarPopup = ref(false);
+const isPopupOpen = ref(false);
+const cnpjData = ref<any | null>(null);
 const disableCPF = ref(false);
 const disableCNPJ = ref(false);
 
@@ -564,12 +566,13 @@ const showSnackbar = (message: string, color: string) => {
     snackbar.value = true;
 };
 
+// Abre o popup
 function abrirPopup() {
-    mostrarPopup.value = true;
+    isPopupOpen.value = true;
 }
 
 // Função para lidar com o recebimento dos dados
-function receberDadosCnpj(dados: any) {
+function handleCnpjData(dados: any) {
     console.log('Dados recebidos do popup:', dados);
 
     BB012.value.BB012_Nome_Cliente = dados.razao_social;
@@ -591,8 +594,6 @@ function receberDadosCnpj(dados: any) {
     BB01206.value.BB012_CEP = dados.cep;
 
     BB01202.value.BB012_CNPJ = dados.cnpj;
-
-    mostrarPopup.value = false;
 }
 
 const handleCepInfo = (info: CEP) => {

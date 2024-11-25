@@ -35,6 +35,7 @@
                             <v-col cols="3">
                                 <p><strong>Conta:</strong></p>
                                 <p>{{ item.CodigoConta }}</p>
+                                <p>{{ item.Conta }}</p>
                             </v-col>
                             <v-col cols="3">
                                 <p><strong>Associado:</strong></p>
@@ -142,7 +143,7 @@ interface Item {
     ID: string;
     Codigo: string;
     Convenio: string;
-    CodigoConta: string;
+    CodigoConta: number;
     Conta: string;
     Associado: string;
     TipoAssociado: string;
@@ -219,8 +220,8 @@ const fetchAssociados = async (id: string) => {
             ID: associados.csicp_bb061.bb061_Id.toString(),
             Codigo: associados.csicp_bb060.bb060_Codigo || '',
             Convenio: associados.csicp_bb060.bb060_Descricao || '',
-            CodigoConta: '',
-            Conta: associados.csicp_bb061.bb012_ContaId || '',
+            CodigoConta: associados.csicp_bb012.BB012_Codigo,
+            Conta: associados.csicp_bb012.BB012_Nome_Cliente || '',
             Associado: `${associados.csicp_bb035.BB035_PrimeiroNome} ${associados.csicp_bb035.BB035_Sobrenome}` || '',
             TipoAssociado: associados.csicp_bb061_tp.Label || '',
             Ativo: associados.csicp_bb061.bb061_IsActive,
