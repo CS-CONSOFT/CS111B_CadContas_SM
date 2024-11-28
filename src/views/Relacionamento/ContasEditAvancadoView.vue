@@ -11,7 +11,7 @@
         <v-form ref="formRef">
             <v-card class="border-sm border-opacity-50 mt-1 pa-4" elevation="0">
                 <v-tabs v-model="tab" align-tabs="start" color="primary" class="rounded">
-                    <v-tab value="one">Tipo de Conta</v-tab>
+                    <v-tab value="one">Tipo Conta</v-tab>
                     <v-tab value="two">Dados</v-tab>
                     <v-tab value="three">Crédito</v-tab>
                 </v-tabs>
@@ -29,7 +29,7 @@
                                 <v-card class="border mb-10" elevation="0">
                                     <v-row>
                                         <v-col cols="12">
-                                            <p class="text-h4 px-6 py-3 ma-0 rounded-t bg-primary">Tipos de Conta</p>
+                                            <p class="text-h4 px-6 py-3 ma-0 rounded-t bg-primary">Tipo Conta</p>
                                         </v-col>
                                     </v-row>
 
@@ -57,6 +57,7 @@
                                                 Prm_etiqueta="Emissão RG"
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
+                                                type="date"
                                             />
 
                                             <InputTexto
@@ -66,9 +67,9 @@
                                                 :Prm_isObrigatorio="false"
                                             />
 
-                                            <div class="d-flex">
+                                            <div class="d-flex mb-6">
                                                 <v-col cols="6" class="pa-0">
-                                                    <InputTexto
+                                                    <cs_SelectSexo
                                                         v-model="BB01202.BB012_Sexo_ID"
                                                         Prm_etiqueta="Sexo"
                                                         :Prm_limpavel="false"
@@ -76,7 +77,7 @@
                                                     />
                                                 </v-col>
                                                 <v-col cols="6" class="pa-0 pl-4">
-                                                    <InputTexto
+                                                    <cs_SelectEstadoCivil
                                                         v-model="BB01202.BB012_EstadoCivil_ID"
                                                         Prm_etiqueta="Estado Civi"
                                                         :Prm_limpavel="false"
@@ -85,16 +86,19 @@
                                                 </v-col>
                                             </div>
 
-                                            <InputTexto
+                                            <cs_SelectCidades
                                                 v-model="BB01202.BB012_NaturalDe_ID"
+                                                class="mb-5"
+                                                selectedUF=""
                                                 Prm_etiqueta="Naturalidade"
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
                                             />
 
-                                            <InputTexto
+                                            <cs_SelectGrauEscolaridade
                                                 v-model="BB01202.BB012_GEscolaridade_ID"
-                                                Prm_etiqueta="Escolaridade"
+                                                class="mb-5"
+                                                Prm_etiqueta="Grau Escolaridade"
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
                                             />
@@ -104,11 +108,13 @@
                                                 Prm_etiqueta="Reside Desde"
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
+                                                type="date"
                                             />
                                         </v-col>
                                         <v-col cols="6">
-                                            <InputTexto
+                                            <cs_SelectTpDomicilio
                                                 v-model="BB01202.BB012_TipoDomicilio_ID"
+                                                class="mb-5"
                                                 Prm_etiqueta="Tipo Domicilio"
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
@@ -134,8 +140,8 @@
 
                                             <div class="d-flex">
                                                 <v-col cols="6" class="pa-0">
-                                                    <InputTexto
-                                                        v-model="BB01202.BB012_TipoDomicilio_ID"
+                                                    <cs_SelectTpEmpresa
+                                                        v-model="BB01202.BB012_Emp_Grupo_ID"
                                                         Prm_etiqueta="Tipo Empresa"
                                                         :Prm_limpavel="false"
                                                         :Prm_isObrigatorio="false"
@@ -153,7 +159,7 @@
 
                                             <div class="d-flex">
                                                 <v-col cols="6" class="pa-0">
-                                                    <InputTexto
+                                                    <cs_SelectOcupacao
                                                         v-model="BB01202.BB012_Ocupacao_Id"
                                                         Prm_etiqueta="Ocupação"
                                                         :Prm_limpavel="false"
@@ -166,6 +172,7 @@
                                                         Prm_etiqueta="Admissão"
                                                         :Prm_limpavel="false"
                                                         :Prm_isObrigatorio="false"
+                                                        type="date"
                                                     />
                                                 </v-col>
                                             </div>
@@ -180,7 +187,7 @@
                                                     />
                                                 </v-col>
                                                 <v-col cols="6" class="pa-0 pl-4">
-                                                    <InputTexto
+                                                    <cs_InputValor
                                                         v-model="BB01202.BB012_ValorRemuneracao"
                                                         Prm_etiqueta="Remuneração"
                                                         :Prm_limpavel="false"
@@ -195,7 +202,7 @@
 
                                             <div class="d-flex">
                                                 <v-col cols="6" class="pa-0">
-                                                    <InputTexto
+                                                    <cs_InputValor
                                                         v-model="BB01202.BB012_OutrosRendimentos"
                                                         Prm_etiqueta="Valor"
                                                         :Prm_limpavel="false"
@@ -258,7 +265,7 @@
 
                                             <v-col cols="12" class="d-flex px-0 py-0">
                                                 <cs_SelectZona
-                                                    class="mb-5"
+                                                    class="mb-6"
                                                     v-model="BB01201.BB012_VendaRotaID"
                                                     Prm_etiqueta="Venda Rota"
                                                     :Prm_limpavel="false"
@@ -278,8 +285,9 @@
                                                 <v-btn class="v-btn-icon ml-4" icon="mdi-delete"></v-btn>
                                             </v-col>
 
-                                            <InputTexto
+                                            <cs_SelectAgCobrador
                                                 v-model="BB01201.BB012_PadraoBancoID"
+                                                class="mb-6"
                                                 Prm_etiqueta="Padrão Banco"
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
@@ -300,11 +308,12 @@
                                             />
                                         </v-col>
                                         <v-col cols="6">
-                                            <InputTexto
+                                            <cs_SelectEstaticas
                                                 v-model="BB01201.BB012_Requisicao"
                                                 Prm_etiqueta="Requisição"
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
+                                                :Tipo="1"
                                             />
 
                                             <InputTexto
@@ -322,8 +331,9 @@
                                             />
 
                                             <v-col cols="12" class="d-flex px-0 py-0">
-                                                <InputTexto
+                                                <cs_SelectNaturezaOperacao
                                                     v-model="BB01201.BB012_NatOperacaoID"
+                                                    class="mb-6"
                                                     Prm_etiqueta="Natureza Operação"
                                                     :Prm_limpavel="false"
                                                     :Prm_isObrigatorio="false"
@@ -354,6 +364,7 @@
                                                 Prm_etiqueta="Validade Cadastro"
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
+                                                type="date"
                                             />
 
                                             <InputTexto
@@ -446,8 +457,9 @@
                                                 :Prm_isObrigatorio="false"
                                             />
 
-                                            <InputTexto
-                                                v-model="BB01201.BB012_NumCompras"
+                                            <cs_SelectConvenio
+                                                v-model="BB01201.BB012_Convenio_ID"
+                                                class="mb-6"
                                                 Prm_etiqueta="Forma Compra"
                                                 :Prm_limpavel="false"
                                                 :Prm_isObrigatorio="false"
@@ -463,7 +475,7 @@
                                                     />
                                                 </v-col>
                                                 <v-col cols="6" class="pa-0 pl-4">
-                                                    <InputTexto
+                                                    <cs_SelectVencimento
                                                         v-model="BB01201.bb012_DiaVenctoID"
                                                         Prm_etiqueta="Dia Vencimento"
                                                         :Prm_limpavel="false"
@@ -499,6 +511,19 @@ import cs_SelectZona from '../../submodules/cs_components/src/components/selects
 import cs_SelectAtividade from '../../submodules/cs_components/src/components/selects/cs_SelectAtividade.vue';
 import cs_SelectCategoria from '../../submodules/cs_components/src/components/selects/cs_SelectCategoria.vue';
 import cs_SelectCondicaoPagto from '../../submodules/cs_components/src/components/selects/cs_SelectCondicaoPagto.vue';
+import cs_InputValor from '../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
+import cs_SelectCidades from '../../submodules/cs_components/src/components/selects/cs_SelectCidades.vue';
+import cs_SelectSexo from '../../submodules/cs_components/src/components/selects/cs_SelectSexo.vue';
+import cs_SelectEstadoCivil from '../../submodules/cs_components/src/components/selects/cs_SelectEstadoCivil.vue';
+import cs_SelectGrauEscolaridade from '../../submodules/cs_components/src/components/selects/cs_SelectGrauEscolaridade.vue';
+import cs_SelectTpDomicilio from '../../submodules/cs_components/src/components/selects/cs_SelectTpDomicilio.vue';
+import cs_SelectTpEmpresa from '../../submodules/cs_components/src/components/selects/cs_SelectTpEmpresa.vue';
+import cs_SelectOcupacao from '../../submodules/cs_components/src/components/selects/cs_SelectOcupacao.vue';
+import cs_SelectVencimento from '../../submodules/cs_components/src/components/selects/cs_SelectVencimento.vue';
+import cs_SelectEstaticas from '../../submodules/cs_components/src/components/selects/cs_SelectEstaticas.vue';
+import cs_SelectAgCobrador from '../../submodules/cs_components/src/components/selects/cs_SelectAgCobrador.vue';
+import cs_SelectNaturezaOperacao from '../../submodules/cs_components/src/components/selects/cs_SelectNaturezaOperacao.vue';
+import cs_SelectConvenio from '../../submodules/cs_components/src/components/selects/cs_SelectConvenio.vue';
 
 const props = defineProps<{
     id: string;

@@ -11,7 +11,7 @@
                     <v-col cols="8" class="d-flex gap-4">
                         <cs_InputTexto v-model="search" Prm_etiqueta="Nome Cliente" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
 
-                        <cs_InputTexto v-model="search" Prm_etiqueta="Código" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
+                        <cs_InputTexto v-model="searchCodigo" Prm_etiqueta="Código" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
 
                         <cs_InputTexto v-model="search" Prm_etiqueta="CPF" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
                     </v-col>
@@ -368,6 +368,7 @@ const loading = ref(false);
 const active = ref(true);
 const count = false;
 const search = ref('');
+const searchCodigo = ref('');
 
 // Definindo os valores para os filtros
 const filterMrel = ref<number>(0);
@@ -427,6 +428,7 @@ const fetchData = async () => {
             tenant,
             active.value,
             count,
+            searchCodigo.value,
             search.value,
             currentPage.value,
             itemsPerPage.value,
