@@ -611,7 +611,7 @@ const updateItemsPerPage = (itemsPerPageValue: number) => {
     fetchData();
 };
 
-watch([itemsPerPage, search], fetchData);
+watch([itemsPerPage, search, searchCodigo], fetchData);
 
 onMounted(() => {
     fetchData();
