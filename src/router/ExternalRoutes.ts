@@ -38,6 +38,15 @@ const CrmRoutes = {
             props: true
         },
         {
+            name: 'AnaliseCredito',
+            path: 'AnaliseCredito/:id?',
+            component: () => import('../../src/views/AnaliseCredito/AnaliseCreditoView.vue'),
+            meta: {
+                title: 'Analise de Crédito'
+            },
+            props: true
+        },
+        {
             name: 'ContasEditCompleto',
             path: 'ContasEditCompleto/:id?',
             component: () => import('../../src/views/Relacionamento/ContasEditAvancadoView.vue'),

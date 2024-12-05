@@ -530,6 +530,22 @@ const opcoesMenu = [
         }
     },
     {
+        nome: () => 'Analise de Crédito',
+        icone: () => 'mdi-credit-card-search-outline',
+        acao: async (item: { ID: any }) => {
+            if (item && item.ID) {
+                await router.push({
+                    name: 'AnaliseCredito',
+                    params: {
+                        id: item.ID
+                    }
+                });
+            } else {
+                console.error('Item indefinido');
+            }
+        }
+    },
+    {
         nome: (item: Item) => (item.IsActive ? 'Inativar' : 'Ativar'),
         icone: (item: Item) => (item.IsActive ? 'mdi-cancel' : 'mdi-check'),
         acao: (item: Item) => {
