@@ -5,6 +5,10 @@
                 <v-col cols="12" class="d-flex justify-end">
                     <v-btn prepend-icon="mdi-reload" flat class="bg-success mr-4" @click="reloadConsulta">Atualizar Consulta</v-btn>
 
+                    <v-btn prepend-icon="mdi-chart-line" flat class="bg-greensuccess mr-4" @click="showPopupHistorico = true"
+                        >Histórico</v-btn
+                    >
+
                     <v-btn prepend-icon="mdi-arrow-left" flat class="bg-primary mr-4" to="/Contas">Voltar</v-btn>
                 </v-col>
             </v-row>
@@ -59,7 +63,7 @@
                     <div class="text-center">
                         <v-progress-circular :model-value="scorePercentage" :color="scoreData.color" :rotate="90" :size="250" :width="20">
                             <template v-slot:default>
-                                <div style="color: white">
+                                <div class="text-grey-darken-3">
                                     <span>O nível do score é:</span>
                                     <div class="text-h4">{{ scoreData.label }}</div>
                                     <div class="text-h1">{{ score }}</div>
@@ -227,13 +231,15 @@
                                 <span> Categoria do cartão mais utilizado </span>
                             </div>
                             <div class="text-center my-6">
-                                <div class="credit-card mx-10">
+                                <div :class="['credit-card', colorClass]" class="mx-10">
                                     <div class="card-header">
                                         <v-icon class="icon-nfc">mdi-contactless-payment</v-icon>
-                                        <span class="card-type"> CARTÂO {{ nameCategoriaCartao }}</span>
+                                        <span class="card-type">CARTÃO {{ nameCategoriaCartao }}</span>
                                     </div>
-                                    <div class="card-number">0000 0000 0000 0000</div>
-                                    <div class="chip"></div>
+                                    <div class="d-flex align-center justify-between">
+                                        <div class="card-number">0000 0000 0000 0000</div>
+                                        <div class="chip"></div>
+                                    </div>
                                     <div class="card-footer">
                                         <span class="card-name">Nome</span>
                                         <span class="card-expiration">00/00</span>
@@ -315,6 +321,30 @@
         </v-card>
     </v-container>
 
+    <!-- Dialog historico -->
+    <v-dialog v-model="showPopupHistorico" style="width: 80%">
+        <v-card>
+            <div class="d-flex justify-between align-end px-4 py-2">
+                <span class="text-h4">Histórico de Crédito</span>
+                <v-spacer></v-spacer>
+                <v-btn small icon @click="showPopupHistorico = false">
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </div>
+
+            <v-card class="m-2 pa-4" elevation="0">
+                <v-data-table class="border" :headers="headers" :items="items" :loading="loading"></v-data-table>
+            </v-card>
+
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" @click="showPopupHistorico = false"> Fechar </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <!-- CREDIT SCORE -->
+
     <v-navigation-drawer
         v-model="drawerCreditScore"
         location="right"
@@ -375,7 +405,7 @@
             </v-col>
         </div>
     </v-navigation-drawer>
-
+    <!-- POTÊNCIAL DE CONSUMO -->
     <v-navigation-drawer
         v-model="drawerPotencialConsumo"
         location="right"
@@ -410,7 +440,7 @@
                         <div class="d-flex align-start">
                             <span class="justify-start">{{ score.name }}</span>
                             <v-spacer></v-spacer>
-                            <span class="justify-end ml-2">{{ score.value }}</span>
+                            <span class="justify-end ml-2">{{ score.value }}%</span>
                         </div>
                         <v-progress-linear
                             :model-value="parseInt(score.value)"
@@ -420,6 +450,11 @@
                             height="12"
                             rounded
                         ></v-progress-linear>
+                        <div class="d-flex">
+                            <span class="text-subtitle-2" style="color: gray">Baixo</span>
+                            <v-spacer></v-spacer>
+                            <span class="text-subtitle-2" style="color: gray"> Alto </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -437,6 +472,8 @@
             </div>
         </template>
     </v-navigation-drawer>
+
+    <!-- PERSONA PAGAMENTO -->
 
     <v-navigation-drawer
         v-model="drawerPersonaPagamento"
@@ -527,7 +564,7 @@
 
 <script setup lang="ts">
 // Import de bibliotecas e etc...
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
@@ -541,6 +578,7 @@ import type {
     Csicp_bb01201,
     Csicp_bb01202,
     CreditProData,
+    CreditoGradual_List,
     Score
 } from '../../types/analiseCredito/bb01210_analiseCredito';
 //Import de componentes
@@ -549,10 +587,69 @@ const props = defineProps<{
     id: string;
 }>();
 
+interface Item {
+    ID: number;
+    Data: string;
+    CreditoUsado: string;
+    CreditoPago: string;
+    CreditoAberto: string;
+    MaxDiasPagtoAtraso: string;
+    MaxDiasTitAtraso: string;
+    Vlr_CreditoAntigo: string;
+    Vlr_NovoCredito: string;
+}
+
+//Declaração do Header para montagem da tabela
+const headers = ref([
+    {
+        title: 'Mês / Ano',
+        value: 'Data',
+        sortable: false,
+        width: '10%',
+        align: 'start'
+    },
+    {
+        title: 'Crédito',
+        align: 'center',
+        width: '30%',
+        children: [
+            { title: 'Usado', value: 'CreditoUsado', align: 'center' },
+            { title: 'Pago', value: 'CreditoPago', align: 'center' },
+            { title: 'Em Aberto', value: 'CreditoAberto', align: 'center' }
+        ]
+    },
+    {
+        title: 'Máx. Dias Pagto. Atraso',
+        value: 'MaxDiasPagtoAtraso',
+        width: '15%',
+        align: 'center'
+    },
+    {
+        title: 'Máx. Dias Tit. Atraso',
+        value: 'MaxDiasTitAtraso',
+        width: '15%',
+        align: 'center'
+    },
+    {
+        title: 'Crédito Antigo',
+        value: 'Vlr_CreditoAntigo',
+        width: '15%',
+        align: 'center'
+    },
+    {
+        title: 'Novo Crédito',
+        value: 'Vlr_NovoCredito',
+        width: '15%',
+        align: 'center'
+    }
+]);
+
 //Declaração de variaveis
 const loading = ref(false);
 const atualizarConsulta = ref<boolean>(false);
+const items = ref<Item[]>([]);
 
+const showPopupHistorico = ref(false);
 const drawerCreditScore = ref<boolean>(false);
 const drawerPersonaPagamento = ref<boolean>(false);
 const drawerPresencaDigital = ref<boolean>(false);
@@ -562,6 +659,7 @@ const bb01210 = ref<Csicp_bb01210>();
 const bb012 = ref<Csicp_bb012>();
 const bb01201 = ref<Csicp_bb01201>();
 const bb01202 = ref<Csicp_bb01202>();
+
 const var_bb01210_vCredComScore = ref<number>(0);
 const var_bb01210_vCredMedia = ref<number>(0);
 const var_bb01210_vCredSemScore = ref<number>(0);
@@ -573,22 +671,9 @@ const score = ref<any>();
 const levelPersonaPagamento = ref<any>();
 const levelPresencaDigital = ref<any>();
 const namePersonaBanco = ref<any>();
-const nameCategoriaCartao = ref<any>();
+const nameCategoriaCartao = ref<string | null>(null);
 const consumoGeral = ref<string>('');
 const maiorConsumo = ref<Score>();
-
-const scorePercentage = computed(() => (score.value / 1000) * 100);
-const scoreData = computed(() => getScoreData(score.value));
-
-const formattedDate = computed(() => {
-    return creditProData.value?.creationDateUtc
-        ? new Intl.DateTimeFormat('pt-BR', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric'
-          }).format(new Date(creditProData.value.creationDateUtc))
-        : '';
-});
 
 const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
@@ -616,6 +701,41 @@ const scoreRanges = [
     { range: '600-799', color: '#556B2F', label: 'Alto' },
     { range: '800-999', color: '#5353ec', label: 'Muito alto' }
 ];
+
+//Funções e variáveis computadas
+const scorePercentage = computed(() => (score.value / 1000) * 100);
+const scoreData = computed(() => getScoreData(score.value));
+
+const formattedDate = computed(() => {
+    return creditProData.value?.creationDateUtc
+        ? new Intl.DateTimeFormat('pt-BR', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+          }).format(new Date(creditProData.value.creationDateUtc))
+        : '';
+});
+
+// Computed para determinar a classe baseada no nome do cartão
+const colorClass = computed(() => {
+    const categoria = nameCategoriaCartao.value?.toLowerCase() || '';
+    switch (categoria) {
+        case 'platinum':
+            return 'card-platinum';
+        case 'beneficios':
+            return 'card-gold';
+        case 'intermediario':
+            return 'card-silver';
+        default:
+            return 'card-default'; // Classe padrão (black)
+    }
+});
+
+// Computed property para filtrar os itens com "Potencial de consumo"
+const potentialConsumptionScores = computed(() => {
+    if (!creditProData.value?.scores) return [];
+    return creditProData.value.scores.filter((score) => score.name.includes('Potencial de consumo'));
+});
 
 //Funções
 const showSnackbar = (message: string, color: string) => {
@@ -653,14 +773,8 @@ const getExplanationForLevelPresenca = (level: number): string => {
     return explanationsPresenca[level] ?? 'Sem descrição';
 };
 
-// Computed property para filtrar os itens com "Potencial de consumo"
-const potentialConsumptionScores = computed(() => {
-    if (!creditProData.value?.scores) return [];
-    return creditProData.value.scores.filter((score) => score.name.includes('Potencial de consumo'));
-});
-
 const reloadConsulta = () => {
-    atualizarConsulta.value = !atualizarConsulta.value;
+    atualizarConsulta.value = true;
     fetchData();
 };
 
@@ -691,6 +805,20 @@ const fetchData = async () => {
         var_bb01210_vCredMedia.value = data.AnaliseCredito.csicp_bb01210.bb01210_vCredMedia;
         var_bb01210_vCredSemScore.value = data.AnaliseCredito.csicp_bb01210.bb01210_vCredSemScore;
 
+        items.value = data.AnaliseCredito.CreditoGradual_List.map((item: CreditoGradual_List) => ({
+            ID: item.Id,
+            Data: `${item.bb01210_Mes} / ${item.bb01210_Ano}`,
+            CreditoUsado: formatCurrency(item.CTE_CGrad_Credito_Usado),
+            CreditoPago: formatCurrency(item.CTE_CGrad_Credito_Pago),
+            CreditoAberto: formatCurrency(item.CTE_CGrad_Credito_EmAberto),
+            MaxDiasPagtoAtraso: `${item.CTE_CGrad_Max_Dias_PagtoAtra} Dias`,
+            MaxDiasTitAtraso: `${item.CTE_CGrad_Max_Dias_TitAtraso} Dias`,
+            Vlr_CreditoAntigo: formatCurrency(item.CTE_CGrad_ValorCredito),
+            Vlr_NovoCredito: formatCurrency(item.Vlr_NovoCredito)
+        }));
+
+        console.log(data);
+
         // Converte o campo JSON_CreditPro em um objeto JSON acessível
         if (bb01210.value && bb01210.value.JSON_CreditPro) {
             const parsedCreditPro = JSON.parse(bb01210.value.JSON_CreditPro);
@@ -716,7 +844,7 @@ const fetchData = async () => {
             const categoriaCartao = creditProData.value?.scores.find(
                 (categoriaCartao) => categoriaCartao.name === 'Persona Categoria cartao'
             );
-            nameCategoriaCartao.value = categoriaCartao?.value;
+            nameCategoriaCartao.value = categoriaCartao?.value ?? null;
             // Buscar o potencial de consumo geral
             const potencialConsumoGeral = creditProData.value?.scores.find(
                 (consumoGeral) => consumoGeral.name === 'Potencial de consumo - Geral'
@@ -733,6 +861,7 @@ const fetchData = async () => {
         showSnackbar('Erro ao buscar dados.', 'error');
     } finally {
         loading.value = false;
+        atualizarConsulta.value = false;
     }
 };
 
@@ -760,7 +889,6 @@ onMounted(() => {
 .credit-card {
     height: 240px;
     border-radius: 15px;
-    background: linear-gradient(145deg, #2c2c2c, #1e1e1e);
     color: white;
     display: flex;
     flex-direction: column;
@@ -770,12 +898,32 @@ onMounted(() => {
     position: relative;
 }
 
-/* Header com nome do cartão e ícone NFC */
+/* Padrão */
+.card-default {
+    background: linear-gradient(145deg, #2c2c2c, #1e1e1e);
+}
+
+/* Platinum */
+.card-platinum {
+    background: linear-gradient(145deg, #e5e5e5, #b3b3b3);
+}
+
+/* Gold */
+.card-gold {
+    background: linear-gradient(145deg, #ffd700, #daa520);
+}
+
+/* Silver */
+.card-silver {
+    background: linear-gradient(145deg, #c0c0c0, #a9a9a9);
+}
+
+/* Resto do CSS permanece o mesmo */
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
 }
 
@@ -787,15 +935,13 @@ onMounted(() => {
     text-transform: uppercase;
 }
 
-/* Número do cartão */
 .card-number {
-    font-size: 18px;
+    font-size: 20px;
     letter-spacing: 2px;
     margin-top: 20px;
     text-align: center;
 }
 
-/* Simulação de chip */
 .chip {
     width: 40px;
     height: 30px;
@@ -807,7 +953,6 @@ onMounted(() => {
     box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Footer com nome e validade */
 .card-footer {
     display: flex;
     justify-content: space-between;
@@ -817,10 +962,12 @@ onMounted(() => {
 }
 
 .card-name {
+    font-size: 14px;
     text-transform: uppercase;
 }
 
 .card-expiration {
+    font-size: 14px;
     font-weight: bold;
 }
 </style>
