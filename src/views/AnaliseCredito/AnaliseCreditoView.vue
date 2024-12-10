@@ -61,7 +61,14 @@
                     </div>
 
                     <div class="text-center">
-                        <v-progress-circular :model-value="scorePercentage" :color="scoreData.color" :rotate="90" :size="250" :width="20">
+                        <v-progress-circular
+                            :model-value="scorePercentage"
+                            :color="scoreData.color"
+                            :rotate="90"
+                            :size="250"
+                            :width="20"
+                            bg-color="#E0E0E0"
+                        >
                             <template v-slot:default>
                                 <div class="text-grey-darken-3">
                                     <span>O nível do score é:</span>
