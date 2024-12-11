@@ -22,23 +22,26 @@
             <v-row class="d-flex justify-space-between">
                 <v-col cols="5">
                     <div>
-                        <v-col cols="12">
+                        <v-col cols="12" class="py-1">
                             <span><strong> Resultado da Consulta </strong></span>
                         </v-col>
-                        <div class="d-flex justify-space-between align-center">
-                            <v-col cols="auto">
+                        <div class="d-flex justify-space-between align-center py-1">
+                            <v-col cols="auto" class="py-1">
                                 <span>
                                     CPF Consultado: <strong>{{ formatCPF(bb01202?.BB012_CPF) }}</strong>
                                 </span>
                             </v-col>
-                            <v-col cols="auto">
+                            <v-col cols="auto" class="py-1">
                                 <span>
                                     Data Consulta: <strong>{{ formattedDate }}</strong>
                                 </span>
                             </v-col>
                         </div>
 
-                        <v-row class="d-flex align-center justify-space-between border rounded mx-3 my-2">
+                        <v-row class="d-flex align-center justify-space-between border rounded mx-3 my-1">
+                            <v-col cols="12">
+                                <span> Renda Atual: {{ formatCurrency(var_BB012_RendaAtual) }} </span>
+                            </v-col>
                             <v-col cols="7">
                                 <span> Limite de Crédito: {{ formatCurrency(var_BB012_LimiteCredito) }} </span>
                             </v-col>
@@ -53,50 +56,59 @@
                             </v-col>
                         </v-row>
 
-                        <v-col cols="12">
-                            <p class="py-2 ma-0 rounded-t">
-                                <strong>Credit Score 3.0</strong>
-                            </p>
-                        </v-col>
-                    </div>
+                        <v-sheet class="ma-3" color="lightprimary" rounded="lg">
+                            <v-col cols="12">
+                                <p>
+                                    <strong>Credit Score 3.0</strong>
+                                </p>
+                            </v-col>
+                            <div class="text-center">
+                                <v-progress-circular
+                                    :model-value="scorePercentage"
+                                    :color="scoreData.color"
+                                    :rotate="90"
+                                    :size="250"
+                                    :width="20"
+                                >
+                                    <template v-slot:default>
+                                        <div class="text-white">
+                                            <span>O nível do score é:</span>
+                                            <div class="text-h4">{{ scoreData.label }}</div>
+                                            <div class="text-h1">{{ score }}</div>
+                                        </div>
+                                    </template>
+                                </v-progress-circular>
+                            </div>
+                            <v-row class="mt-6 px-6" dense>
+                                <!-- Legenda -->
+                                <v-col cols="12" style="height: 130px">
+                                    <v-row justify="space-evenly" class="flex-wrap">
+                                        <v-col
+                                            v-for="(range, index) in scoreRanges"
+                                            :key="index"
+                                            cols="auto"
+                                            class="d-flex align-center mb-2"
+                                        >
+                                            <v-icon small :color="range.color" class="mr-2">mdi-checkbox-blank</v-icon>
+                                            <span>{{ range.label }} ({{ range.range }})</span>
+                                        </v-col>
+                                    </v-row>
+                                </v-col>
 
-                    <div class="text-center">
-                        <v-progress-circular
-                            :model-value="scorePercentage"
-                            :color="scoreData.color"
-                            :rotate="90"
-                            :size="250"
-                            :width="20"
-                            bg-color="#E0E0E0"
-                        >
-                            <template v-slot:default>
-                                <div class="text-grey-darken-3">
-                                    <span>O nível do score é:</span>
-                                    <div class="text-h4">{{ scoreData.label }}</div>
-                                    <div class="text-h1">{{ score }}</div>
-                                </div>
-                            </template>
-                        </v-progress-circular>
-                    </div>
-                    <v-row class="mt-6 px-6" dense>
-                        <!-- Legenda -->
-                        <v-col cols="12" style="height: 140px">
-                            <v-row justify="space-between" class="flex-wrap">
-                                <v-col v-for="(range, index) in scoreRanges" :key="index" cols="auto" class="d-flex align-center mb-2">
-                                    <v-icon small :color="range.color" class="mr-2">mdi-checkbox-blank</v-icon>
-                                    <span>{{ range.label }} ({{ range.range }})</span>
+                                <!-- Link -->
+                                <v-col cols="12" class="d-flex justify-end mb-2">
+                                    <v-icon color="primary" class="mr-1">mdi-open-in-new</v-icon>
+                                    <span
+                                        class="text-primary ml-2 cursor-pointer"
+                                        @click="helpCreditScore()"
+                                        style="text-decoration: underline"
+                                    >
+                                        Entenda o score
+                                    </span>
                                 </v-col>
                             </v-row>
-                        </v-col>
-
-                        <!-- Link -->
-                        <v-col cols="12" class="d-flex justify-end">
-                            <v-icon color="primary" class="mr-1">mdi-open-in-new</v-icon>
-                            <span class="text-primary ml-2 cursor-pointer" @click="helpCreditScore()" style="text-decoration: underline">
-                                Entenda o score
-                            </span>
-                        </v-col>
-                    </v-row>
+                        </v-sheet>
+                    </div>
                 </v-col>
                 <v-col cols="7">
                     <v-row class="d-flex mb-10">
@@ -667,6 +679,7 @@ const bb012 = ref<Csicp_bb012>();
 const bb01201 = ref<Csicp_bb01201>();
 const bb01202 = ref<Csicp_bb01202>();
 
+const var_BB012_RendaAtual = ref<number>(0);
 const var_bb01210_vCredComScore = ref<number>(0);
 const var_bb01210_vCredMedia = ref<number>(0);
 const var_bb01210_vCredSemScore = ref<number>(0);
@@ -807,6 +820,7 @@ const fetchData = async () => {
         bb01201.value = data.AnaliseCredito.csicp_bb01201;
         bb01202.value = data.AnaliseCredito.csicp_bb01202;
 
+        var_BB012_RendaAtual.value = data.AnaliseCredito.csicp_bb01202.BB012_ValorRemuneracao;
         var_BB012_LimiteCredito.value = data.AnaliseCredito.csicp_bb01201.BB012_LimiteCredito;
         var_bb01210_vCredComScore.value = data.AnaliseCredito.csicp_bb01210.bb01210_vCredComScore;
         var_bb01210_vCredMedia.value = data.AnaliseCredito.csicp_bb01210.bb01210_vCredMedia;
