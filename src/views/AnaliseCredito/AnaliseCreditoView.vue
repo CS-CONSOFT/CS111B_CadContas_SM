@@ -94,20 +94,15 @@
                                         </v-col>
                                     </v-row>
                                 </v-col>
-
-                                <!-- Link -->
-                                <v-col cols="12" class="d-flex justify-end mb-2">
-                                    <v-icon color="primary" class="mr-1">mdi-open-in-new</v-icon>
-                                    <span
-                                        class="text-primary ml-2 cursor-pointer"
-                                        @click="helpCreditScore()"
-                                        style="text-decoration: underline"
-                                    >
-                                        Entenda o score
-                                    </span>
-                                </v-col>
                             </v-row>
                         </v-sheet>
+                        <!-- Link -->
+                        <v-col cols="12" class="d-flex justify-end mb-2">
+                            <v-icon color="primary" class="mr-1">mdi-open-in-new</v-icon>
+                            <span class="text-primary ml-2 cursor-pointer" @click="helpCreditScore()" style="text-decoration: underline">
+                                Entenda o score
+                            </span>
+                        </v-col>
                     </div>
                 </v-col>
                 <v-col cols="7">
