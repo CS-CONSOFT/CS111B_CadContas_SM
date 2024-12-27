@@ -47,22 +47,11 @@
                 >
                     <template v-slot:bottom>
                         <v-row class="d-flex align-center">
-                            <v-col cols="2">
-                                <v-select
-                                    v-model="itemsPerPage"
-                                    class="pa-2 mr-4"
-                                    label="Itens por página"
-                                    :items="[5, 10, 15, 25, 50]"
-                                    hide-details
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="8" class="d-flex justify-center">
+                            <v-col cols="12" class="d-flex justify-center">
                                 <Pagination
-                                    :currentPage="currentPage"
-                                    :totalPages="totalPages"
-                                    :itemsPerPage="itemsPerPage"
+                                    v-model:currentPage="currentPage"
                                     :totalItems="totalItems"
-                                    @update:currentPage="updatePage"
+                                    v-model:itemsPerPage="itemsPerPage"
                                 />
                             </v-col>
                         </v-row>
@@ -116,23 +105,8 @@
                     </v-col>
                 </v-row>
                 <v-row class="d-block-inline align-center">
-                    <v-col cols="2">
-                        <v-select
-                            v-model="itemsPerPage"
-                            class="pa-2 mr-4"
-                            label="Itens por página"
-                            :items="[5, 10, 15, 25, 50]"
-                            hide-details
-                        ></v-select>
-                    </v-col>
-                    <v-col cols="8" class="d-flex justify-center">
-                        <Pagination
-                            :currentPage="currentPage"
-                            :totalPages="totalPages"
-                            :itemsPerPage="itemsPerPage"
-                            :totalItems="totalItems"
-                            @update:currentPage="updatePage"
-                        />
+                    <v-col cols="12" class="d-flex justify-center">
+                        <Pagination v-model:currentPage="currentPage" :totalItems="totalItems" v-model:itemsPerPage="itemsPerPage" />
                     </v-col>
                 </v-row>
             </v-container>
@@ -600,18 +574,14 @@ const softDeleteZonaConfirmed = async () => {
     }
 };
 
-const updatePage = (page: number) => {
-    currentPage.value = page;
-    fetchData();
-};
-
 const updateItemsPerPage = (itemsPerPageValue: number) => {
-    itemsPerPage.value = itemsPerPageValue;
-    currentPage.value = 1;
-    fetchData();
+    if (itemsPerPage.value !== itemsPerPageValue) {
+        itemsPerPage.value = itemsPerPageValue;
+        currentPage.value = 1;
+        fetchData();
+    }
 };
-
-watch([itemsPerPage, search], fetchData);
+watch([currentPage, itemsPerPage, search], fetchData);
 
 onMounted(() => {
     fetchData();

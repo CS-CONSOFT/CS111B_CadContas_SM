@@ -12,8 +12,6 @@
                         <cs_InputTexto v-model="search" Prm_etiqueta="Nome Cliente" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
 
                         <cs_InputTexto v-model="searchCodigo" Prm_etiqueta="Código" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
-
-                        <cs_InputTexto v-model="search" Prm_etiqueta="CPF" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
                     </v-col>
                     <v-spacer></v-spacer>
 
@@ -35,7 +33,14 @@
 
                             <v-expansion-panel-text>
                                 <v-row class="d-flex align-start">
-                                    <v-col cols="12" class="d-flex gap-4 justify-between">
+                                    <v-col cols="12" class="d-flex gap-4 justify-between" style="height: 75px">
+                                        <cs_InputTexto
+                                            v-model="filterCPF"
+                                            Prm_etiqueta="CPF/CNPJ"
+                                            :Prm_limpavel="true"
+                                            :Prm_isObrigatorio="false"
+                                        />
+
                                         <cs_SelectMRelacionamento
                                             v-model="filterMrel"
                                             Prm_etiqueta="Modelo de Relação"
@@ -123,22 +128,11 @@
                     </template>
                     <template v-slot:bottom>
                         <v-row class="d-flex align-center">
-                            <v-col cols="2">
-                                <v-select
-                                    v-model="itemsPerPage"
-                                    class="pa-2 mr-4"
-                                    label="Itens por página"
-                                    :items="[5, 10, 15, 25, 50]"
-                                    hide-details
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="8" class="d-flex justify-center">
-                                <Pagination
-                                    :currentPage="currentPage"
-                                    :totalPages="totalPages"
-                                    :itemsPerPage="itemsPerPage"
+                            <v-col cols="12" class="d-flex justify-center">
+                                <cs_Pagination
+                                    v-model:currentPage="currentPage"
                                     :totalItems="totalItems"
-                                    @update:currentPage="updatePage"
+                                    v-model:itemsPerPage="itemsPerPage"
                                 />
                             </v-col>
                         </v-row>
@@ -213,23 +207,8 @@
                     </v-col>
                 </v-row>
                 <v-row class="d-block-inline align-center">
-                    <v-col cols="2">
-                        <v-select
-                            v-model="itemsPerPage"
-                            class="pa-2 mr-4"
-                            label="Itens por página"
-                            :items="[5, 10, 15, 25, 50]"
-                            hide-details
-                        ></v-select>
-                    </v-col>
-                    <v-col cols="8" class="d-flex justify-center">
-                        <Pagination
-                            :currentPage="currentPage"
-                            :totalPages="totalPages"
-                            :itemsPerPage="itemsPerPage"
-                            :totalItems="totalItems"
-                            @update:currentPage="updatePage"
-                        />
+                    <v-col cols="12" class="d-flex justify-center">
+                        <cs_Pagination v-model:currentPage="currentPage" :totalItems="totalItems" v-model:itemsPerPage="itemsPerPage" />
                     </v-col>
                 </v-row>
             </v-container>
@@ -280,7 +259,7 @@ import type { AxiosResponse } from 'axios';
 import type { ContaCompleta, ApiResponse, Lista_csicp_bb012 } from '../../types/crm/bb012_conta';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
-import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
+import cs_Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
 import BtnAdicionar from '../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import BtnExcluir from '../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
 import BtnIsActive from '../../submodules/cs_components/src/components/botoes/cs_BtnIsActive.vue';
@@ -371,6 +350,7 @@ const search = ref('');
 const searchCodigo = ref('');
 
 // Definindo os valores para os filtros
+const filterCPF = ref<string>('');
 const filterMrel = ref<number>(0);
 const filterGrupo = ref<number>(0);
 const filterClasse = ref<number>(0);
@@ -421,6 +401,21 @@ const fetchInactive = () => {
     fetchData();
 };
 
+const formatCPFOrCNPJ = (value: string | null | undefined): string => {
+    if (!value) return 'N/A'; // Valor inválido ou ausente
+    const onlyDigits = value.replace(/\D/g, ''); // Remove tudo que não for dígito
+
+    if (onlyDigits.length === 11) {
+        // Formata como CPF
+        return onlyDigits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    } else if (onlyDigits.length === 14) {
+        // Formata como CNPJ
+        return onlyDigits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    }
+
+    return value;
+};
+
 const fetchData = async () => {
     loading.value = true;
     try {
@@ -444,7 +439,7 @@ const fetchData = async () => {
             Nome: `${item.csicp_bb012.csicp_bb012.BB012_Codigo} - ${item.csicp_bb012.csicp_bb012.BB012_Nome_Cliente}`,
             Endereco: item.BB01206_Endereco.csicp_bb01206.BB012_Logradouro,
             Contato: item.csicp_bb012.csicp_bb012.BB012_FaxCelular,
-            CPF: item.BB01202.csicp_bb01202.BB012_CPF || item.BB01202.csicp_bb01202.BB012_CNPJ,
+            CPF: formatCPFOrCNPJ(String(item.BB01202.csicp_bb01202.BB012_CPF || item.BB01202.csicp_bb01202.BB012_CNPJ)),
             Modalidade: item.csicp_bb012.csicp_bb012_MRel.Label,
             Grupo: item.csicp_bb012.csicp_bb012_GruCta.Label,
             Classe: item.csicp_bb012.csicp_bb012_ClaCta.Label,
@@ -472,9 +467,19 @@ const fetchData = async () => {
     }
 };
 
+// Função para remover formatações
+const normalizeCPF = (cpf: unknown): string => {
+    return typeof cpf === 'string' ? cpf.replace(/\D/g, '') : '';
+};
+
+// Função de filtro
 const filterList = () => {
     filteredItems.value = items.value.filter((item) => {
+        const normalizedItemCPF = normalizeCPF(item.CPF); // Normaliza o CPF do item
+        const normalizedFilterCPF = normalizeCPF(filterCPF.value); // Normaliza o valor do filtro
+
         return (
+            (!filterCPF.value || normalizedItemCPF.includes(normalizedFilterCPF)) &&
             (!filterMrel.value || item.MrelId === filterMrel.value) &&
             (!filterGrupo.value || item.GrupoId === filterGrupo.value) &&
             (!filterClasse.value || item.ClasseId === filterClasse.value) &&
@@ -485,6 +490,7 @@ const filterList = () => {
 };
 
 const clearFilters = () => {
+    filterCPF.value = '';
     filterMrel.value = 0;
     filterGrupo.value = 0;
     filterClasse.value = 0;
@@ -616,18 +622,15 @@ const softDeleteContaConfirmed = async () => {
     }
 };
 
-const updatePage = (page: number) => {
-    currentPage.value = page;
-    fetchData();
-};
-
 const updateItemsPerPage = (itemsPerPageValue: number) => {
-    itemsPerPage.value = itemsPerPageValue;
-    currentPage.value = 1;
-    fetchData();
+    if (itemsPerPage.value !== itemsPerPageValue) {
+        itemsPerPage.value = itemsPerPageValue;
+        currentPage.value = 1;
+        fetchData();
+    }
 };
 
-watch([itemsPerPage, search, searchCodigo], fetchData);
+watch([currentPage, itemsPerPage, search, searchCodigo], fetchData);
 
 onMounted(() => {
     fetchData();

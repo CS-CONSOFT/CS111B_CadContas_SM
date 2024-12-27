@@ -102,23 +102,8 @@
                 </v-col>
             </v-row>
             <v-row class="d-block-inline align-center">
-                <v-col cols="2">
-                    <v-select
-                        v-model="itemsPerPage"
-                        class="pa-2 mr-4"
-                        label="Itens por página"
-                        :items="[5, 10, 15, 25, 50]"
-                        hide-details
-                    ></v-select>
-                </v-col>
-                <v-col cols="8" class="d-flex justify-center">
-                    <Pagination
-                        :currentPage="currentPage"
-                        :totalPages="totalPages"
-                        :itemsPerPage="itemsPerPage"
-                        :totalItems="totalItems"
-                        @update:currentPage="updatePage"
-                    />
+                <v-col cols="12" class="d-flex justify-center">
+                    <Pagination v-model:currentPage="currentPage" :totalItems="totalItems" v-model:itemsPerPage="itemsPerPage" />
                 </v-col>
             </v-row>
         </v-container>
@@ -155,11 +140,9 @@ import { GetConvenioList, DeleteConvenio } from '../../services/convenio/bb060_c
 import type { AxiosResponse } from 'axios';
 import type { ConvenioCompleto, ApiResponse, Convenio_List } from '@/types/convenio/bb060_convenio';
 //Import de componentes
-import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
 import BtnAdicionar from '../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import BtnExcluir from '../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
-import BtnIsActive from '../../submodules/cs_components/src/components/botoes/cs_BtnIsActive.vue';
 import BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 
 interface Item {
@@ -321,15 +304,12 @@ const deleteConvenioConfirmed = async () => {
     }
 };
 
-const updatePage = (page: number) => {
-    currentPage.value = page;
-    fetchData();
-};
-
 const updateItemsPerPage = (itemsPerPageValue: number) => {
-    itemsPerPage.value = itemsPerPageValue;
-    currentPage.value = 1;
-    fetchData();
+    if (itemsPerPage.value !== itemsPerPageValue) {
+        itemsPerPage.value = itemsPerPageValue;
+        currentPage.value = 1;
+        fetchData();
+    }
 };
 
 watch([currentPage, itemsPerPage, search], fetchData);

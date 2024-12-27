@@ -18,6 +18,14 @@
             <v-progress-circular indeterminate color="primary"></v-progress-circular>
         </v-row>
 
+        <v-card v-else-if="error" class="border pa-4 mb-10" elevation="0">
+            <v-row class="d-flex justify-center">
+                <v-col cols="12" class="text-center">
+                    <span>Erro ao carregar os dados. Por favor, verifique o CPF informado na consulta e tente novamente.</span>
+                </v-col>
+            </v-row>
+        </v-card>
+
         <v-card v-else="!loading" class="border pa-4 mb-10" elevation="0">
             <v-row class="d-flex justify-space-between">
                 <v-col cols="5">
@@ -83,12 +91,7 @@
                                 <!-- Legenda -->
                                 <v-col cols="12" style="height: 130px">
                                     <v-row justify="space-evenly" class="flex-wrap">
-                                        <v-col
-                                            v-for="(range, index) in scoreRanges"
-                                            :key="index"
-                                            cols="auto"
-                                            class="d-flex align-center mb-2"
-                                        >
+                                        <v-col v-for="(range, index) in scoreRanges" :key="index" cols="auto" class="d-flex align-center">
                                             <v-icon small :color="range.color" class="mr-2">mdi-checkbox-blank</v-icon>
                                             <span>{{ range.label }} ({{ range.range }})</span>
                                         </v-col>
@@ -660,6 +663,7 @@ const headers = ref([
 
 //Declaração de variaveis
 const loading = ref(false);
+const error = ref<boolean>(false);
 const atualizarConsulta = ref<boolean>(false);
 const items = ref<Item[]>([]);
 
@@ -833,8 +837,6 @@ const fetchData = async () => {
             Vlr_NovoCredito: formatCurrency(item.Vlr_NovoCredito)
         }));
 
-        console.log(data);
-
         // Converte o campo JSON_CreditPro em um objeto JSON acessível
         if (bb01210.value && bb01210.value.JSON_CreditPro) {
             const parsedCreditPro = JSON.parse(bb01210.value.JSON_CreditPro);
@@ -875,6 +877,7 @@ const fetchData = async () => {
         }
     } catch (err) {
         showSnackbar('Erro ao buscar dados.', 'error');
+        error.value = true;
     } finally {
         loading.value = false;
         atualizarConsulta.value = false;

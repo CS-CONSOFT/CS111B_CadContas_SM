@@ -86,21 +86,11 @@
                                 >
                                     <template v-slot:bottom>
                                         <v-row class="d-flex align-center">
-                                            <v-col cols="2">
-                                                <v-select
-                                                    v-model="itemsPerPage"
-                                                    class="pa-2 mr-4"
-                                                    label="Itens por página"
-                                                    :items="[5, 10, 15, 25, 50]"
-                                                    hide-details
-                                                ></v-select>
-                                            </v-col>
-                                            <v-col cols="8" class="d-flex justify-center">
+                                            <v-col cols="12" class="d-flex justify-center">
                                                 <Pagination
-                                                    :currentPage="currentPage"
-                                                    :totalPages="totalPages"
-                                                    :itemsPerPage="itemsPerPage"
-                                                    @update:currentPage="updatePage"
+                                                    v-model:currentPage="currentPage"
+                                                    :totalItems="totalItems"
+                                                    v-model:itemsPerPage="itemsPerPage"
                                                 />
                                             </v-col>
                                         </v-row>
@@ -142,21 +132,11 @@
                                 >
                                     <template v-slot:bottom>
                                         <v-row class="d-flex align-center">
-                                            <v-col cols="2">
-                                                <v-select
-                                                    v-model="itemsPerPage"
-                                                    class="pa-2 mr-4"
-                                                    label="Itens por página"
-                                                    :items="[5, 10, 15, 25, 50]"
-                                                    hide-details
-                                                ></v-select>
-                                            </v-col>
-                                            <v-col cols="8" class="d-flex justify-center">
+                                            <v-col cols="12" class="d-flex justify-center">
                                                 <Pagination
-                                                    :currentPage="currentPage"
-                                                    :totalPages="totalPages"
-                                                    :itemsPerPage="itemsPerPage"
-                                                    @update:currentPage="updatePage"
+                                                    v-model:currentPage="currentPage"
+                                                    :totalItems="totalItems"
+                                                    v-model:itemsPerPage="itemsPerPage"
                                                 />
                                             </v-col>
                                         </v-row>
@@ -463,15 +443,12 @@ const deleteVinculoConvenio = async (id: string) => {
     }
 };
 
-const updatePage = (page: number) => {
-    currentPage.value = page;
-    mapFaixaEtariaToItems(faixaEtaria.value);
-};
-
 const updateItemsPerPage = (itemsPerPageValue: number) => {
-    itemsPerPage.value = itemsPerPageValue;
-    currentPage.value = 1;
-    mapFaixaEtariaToItems(faixaEtaria.value);
+    if (itemsPerPage.value !== itemsPerPageValue) {
+        itemsPerPage.value = itemsPerPageValue;
+        currentPage.value = 1;
+        mapFaixaEtariaToItems(faixaEtaria.value);
+    }
 };
 
 onMounted(() => {

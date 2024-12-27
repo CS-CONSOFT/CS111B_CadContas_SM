@@ -41,22 +41,11 @@
                 >
                     <template v-slot:bottom>
                         <v-row class="d-flex align-center">
-                            <v-col cols="2">
-                                <v-select
-                                    v-model="itemsPerPage"
-                                    class="pa-2 mr-4"
-                                    label="Itens por página"
-                                    :items="[5, 10, 15, 25, 50]"
-                                    hide-details
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="8" class="d-flex justify-center">
+                            <v-col cols="12" class="d-flex justify-center">
                                 <Pagination
-                                    :currentPage="currentPage"
-                                    :totalPages="totalPages"
-                                    :itemsPerPage="itemsPerPage"
+                                    v-model:currentPage="currentPage"
                                     :totalItems="totalItems"
-                                    @update:currentPage="updatePage"
+                                    v-model:itemsPerPage="itemsPerPage"
                                 />
                             </v-col>
                         </v-row>
@@ -180,7 +169,6 @@ import { GetEstaticasBB } from '../../services/estaticas/estaticas_BB';
 import type { AxiosResponse } from 'axios';
 import type { PeriodoCompleto, ApiResponse, Lista_bb062_Periodo, Csicp_bb062 } from '../../types/crm/periodo/bb062_periodo';
 import type { PeridoById } from '../../types/crm/periodo/bb062_GetPeriodoById';
-import type { EstaticasBB } from '../../types/estaticas/estaticas_bb';
 //Import de componentes
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
@@ -490,18 +478,15 @@ async function atualizarStatusConfirmed() {
     }
 }
 
-const updatePage = (page: number) => {
-    currentPage.value = page;
-    fetchData();
-};
-
 const updateItemsPerPage = (itemsPerPageValue: number) => {
-    itemsPerPage.value = itemsPerPageValue;
-    currentPage.value = 1;
-    fetchData();
+    if (itemsPerPage.value !== itemsPerPageValue) {
+        itemsPerPage.value = itemsPerPageValue;
+        currentPage.value = 1;
+        fetchData();
+    }
 };
 
-watch([itemsPerPage, search], fetchData);
+watch([currentPage, itemsPerPage, search], fetchData);
 
 onMounted(() => {
     fetchData();
