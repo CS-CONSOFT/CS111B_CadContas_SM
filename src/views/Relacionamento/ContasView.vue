@@ -19,9 +19,11 @@
                         <v-btn v-if="active" prepend-icon="mdi-cancel" flat class="mr-2 bg-error" @click="fetchInactive">Inativos</v-btn>
                         <v-btn v-else prepend-icon="mdi-delete-empty" flat class="bg-secondary mr-2" @click="fetchActive">Ativos</v-btn>
                         <BtnAdicionar @click="redirectToCreate" />
+                        <!--
                         <v-btn icon @click="toggleView">
                             <v-icon>{{ isListView ? 'mdi-view-grid' : 'mdi-view-list' }}</v-icon>
                         </v-btn>
+                        -->
                     </v-col>
                 </v-row>
             </div>
@@ -156,14 +158,19 @@
 
                             <v-list style="width: 250px">
                                 <v-list-item v-for="(opcao, index) in opcoesMenu" :key="index" @click="opcao.acao(item)">
-                                    <div class="d-flex">
-                                        <v-col cols="3">
-                                            <v-icon>{{ opcao.icone(item) }}</v-icon>
-                                        </v-col>
-                                        <v-col cols="9">
-                                            <v-list-item-title>{{ opcao.nome(item) }}</v-list-item-title>
-                                        </v-col>
-                                    </div>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ props }">
+                                            <div v-bind="props" class="d-flex align-center" style="cursor: pointer">
+                                                <v-col cols="3">
+                                                    <v-icon>{{ opcao.icone(item) }}</v-icon>
+                                                </v-col>
+                                                <v-col cols="9">
+                                                    <v-list-item-title>{{ opcao.nome(item) }}</v-list-item-title>
+                                                </v-col>
+                                            </div>
+                                        </template>
+                                        <span>{{ opcao.nome(item) }}</span>
+                                    </v-tooltip>
                                 </v-list-item>
                             </v-list>
                         </v-menu>

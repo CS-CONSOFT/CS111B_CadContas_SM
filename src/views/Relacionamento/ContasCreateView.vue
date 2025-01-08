@@ -75,6 +75,7 @@
                                         :Prm_limpavel="false"
                                         :Prm_isObrigatorio="false"
                                         :disabled="disableCPF"
+                                        @cpf-limpo="capturarCpfLimpo"
                                     />
                                 </v-col>
                                 <v-col cols="5" class="pa-0 pl-4">
@@ -523,6 +524,7 @@ const tenant = user?.TenantId;
 const router = useRouter();
 const formRef = ref<any>(null);
 const mostrarPopup = ref(false);
+const cpfClear = ref<number>(0);
 const disableCPF = ref(false);
 const disableCNPJ = ref(false);
 
@@ -542,6 +544,14 @@ const showSnackbar = (message: string, color: string) => {
     snackbarColor.value = color;
     snackbar.value = true;
 };
+
+function capturarCpfLimpo(cpf: any) {
+    cpfClear.value = cpf;
+}
+
+function limparCep(cep: any): string {
+    return cep.replace(/\D/g, '');
+}
 
 function abrirPopup() {
     mostrarPopup.value = true;
@@ -577,9 +587,10 @@ const onPaisSelecionado = (value: any) => {
 };
 
 const handleCepInfo = (info: CEP) => {
-    BB01206.value.BB012_Logradouro = info.logradouro || '';
-    BB01206.value.BB012_Bairro = info.bairro || '';
-    BB01206.value.BB012_Complemento = info.complemento || '';
+    BB01206.value.BB012_Logradouro = info.logradouro;
+    BB01206.value.BB012_Bairro = info.bairro;
+    BB01206.value.BB012_Complemento = info.complemento;
+    BB01206.value.BB012_CEP = Number(limparCep(info.cep));
 };
 
 async function salvarConta() {
@@ -689,7 +700,7 @@ async function salvarConta() {
             BB012_DataRegJunta: BB01202.value.BB012_DataRegJunta,
             BB012_Patrimonio: BB01202.value.BB012_Patrimonio,
             BB012_Capital_Social: BB01202.value.BB012_Capital_Social,
-            BB012_CPF: BB01202.value.BB012_CPF,
+            BB012_CPF: cpfClear.value,
             BB012_RG: BB01202.value.BB012_RG,
             BB012_ComplementoRG: BB01202.value.BB012_ComplementoRG,
             BB012_EmissaoRG: BB01202.value.BB012_EmissaoRG,
@@ -764,7 +775,7 @@ async function salvarConta() {
                     });
                 }, 2000);
             } else {
-                showSnackbar(response.data.Out_Message || 'Erro ao criar conta', 'error');
+                showSnackbar(response.data.Str_ReturnErro.Out_Message || 'Erro ao criar conta', 'error');
             }
         } catch (error) {
             showSnackbar('Erro inesperado ao criar a conta', 'error');
