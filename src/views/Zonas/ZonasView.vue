@@ -68,9 +68,28 @@
                         }}</v-chip>
                     </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                        <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
-                        <v-icon small @click="confirmSoftDelete(item)" class="v-btn-icon">{{ active ? 'mdi-cancel' : 'mdi-check' }}</v-icon>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
+                            </template>
+                            <span>Editar</span>
+                        </v-tooltip>
+                        
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon"> mdi-delete </v-icon>
+                            </template>
+                            <span>Excluir</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="confirmSoftDelete(item)" class="v-btn-icon">
+                                    {{ active ? 'mdi-cancel' : 'mdi-check' }}
+                                </v-icon>
+                            </template>
+                            <span>{{ active ? 'Desativar' : 'Ativar' }}</span>
+                        </v-tooltip>
                     </template>
                 </v-data-table>
             </v-card>
@@ -93,11 +112,31 @@
                                         >
                                     </v-card-text>
                                     <v-card-actions class="pl-4">
-                                        <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                                        <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
-                                        <v-icon small @click="confirmSoftDelete(item)" class="v-btn-icon">{{
-                                            active ? 'mdi-cancel' : 'mdi-check'
-                                        }}</v-icon>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="openEditDialog(item)" class="v-btn-icon"
+                                                    >mdi-pencil</v-icon
+                                                >
+                                            </template>
+                                            <span>Editar</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon">
+                                                    mdi-delete
+                                                </v-icon>
+                                            </template>
+                                            <span>Excluir</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="confirmSoftDelete(item)" class="v-btn-icon">
+                                                    {{ active ? 'mdi-cancel' : 'mdi-check' }}
+                                                </v-icon>
+                                            </template>
+                                            <span>{{ active ? 'Desativar' : 'Ativar' }}</span>
+                                        </v-tooltip>
                                     </v-card-actions>
                                 </v-card>
                             </v-col>
@@ -128,6 +167,7 @@
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="true"
                                 :rules="rules.nome"
+                                :Prm_QuantiCaracteres="10"
                             />
 
                             <cs_InputTexto
@@ -179,7 +219,13 @@
                         </v-col>
 
                         <v-col cols="6">
-                            <cs_InputTexto v-model="var_BB010_Km" Prm_etiqueta="Km" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
+                            <cs_InputTexto
+                                v-model="var_BB010_Km"
+                                Prm_etiqueta="Km"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                                :Prm_QuantiCaracteres="10"
+                            />
 
                             <cs_InputCelular
                                 v-model="var_BB010_Fone_Contato"
@@ -193,6 +239,7 @@
                                 Prm_etiqueta="Promotor"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
+                                :Prm_QuantiCaracteres="10"
                             />
 
                             <cs_InputTexto
@@ -207,6 +254,7 @@
                                 Prm_etiqueta="Período Rota"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
+                                :Prm_QuantiCaracteres="10"
                             />
 
                             <cs_InputTexto
@@ -214,6 +262,7 @@
                                 Prm_etiqueta="Período Visita"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
+                                :Prm_QuantiCaracteres="10"
                             />
                         </v-col>
                     </div>

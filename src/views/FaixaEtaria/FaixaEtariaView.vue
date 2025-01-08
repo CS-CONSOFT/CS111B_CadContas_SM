@@ -59,9 +59,26 @@
                     }}</v-chip>
                 </template>
                 <template v-slot:item.actions="{ item }">
-                    <v-icon small @click="redirectToEdit(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                    <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
-                    <v-icon small @click="atualizarFaixa(item)" class="v-btn-icon">mdi-arrow-right-thick</v-icon>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ props }">
+                            <v-icon small v-bind="props" @click="redirectToEdit(item)" class="v-btn-icon">mdi-pencil</v-icon>
+                        </template>
+                        <span>Editar</span>
+                    </v-tooltip>
+
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ props }">
+                            <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon"> mdi-delete </v-icon>
+                        </template>
+                        <span>Excluir</span>
+                    </v-tooltip>
+
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ props }">
+                            <v-icon small v-bind="props" @click="atualizarFaixa(item)" class="v-btn-icon"> mdi-arrow-right-thick </v-icon>
+                        </template>
+                        <span>Atualizar Faixa</span>
+                    </v-tooltip>
                 </template>
             </v-data-table>
         </v-card>

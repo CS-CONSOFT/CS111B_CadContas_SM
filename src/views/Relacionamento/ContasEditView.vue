@@ -371,7 +371,7 @@ import cs_InputCPF from '../../submodules/cs_components/src/components/campos/cs
 import cs_InputCnpj from '../../submodules/cs_components/src/components/campos/cs_InputCnpj.vue';
 import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
-import cs_PopUpConsultarCnpj from '../../submodules/cs_components/src/components/popup/cs_PopUpConsultarCnpj.vue';
+import cs_PopUpConsultarCnpj from './Componentes/cs_PopUpConsultarCnpj.vue';
 
 const props = defineProps<{
     id: string;
@@ -571,6 +571,10 @@ function capturarCpfLimpo(cpf: any) {
     cpfClear.value = cpf;
 }
 
+function limparCep(cepComMascara: string): string {
+    return cepComMascara.replace(/\D/g, '');
+}
+
 // Abre o popup
 function abrirPopup() {
     isPopupOpen.value = true;
@@ -578,8 +582,6 @@ function abrirPopup() {
 
 // Função para lidar com o recebimento dos dados
 function handleCnpjData(dados: any) {
-    console.log('Dados recebidos do popup:', dados);
-
     BB012.value.BB012_Nome_Cliente = dados.razao_social;
     BB012.value.BB012_Nome_Fantasia;
     BB012.value.BB012_Data_Aniversario;
@@ -605,6 +607,7 @@ const handleCepInfo = (info: CEP) => {
     BB01206.value.BB012_Logradouro = info.logradouro;
     BB01206.value.BB012_Bairro = info.bairro;
     BB01206.value.BB012_Complemento = info.complemento;
+    BB01206.value.BB012_CEP = Number(limparCep(info.cep));
 };
 
 const onPaisSelecionado = (value: any) => {
@@ -792,7 +795,7 @@ async function salvarConta() {
             BB012_Data_Entrada_Sit: BB012.value.BB012_Data_Entrada_Sit,
             BB012_Data_Saida_Sit: BB012.value.BB012_Data_Saida_Sit,
             BB012_Descricao: BB012.value.BB012_Descricao,
-            BB012_Is_Active: BB012.value.BB012_Is_Active,
+            BB012_Is_Active: true,
             BB012_Tipo_Conta_ID: BB012.value.BB012_Tipo_Conta_ID,
             BB012_Grupoconta_ID: BB012.value.BB012_Grupoconta_ID,
             BB012_ClasseConta_ID: BB012.value.BB012_ClasseConta_ID,
@@ -958,7 +961,7 @@ async function salvarConta() {
                     });
                 }, 2000);
             } else {
-                showSnackbar(response.data.Out_Message || 'Erro ao editar conta', 'error');
+                showSnackbar(response.data.Str_ReturnErro.Out_Message || 'Erro ao criar conta', 'error');
             }
         } catch (error) {
             showSnackbar('Erro inesperado ao editar a conta', 'error');

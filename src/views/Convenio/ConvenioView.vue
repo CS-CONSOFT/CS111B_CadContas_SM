@@ -40,8 +40,23 @@
                                     </v-col>
 
                                     <v-col cols="6" class="pa-0 d-flex justify-end align-center">
-                                        <v-icon small @click="redirectToEdit(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                                        <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="redirectToEdit(item)" class="v-btn-icon"
+                                                    >mdi-pencil</v-icon
+                                                >
+                                            </template>
+                                            <span>Editar</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon">
+                                                    mdi-delete
+                                                </v-icon>
+                                            </template>
+                                            <span>Excluir</span>
+                                        </v-tooltip>
                                     </v-col>
                                 </div>
 

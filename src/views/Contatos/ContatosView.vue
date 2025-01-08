@@ -70,8 +70,19 @@
                         }}</v-chip>
                     </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                        <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
+                            </template>
+                            <span>Editar</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon"> mdi-delete </v-icon>
+                            </template>
+                            <span>Excluir</span>
+                        </v-tooltip>
                     </template>
                 </v-data-table>
             </v-card>
@@ -85,7 +96,7 @@
                                     <v-card-title class="font-weight-bold bg-lightprimary rounded-t-sm"
                                         >{{ item.Nome }} {{ item.Sobrenome }}</v-card-title
                                     >
-                                    <v-card-text class="pl-4">
+                                    <v-card-text class="pl-4 pt-2">
                                         <v-chip
                                             :color="item.Ativo ? 'success' : 'error'"
                                             class="font-weight-bold"
@@ -95,8 +106,23 @@
                                         >
                                     </v-card-text>
                                     <v-card-actions class="pl-4">
-                                        <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                                        <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="openEditDialog(item)" class="v-btn-icon"
+                                                    >mdi-pencil</v-icon
+                                                >
+                                            </template>
+                                            <span>Editar</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon">
+                                                    mdi-delete
+                                                </v-icon>
+                                            </template>
+                                            <span>Excluir</span>
+                                        </v-tooltip>
                                     </v-card-actions>
                                 </v-card>
                             </v-col>
@@ -121,11 +147,12 @@
                 <v-form ref="formRef">
                     <div class="d-flex">
                         <v-col cols="6">
-                            <cs_InputTexto
+                            <cs_SelectTratamento
                                 v-model="var_BB035_Tratamento_ID"
                                 Prm_etiqueta="Tratamento"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
+                                style="margin-bottom: 22px"
                             />
 
                             <div class="d-flex">
@@ -250,7 +277,13 @@
                                 </v-col>
                             </div>
 
-                            <cs_InputTexto v-model="var_BB035_CPF" Prm_etiqueta="CPF" :Prm_limpavel="false" :Prm_isObrigatorio="false" />
+                            <cs_InputCPF
+                                v-model="var_BB035_CPF"
+                                Prm_etiqueta="CPF"
+                                :Prm_limpavel="false"
+                                :Prm_isObrigatorio="false"
+                                @cpf-limpo="capturarCpfLimpo"
+                            />
 
                             <div class="d-flex">
                                 <v-col cols="6" class="pa-0">
@@ -272,7 +305,7 @@
                             </div>
 
                             <div class="d-flex">
-                                <v-col cols="4" class="pa-0">
+                                <v-col cols="6" class="pa-0">
                                     <cs_InputCep
                                         :initialCep="var_BB035_CEP"
                                         :readonly="false"
@@ -280,7 +313,7 @@
                                         @cep-info="handleCepInfo"
                                     />
                                 </v-col>
-                                <v-col cols="8" class="pa-0 pl-4">
+                                <v-col cols="6" class="pa-0 pl-4">
                                     <cs_InputTexto
                                         v-model="var_BB035_Logradouro"
                                         Prm_etiqueta="Logradouro"
@@ -407,6 +440,8 @@ import cs_SelectUF from '../../submodules/cs_components/src/components/selects/c
 import cs_SelectCidades from '../../submodules/cs_components/src/components/selects/cs_SelectCidades.vue';
 import cs_InputTelefone from '../../submodules/cs_components/src/components/campos/cs_InputTelefone.vue';
 import cs_InputCelular from '../../submodules/cs_components/src/components/campos/cs_InputCelular.vue';
+import cs_SelectTratamento from '../../submodules/cs_components/src/components/selects/cs_SelectTratamento.vue';
+import cs_InputCPF from '../../submodules/cs_components/src/components/campos/cs_InputCPF.vue';
 
 interface Item {
     ID: string;
@@ -509,8 +544,8 @@ const rules = {
 
 const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
-const router = useRouter();
 const formRef = ref<any>(null);
+const cpfClear = ref<number>(0);
 
 //variaveis da paginação
 const currentPage = ref(1);
@@ -534,10 +569,19 @@ const showSnackbar = (message: string, color: string) => {
 };
 
 const handleCepInfo = (info: CEP) => {
-    var_BB035_Logradouro.value = info.logradouro || '';
-    var_BB035_Bairro.value = info.bairro || '';
-    var_BB035_Complemento.value = info.complemento || '';
+    var_BB035_Logradouro.value = info.logradouro;
+    var_BB035_Bairro.value = info.bairro;
+    var_BB035_Complemento.value = info.complemento;
+    var_BB035_CEP.value = limparCep(info.cep);
 };
+
+function capturarCpfLimpo(cpf: any) {
+    cpfClear.value = cpf;
+}
+
+function limparCep(cepComMascara: string): string {
+    return cepComMascara.replace(/\D/g, '');
+}
 
 const onPaisSelecionado = (value: any) => {
     var_BB035_Codigo_Pais.value = value;
@@ -699,7 +743,7 @@ async function CreateOrUpdateContato() {
                 BB035_Assistente: var_BB035_Assistente.value,
                 BB035_TelefoneAssist: var_BB035_TelefoneAssist.value,
                 BB035_EMailSecundario: var_BB035_EMailSecundario.value,
-                BB035_CPF: var_BB035_CPF.value,
+                BB035_CPF: cpfClear.value.toString(),
                 BB035_RG: var_BB035_RG.value,
                 BB035_Orgao_Exped_RG: var_BB035_Orgao_Exped_RG.value,
                 BB035_Data_Emissao_RG: var_BB035_Data_Emissao_RG.value,
@@ -710,7 +754,7 @@ async function CreateOrUpdateContato() {
 
             const csicp_bb035_end: Csicp_bb035_end = {
                 bb035_Id: var_bb035_Id.value,
-                BB035_ContatoID: var_BB035_ContatoID.value,
+                BB035_ContatoID: var_Id.value ? var_Id.value : '',
                 BB035_Logradouro: var_BB035_Logradouro.value,
                 BB035_Numero: var_BB035_Numero.value,
                 BB035_Complemento: var_BB035_Complemento.value,

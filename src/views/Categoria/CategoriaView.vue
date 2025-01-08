@@ -68,8 +68,19 @@
                         }}</v-chip>
                     </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                        <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
+                            </template>
+                            <span>Editar</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon"> mdi-delete </v-icon>
+                            </template>
+                            <span>Excluir</span>
+                        </v-tooltip>
                     </template>
                 </v-data-table>
             </v-card>
@@ -92,8 +103,23 @@
                                         >
                                     </v-card-text>
                                     <v-card-actions class="pl-4">
-                                        <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                                        <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="openEditDialog(item)" class="v-btn-icon"
+                                                    >mdi-pencil</v-icon
+                                                >
+                                            </template>
+                                            <span>Editar</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon">
+                                                    mdi-delete
+                                                </v-icon>
+                                            </template>
+                                            <span>Excluir</span>
+                                        </v-tooltip>
                                     </v-card-actions>
                                 </v-card>
                             </v-col>

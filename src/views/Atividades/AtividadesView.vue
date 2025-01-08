@@ -70,9 +70,28 @@
                         }}</v-chip>
                     </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                        <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
-                        <v-icon small @click="confirmSoftDelete(item)" class="v-btn-icon">{{ active ? 'mdi-cancel' : 'mdi-check' }}</v-icon>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
+                            </template>
+                            <span>Editar</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon"> mdi-delete </v-icon>
+                            </template>
+                            <span>Excluir</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="confirmSoftDelete(item)" class="v-btn-icon">
+                                    {{ active ? 'mdi-cancel' : 'mdi-check' }}
+                                </v-icon>
+                            </template>
+                            <span>{{ active ? 'Desativar' : 'Ativar' }}</span>
+                        </v-tooltip>
                     </template>
                 </v-data-table>
             </v-card>
@@ -85,7 +104,7 @@
                                 <v-card class="border-sm border-opacity-50 pa-0 mt-1" flat elevation="2">
                                     <v-card-title class="font-weight-bold bg-lightprimary rounded-t-sm">{{ item.Atividade }}</v-card-title>
                                     <v-card-subtitle class="mt-5 text-h6">{{ item.Codigo }}</v-card-subtitle>
-                                    <v-card-text class="pl-4">
+                                    <v-card-text class="pl-4 pt-2">
                                         <v-chip
                                             :color="item.Ativo ? 'success' : 'error'"
                                             class="font-weight-bold"
@@ -95,11 +114,32 @@
                                         >
                                     </v-card-text>
                                     <v-card-actions class="pl-4">
-                                        <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                                        <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
-                                        <v-icon small @click="confirmSoftDelete(item)" class="v-btn-icon">{{
-                                            active ? 'mdi-cancel' : 'mdi-check'
-                                        }}</v-icon>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="openEditDialog(item)" class="v-btn-icon"
+                                                    >mdi-pencil</v-icon
+                                                >
+                                            </template>
+                                            <span>Editar</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon">
+                                                    mdi-delete
+                                                </v-icon>
+                                            </template>
+                                            <span>Excluir</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ props }">
+                                                <v-icon small v-bind="props" @click="confirmSoftDelete(item)" class="v-btn-icon">
+                                                    {{ active ? 'mdi-cancel' : 'mdi-check' }}
+                                                </v-icon>
+                                            </template>
+                                            <span>{{ active ? 'Desativar' : 'Ativar' }}</span>
+                                        </v-tooltip>
                                     </v-card-actions>
                                 </v-card>
                             </v-col>

@@ -62,10 +62,35 @@
                         }}</v-chip>
                     </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-icon small @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
-                        <v-icon small @click="confirmDelete(item)" class="v-btn-icon">mdi-delete</v-icon>
-                        <v-icon small @click="confirmAtualizarStatus(item)" class="v-btn-icon">mdi-calendar</v-icon>
-                        <v-icon small @click="confirmTitulo(item)" class="v-btn-icon">mdi-cash-check</v-icon>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="openEditDialog(item)" class="v-btn-icon">mdi-pencil</v-icon>
+                            </template>
+                            <span>Editar</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon"> mdi-delete </v-icon>
+                            </template>
+                            <span>Excluir</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="confirmAtualizarStatus(item)" class="v-btn-icon">
+                                    mdi-calendar
+                                </v-icon>
+                            </template>
+                            <span>Atualizar Status</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon small v-bind="props" @click="confirmTitulo(item)" class="v-btn-icon"> mdi-cash-check </v-icon>
+                            </template>
+                            <span>Confirmar Titulo</span>
+                        </v-tooltip>
                     </template>
                 </v-data-table>
             </v-card>
