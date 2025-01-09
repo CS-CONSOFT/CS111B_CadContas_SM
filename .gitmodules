@@ -1,3 +1,4 @@
 [submodule "src/submodules/cs_components"]
 	path = src/submodules/cs_components
 	url = https://github.com/CS-CONSOFT/CS_Components.git
+	branch = Marco_20241230
