@@ -72,12 +72,11 @@ import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { GetConvenioById, SaveConvenio } from '../../services/convenio/bb060_convenio';
+import { GetConvenioById, UpdateConvenio } from '../../services/convenio/bb060_convenio';
 // Import de types
-import type { ConvenioById, Csicp_bb060 } from '../../types/convenio/bb060_GetConvenioById';
+import type { ConvenioById, ConvenioCreate } from '../../types/convenio/bb060_convenio';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
-import cs_InputValor from '../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
 import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnSalvar from '../../submodules/cs_components/src/components/botoes/cs_BtnSalvar.vue';
 import cs_SelectCentroDeCusto from '../../submodules/cs_components/src/components/selects/cs_SelectCentroDeCusto.vue';
@@ -141,24 +140,24 @@ const fetchConvenioById = async (id: string) => {
     try {
         const data: ConvenioById = await GetConvenioById(tenant, id);
 
-        BB060.value.bb060_ConvenioId = data.csicp_bb060.bb060_ConvenioId;
-        BB060.value.bb060_Codigo = data.csicp_bb060.bb060_Codigo;
-        BB060.value.bb060_Descricao = data.csicp_bb060.bb060_Descricao;
-        BB060.value.bb060_vBase = `${data.csicp_bb060.bb060_vBase.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        BB060.value.bb060_CCustoID = data.csicp_bb060.bb060_CCustoID;
-        BB060.value.bb060_UsuarioProprieID = data.csicp_bb060.bb060_UsuarioProprieID;
-        BB060.value.bb060_AgCobradorID = data.csicp_bb060.bb060_AgCobradorID;
-        BB060.value.bb060_ResponsavelID = data.csicp_bb060.bb060_ResponsavelID;
-        BB060.value.bb060_CondicaoID = data.csicp_bb060.bb060_CondicaoID;
-        BB060.value.bb060_TipoCobrancaID = data.csicp_bb060.bb060_TipoCobrancaID;
-        BB060.value.bb060_UsuarioInc = data.csicp_bb060.bb060_UsuarioInc;
-        BB060.value.bb060_UsuarioAlt = data.csicp_bb060.bb060_UsuarioAlt;
-        BB060.value.bb060_dthrInc = data.csicp_bb060.bb060_dthrInc;
-        BB060.value.bb060_dthrAlt = data.csicp_bb060.bb060_dthrAlt;
-        BB060.value.bb060_EspecieID = data.csicp_bb060.bb060_EspecieID;
-        BB060.value.bb060_FPagto_ID = data.csicp_bb060.bb060_FPagto_ID;
-        BB060.value.bb060_IsActive = data.csicp_bb060.bb060_IsActive;
-        BB060.value.bb060_ConvMasterID = data.csicp_bb060.bb060_ConvMasterID;
+        BB060.value.bb060_ConvenioId = data.Bb060Convenioid;
+        BB060.value.bb060_Codigo = data.Bb060Codigo;
+        BB060.value.bb060_Descricao = data.Bb060Descricao;
+        BB060.value.bb060_vBase = `${data.Bb060Vbase.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        BB060.value.bb060_CCustoID = data.Bb060Ccustoid;
+        BB060.value.bb060_UsuarioProprieID = data.Bb060Usuarioproprieid;
+        BB060.value.bb060_AgCobradorID = data.Bb060Agcobradorid;
+        BB060.value.bb060_ResponsavelID = data.Bb060Responsavelid;
+        BB060.value.bb060_CondicaoID = data.Bb060Condicaoid;
+        BB060.value.bb060_TipoCobrancaID = data.Bb060Tipocobrancaid;
+        BB060.value.bb060_UsuarioInc = data.Bb060Usuarioinc;
+        BB060.value.bb060_UsuarioAlt = data.Bb060Usuarioalt;
+        BB060.value.bb060_dthrInc = data.Bb060Dthrinc;
+        BB060.value.bb060_dthrAlt = data.Bb060Dthralt;
+        BB060.value.bb060_EspecieID = data.Bb060Especieid;
+        BB060.value.bb060_FPagto_ID = data.Bb060FpagtoId;
+        BB060.value.bb060_IsActive = data.Bb060Isactive;
+        BB060.value.bb060_ConvMasterID = data.Bb060ConvMasterid;
     } catch (error) {
         console.error('Erro ao buscar convênio:', error);
     }
@@ -166,29 +165,27 @@ const fetchConvenioById = async (id: string) => {
 
 async function CreateOrUpdateConvenio() {
     if (formRef.value && formRef.value.validate()) {
-        const data: Csicp_bb060 = {
-            bb060_ConvenioId: BB060.value.bb060_ConvenioId,
-            bb060_Codigo: BB060.value.bb060_Codigo,
-            bb060_Descricao: BB060.value.bb060_Descricao,
-            bb060_vBase: BB060.value.bb060_vBase,
-            bb060_CCustoID: BB060.value.bb060_CCustoID,
-            bb060_UsuarioProprieID: BB060.value.bb060_UsuarioProprieID,
-            bb060_AgCobradorID: BB060.value.bb060_AgCobradorID,
-            bb060_ResponsavelID: BB060.value.bb060_ResponsavelID,
-            bb060_CondicaoID: BB060.value.bb060_CondicaoID,
-            bb060_TipoCobrancaID: BB060.value.bb060_TipoCobrancaID,
-            bb060_UsuarioInc: BB060.value.bb060_UsuarioInc,
-            bb060_UsuarioAlt: BB060.value.bb060_UsuarioAlt,
-            bb060_dthrInc: BB060.value.bb060_dthrInc,
-            bb060_dthrAlt: BB060.value.bb060_dthrAlt,
-            bb060_EspecieID: BB060.value.bb060_EspecieID,
-            bb060_FPagto_ID: BB060.value.bb060_FPagto_ID,
-            bb060_IsActive: BB060.value.bb060_IsActive,
-            bb060_ConvMasterID: BB060.value.bb060_ConvMasterID
+        const data: ConvenioCreate = {
+            Bb060Codigo: BB060.value.bb060_Codigo,
+            Bb060Descricao: BB060.value.bb060_Descricao,
+            Bb060Vbase: parseFloat(BB060.value.bb060_vBase),
+            Bb060Ccustoid: BB060.value.bb060_CCustoID,
+            Bb060Usuarioproprieid: BB060.value.bb060_UsuarioProprieID,
+            Bb060Agcobradorid: BB060.value.bb060_AgCobradorID,
+            Bb060Responsavelid: BB060.value.bb060_ResponsavelID,
+            Bb060Condicaoid: BB060.value.bb060_CondicaoID,
+            Bb060Tipocobrancaid: BB060.value.bb060_TipoCobrancaID,
+            Bb060Usuarioinc: BB060.value.bb060_UsuarioInc,
+            Bb060Usuarioalt: BB060.value.bb060_UsuarioAlt,
+            Bb060Dthrinc: BB060.value.bb060_dthrInc,
+            Bb060Dthralt: BB060.value.bb060_dthrAlt,
+            Bb060Especieid: BB060.value.bb060_EspecieID,
+            Bb060FpagtoId: BB060.value.bb060_FPagto_ID,
+            Bb060Convmasterid: BB060.value.bb060_ConvMasterID
         };
 
         try {
-            const response = await SaveConvenio(tenant, data);
+            const response = await UpdateConvenio(tenant, BB060.value.bb060_ConvenioId, data);
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Convênio editado com sucesso', 'success');
                 setTimeout(() => {

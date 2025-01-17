@@ -1,87 +1,137 @@
 export interface ContatosCompleto {
-    PageSize: PageSize;
-    Lista_bb035_List: Lista_bb035_List[];
-    Code_Erro: Code_Erro;
+    List: List[];
+    CurrentPage: number;
+    TotalPage: number;
+    PageSize: number;
+    TotalCount: number;
+    HasPrevius: boolean;
+    HasNext: boolean;
 }
 
-export interface PageSize {
-    cs_list_total_itens: number;
-    cs_itens_per_page: string;
-    cs_number_of_pages: number;
-}
-
-export interface Lista_bb035_List {
-    csicp_bb035: Csicp_bb035;
-    csicp_bb035_end: Csicp_bb035_end;
-    csicp_bb035_Trat: Csicp_bb035_Trat;
-    csicp_bb035_Origem: Csicp_bb035_Origem;
-}
-
-export interface Csicp_bb035 {
+export interface List {
+    TenantId: number;
     Id: string;
-    BB035_PrimeiroNome: string;
-    BB035_Sobrenome: string;
-    BB035_EMail: string;
-    BB035_Titulo: string;
-    BB035_Departamento: string;
-    BB035_Data_Aniversario: string;
-    BB035_Telefone: string;
-    BB035_OutroTelefone: string;
-    BB035_Celular: string;
-    BB035_Fax: string;
-    BB035_TelefoneResidencia: string;
-    BB035_Descricao: string;
-    BB035_Assistente: string;
-    BB035_TelefoneAssist: string;
-    BB035_EMailSecundario: string;
-    BB035_CPF: string;
-    BB035_RG: number;
-    BB035_Orgao_Exped_RG: string;
-    BB035_Data_Emissao_RG: string;
-    BB035_Is_Active: boolean;
-    BB035_Tratamento_ID: number;
-    BB035_OrigemContato_ID: number;
+    Bb035Primeironome: string;
+    Bb035Sobrenome: string;
+    Bb035Email: string;
+    Bb035Titulo: string;
+    Bb035Departamento: string;
+    Bb035DataAniversario: string;
+    Bb035Telefone: string;
+    Bb035Outrotelefone: string;
+    Bb035Celular: string;
+    Bb035Fax: string;
+    Bb035Telefoneresidencia: string;
+    Bb035Descricao: string;
+    Bb035Assistente: string;
+    Bb035Telefoneassist: string;
+    Bb035Emailsecundario: string;
+    Bb035Cpf: string;
+    Bb035Rg: number;
+    Bb035OrgaoExpedRg: string;
+    Bb035DataEmissaoRg: string;
+    Bb035IsActive: boolean;
+    Bb035TratamentoId: number;
+    Bb035OrigemcontatoId: number;
+    Bb035CodgCliente7x: number;
+    Bb035SeqCliente7x: number;
 }
 
-export interface Csicp_bb035_end {
-    bb035_Id: string;
-    BB035_ContatoID: string;
-    BB035_Logradouro: string;
-    BB035_Numero: string;
-    BB035_Complemento: string;
-    BB035_Bairro: string;
-    BB035_Codigo_Cidade: string;
-    BB035_UF: string;
-    BB035_CEP: string;
-    BB035_Codigo_Pais: string;
+export interface ContatoById {
+    TenantId: number;
+    Id: string;
+    Bb035Primeironome: string;
+    Bb035Sobrenome: string;
+    Bb035Email: string;
+    Bb035Titulo: string;
+    Bb035Departamento: string;
+    Bb035DataAniversario: string;
+    Bb035Telefone: string;
+    Bb035Outrotelefone: string;
+    Bb035Celular: string;
+    Bb035Fax: string;
+    Bb035Telefoneresidencia: string;
+    Bb035Descricao: string;
+    Bb035Assistente: string;
+    Bb035Telefoneassist: string;
+    Bb035Emailsecundario: string;
+    Bb035Cpf: string;
+    Bb035Rg: number;
+    Bb035OrgaoExpedRg: string;
+    Bb035DataEmissaoRg: string;
+    Bb035IsActive: boolean;
+    Bb035TratamentoId: number;
+    Bb035OrigemcontatoId: number;
+    Bb035CodgCliente7x: number;
+    Bb035SeqCliente7x: number;
+    NavCSICP_BB035End: NavCSICP_BB035End;
+    NavCSICP_BB035Trat: NavCSICP_BB035Trat;
+    NavCSICP_BB035Origem: NavCSICP_BB035Origem;
 }
 
-export interface Csicp_bb035_Trat {
+export interface NavCSICP_BB035End {
+    TenantId: number;
+    Bb035Id: string;
+    Bb035Contatoid: string;
+    Bb035Logradouro: string;
+    Bb035Numero: string;
+    Bb035Complemento: string;
+    Bb035Bairro: string;
+    Bb035CodigoCidade: string;
+    Bb035Uf: string;
+    Bb035Cep: string;
+    Bb035CodigoPais: string;
+}
+
+export interface NavCSICP_BB035Trat {
     Id: number;
     Label: string;
     Order: number;
-    Is_Active: boolean;
+    IsActive: boolean;
 }
 
-export interface Csicp_bb035_Origem {
+export interface NavCSICP_BB035Origem {
     Id: number;
     Label: string;
     Order: number;
-    Is_Active: boolean;
+    IsActive: boolean;
 }
 
-export interface Code_Erro {
-    Code_Erro: string;
-    Mensagem: string;
+export interface ContatoCreate {
+    Bb035Primeironome: string;
+    Bb035Sobrenome: string;
+    Bb035Email: string;
+    Bb035Titulo: string;
+    Bb035Departamento: string;
+    Bb035DataAniversario: string;
+    Bb035Telefone: string;
+    Bb035Outrotelefone: string;
+    Bb035Celular: string;
+    Bb035Fax: string;
+    Bb035Telefoneresidencia: string;
+    Bb035Descricao: string;
+    Bb035Assistente: string;
+    Bb035Telefoneassist: string;
+    Bb035Emailsecundario: string;
+    Bb035Cpf: string;
+    Bb035Rg: number;
+    Bb035OrgaoExpedRg: string;
+    Bb035DataEmissaoRg: string;
+    Bb035TratamentoId: number;
+    Bb035OrigemcontatoId: number;
+    Bb035CodgCliente7x: number;
+    Bb035SeqCliente7x: number;
+    NavCSICP_BB035End: NavCSICP_BB035EndCreate;
 }
 
-export interface ApiResponse<T> {
-    Lista_bb035_List: any;
-    PageSize: any;
-    data: T;
-    status: number;
-    statusText: string;
-    headers: any;
-    config: any;
-    request?: any;
+export interface NavCSICP_BB035EndCreate {
+    Bb035Id: string;
+    Bb035Logradouro: string;
+    Bb035Numero: string;
+    Bb035Complemento: string;
+    Bb035Bairro: string;
+    Bb035CodigoCidade: string;
+    Bb035Uf: string;
+    Bb035Cep: string;
+    Bb035CodigoPais: string;
 }

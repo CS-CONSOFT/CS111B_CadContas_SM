@@ -174,20 +174,21 @@ import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
 import {
     GetFaixaEtariaById,
-    SaveFaixaEtaria,
-    SaveDetalhesFaixaEtaria,
+    UpdateFaixaEtaria,
+    CreateDetalhesFaixaEtaria,
     DeleteDetalhesFaixaEtaria,
-    SaveVinculoConvenioFaixaEtaria,
+    CreateVinculoConvenioFaixaEtaria,
     DeleteVinculoConvenioFaixaEtaria
 } from '../../services/faixa_etaria/bb064_faixaEtaria';
 // Import de Types
-import type { Csicp_bb064 } from '../../types/faixa_etaria/bb064_faixaEtaria';
 import type {
     FaixaEtariaById,
-    Csicp_bb066_List,
-    Vinculo_FxEtaria_Convenio,
-    Csicp_bb065
-} from '../../types/faixa_etaria/bb064_GetFaixaEtariaById';
+    NavCSICP_BB066List,
+    NavCSICP_BB065List,
+    FaixaEtariaCreate,
+    FaixaEtariaDetalhesCreate,
+    FaixaEtariaConvenioCreate
+} from '../../types/faixa_etaria/bb064_faixaEtaria';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_InputValor from '../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
@@ -275,10 +276,10 @@ const var_bb066_Valor = ref<any>('');
 //Variável para armazenar o var_bb066_Valor limpo
 const cleanValue = ref<number | null>(null);
 
-const selectedConvenio = ref<number>(0);
+const selectedConvenio = ref<string>('');
 
-const faixaEtaria = ref<Csicp_bb066_List[]>([]);
-const convenioVinculados = ref<Vinculo_FxEtaria_Convenio[]>([]);
+const faixaEtaria = ref<NavCSICP_BB066List[]>([]);
+const convenioVinculados = ref<NavCSICP_BB065List[]>([]);
 
 const rules = {
     codigo: [validationRules.required, validationRules.numeric],
@@ -310,60 +311,62 @@ function handleCleanValue(value: number | null) {
 
 const fetchFaixaEtariaById = async (id: string) => {
     try {
-        const data: FaixaEtariaById = await GetFaixaEtariaById(tenant, id);
+        const response: FaixaEtariaById = await GetFaixaEtariaById(tenant, id);
+        const data = response.Data;
 
-        var_ID.value = data.csicp_bb064.bb064_FxEtariaId;
-        var_bb064_Descricao.value = data.csicp_bb064.bb064_Descricao;
-        var_bb064_IsActive.value = data.csicp_bb064.bb064_IsActive;
+        console.log(data);
+        // Preencher as variáveis principais com dados retornados
+        var_ID.value = data.Bb064Fxetariaid;
+        var_bb064_Descricao.value = data.Bb064Descricao;
+        var_bb064_IsActive.value = data.Bb064Isactive;
 
-        faixaEtaria.value = data.csicp_bb066_List;
-        convenioVinculados.value = data.Vinculo_FxEtaria_Convenio;
+        faixaEtaria.value = data.NavCSICP_BB066List || [];
+        convenioVinculados.value = data.NavCSICP_BB065List || [];
 
-        itemsBB066.value = mapFaixaEtariaToItems(data.csicp_bb066_List);
-        itemsBB065.value = mapConvenioVinculadosToItems(data.Vinculo_FxEtaria_Convenio);
+        itemsBB066.value = mapFaixaEtariaToItems(data.NavCSICP_BB066List || []);
+        itemsBB065.value = mapConvenioVinculadosToItems(data.NavCSICP_BB065List || []);
     } catch (error) {
+        console.error('Erro capturado:', error);
         showSnackbar('Erro ao buscar dados da faixa etária', 'error');
     }
 };
 
-const mapFaixaEtariaToItems = (faixaEtaria: Csicp_bb066_List[]): ItemBB066[] => {
+const mapFaixaEtariaToItems = (faixaEtaria: NavCSICP_BB066List[]): ItemBB066[] => {
     return faixaEtaria.map((item) => ({
-        ID: item.bb066_ID,
-        FaixaEtariaId: item.bb066_FxEtariaID,
-        FaixaDe: item.bb066_FaixaDe,
-        FaixaAte: item.bb066_FaixaAte,
-        Valor: `R$ ${item.bb066_Valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        ID: item.Bb066Id,
+        FaixaEtariaId: item.Bb066Fxetariaid,
+        FaixaDe: item.Bb066Faixade,
+        FaixaAte: item.Bb066Faixaate,
+        Valor: `R$ ${item.Bb066Valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     }));
 };
 
-const mapConvenioVinculadosToItems = (convenioVinculados: Vinculo_FxEtaria_Convenio[]): ItemBB065[] => {
+const mapConvenioVinculadosToItems = (convenioVinculados: NavCSICP_BB065List[]): ItemBB065[] => {
     return convenioVinculados.map((item) => ({
-        ID: item.csicp_bb065.bb065_ID,
-        FaixaEtariaId: item.csicp_bb065.bb064_FxEtariaID,
-        Convenio: item.csicp_bb060.bb060_Descricao
+        ID: item.Bb065Id,
+        FaixaEtariaId: item.Bb064Fxetariaid,
+        Convenio: item.NavBb062Convenio.Bb060Descricao
     }));
 };
 
 async function CreateOrUpdateFaixaEtaria() {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb064 = {
-                bb064_FxEtariaId: var_ID.value ? var_ID.value : 0,
-                bb064_Descricao: var_bb064_Descricao.value,
-                bb064_IsActive: var_bb064_IsActive.value
+            const data: FaixaEtariaCreate = {
+                Bb064Descricao: var_bb064_Descricao.value
             };
 
-            const response = await SaveFaixaEtaria(tenant, data);
+            const response = await UpdateFaixaEtaria(tenant, var_ID.value.toString(), data);
 
             if (response.data.Out_IsSuccess) {
-                showSnackbar('Faixa etária master salva com sucesso', 'success');
+                showSnackbar('Faixa etária master atualizada com sucesso', 'success');
                 setTimeout(() => {
                     router.push({
                         name: 'FaixaEtaria'
                     });
                 }, 2000);
             } else {
-                showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar faixa etária. Verifique os dados.', 'error');
+                showSnackbar(response.data.Out_Message || 'Falha ao atualizar faixa etária. Verifique os dados.', 'error');
             }
         } catch (error) {
             showSnackbar('Erro ao atualizar a faixa etária. Verifique sua conexão ou tente novamente.', 'error');
@@ -373,29 +376,28 @@ async function CreateOrUpdateFaixaEtaria() {
 
 const saveDetalhes = async () => {
     // Monta o objeto de dados para enviar à API
-    const data: Csicp_bb066_List = {
-        bb066_ID: 0,
-        bb066_FxEtariaID: var_ID.value,
-        bb066_FaixaDe: Number(var_bb066_FaixaDe.value) || 0,
-        bb066_FaixaAte: Number(var_bb066_FaixaAte.value) || 0,
-        bb066_Valor: cleanValue.value!
+    const data: FaixaEtariaDetalhesCreate = {
+        Bb066Fxetariaid: var_ID.value,
+        Bb066Faixade: Number(var_bb066_FaixaDe.value) || 0,
+        Bb066Faixaate: Number(var_bb066_FaixaAte.value) || 0,
+        Bb066Valor: cleanValue.value!
     };
 
     try {
         // Envia os dados para a API
-        await SaveDetalhesFaixaEtaria(tenant, data);
+        await CreateDetalhesFaixaEtaria(tenant, data);
 
         showSnackbar('Detalhes da faixa etária adicionados com sucesso', 'success');
 
         // Atualiza a lista após a operação
-        const updatedData = await GetFaixaEtariaById(tenant, var_ID.value.toString());
-        faixaEtaria.value = updatedData.csicp_bb066_List;
-        itemsBB066.value = mapFaixaEtariaToItems(updatedData.csicp_bb066_List);
+        const updatedData = await GetFaixaEtariaById(tenant, props.id);
+        faixaEtaria.value = updatedData.NavCSICP_BB066List;
+        itemsBB066.value = mapFaixaEtariaToItems(updatedData.NavCSICP_BB066List);
 
         // Limpa os campos após a operação
         var_bb066_FaixaDe.value = '';
         var_bb066_FaixaAte.value = '';
-        var_bb066_Valor.value = ''; // Limpa o valor de var_bb066_Valor
+        var_bb066_Valor.value = '';
     } catch (error) {
         showSnackbar('Erro ao salvar detalhes da faixa etária', 'error');
     }
@@ -412,22 +414,21 @@ const deleteDetalhes = async (id: string) => {
 };
 
 const saveConvenio = async () => {
-    const data: Csicp_bb065 = {
-        bb065_ID: 0,
-        bb064_FxEtariaID: var_ID.value,
-        bb062_ConvenioID: selectedConvenio.value
+    const data: FaixaEtariaConvenioCreate = {
+        Bb064Fxetariaid: var_ID.value,
+        Bb062Convenioid: Number(selectedConvenio.value)
     };
 
     try {
-        await SaveVinculoConvenioFaixaEtaria(tenant, data);
+        await CreateVinculoConvenioFaixaEtaria(tenant, data);
 
         showSnackbar('Vínculo adicionado com sucesso', 'success');
 
-        const updatedData = await GetFaixaEtariaById(tenant, var_ID.value.toString());
-        convenioVinculados.value = updatedData.Vinculo_FxEtaria_Convenio;
-        itemsBB065.value = mapConvenioVinculadosToItems(updatedData.Vinculo_FxEtaria_Convenio);
+        const updatedData = await GetFaixaEtariaById(tenant, props.id);
+        convenioVinculados.value = updatedData.NavCSICP_BB065List;
+        itemsBB065.value = mapConvenioVinculadosToItems(updatedData.NavCSICP_BB065List);
 
-        selectedConvenio.value = 0;
+        selectedConvenio.value = '';
     } catch (error) {
         showSnackbar('Erro ao salvar vínculo', 'error');
     }

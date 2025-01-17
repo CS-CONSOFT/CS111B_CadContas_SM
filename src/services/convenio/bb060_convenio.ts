@@ -1,40 +1,36 @@
-import { URLBase } from '../configuracoes_axios';
+import { newURLBase } from '../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { ConvenioCompleto, ApiResponse, Csicp_bb060 } from '../../types/convenio/bb060_convenio';
-import type { ConvenioById } from '../../types/convenio/bb060_GetConvenioById';
+import type { ConvenioCompleto, ConvenioById, ConvenioCreate } from '../../types/convenio/bb060_convenio';
 
-function GetConvenioList(
-    tenant: number | undefined,
+function GetConvenioCompleto(
+    tenantId: number | undefined,
     active: boolean,
-    count: boolean,
     search: string,
-    currentpage: number,
+    pagenumber: number,
     pagesize: number
-): Promise<AxiosResponse<ApiResponse<ConvenioCompleto>>> {
-    return axios.get<ApiResponse<ConvenioCompleto>>(
-        `${URLBase}/CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb060_Get_Lista_Convenio_Completo`,
-        {
-            headers: {
-                Tenant_id: tenant,
-                In_IsActive: active,
-                In_IsCount: count,
-                in_search: search,
-                in_currentPage: currentpage,
-                in_pageSize: pagesize
-            }
+): Promise<AxiosResponse<ConvenioCompleto>> {
+    const url =
+        `${newURLBase}/api/v1/bb060?` +
+        `active=${encodeURIComponent(active)}&` +
+        `search=${encodeURIComponent(search)}&` +
+        `pagenumber=${encodeURIComponent(pagenumber)}&` +
+        `pagesize=${encodeURIComponent(pagesize)}`;
+
+    return axios.get<ConvenioCompleto>(url, {
+        headers: {
+            Tenant_ID: tenantId
         }
-    );
+    });
 }
 
-const GetConvenioById = async (tenantId: number | undefined, in_bb060_id: string): Promise<ConvenioById> => {
-    const url = `${URLBase}/CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb060_Get_Convenio_PorID`;
+const GetConvenioById = async (tenantId: number | undefined, id: string): Promise<ConvenioById> => {
+    const url = `${newURLBase}/api/v1/bb060/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<ConvenioById> = await axios.get(url, {
             headers: {
-                tenant_id: tenantId,
-                in_bb060_id: in_bb060_id
+                Tenant_ID: tenantId
             }
         });
 
@@ -45,11 +41,11 @@ const GetConvenioById = async (tenantId: number | undefined, in_bb060_id: string
     }
 };
 
-const SaveConvenio = async (tenantId: number | undefined, convenio: Csicp_bb060): Promise<AxiosResponse<any>> => {
+const CreateConvenio = async (tenantId: number | undefined, convenio: ConvenioCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}/CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb060_Save_Convenio`, convenio, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb060`, convenio, {
             headers: {
-                Tenant_id: tenantId
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -59,12 +55,25 @@ const SaveConvenio = async (tenantId: number | undefined, convenio: Csicp_bb060)
     }
 };
 
-const DeleteConvenio = async (tenantId: number | undefined, in_bb060_id: string): Promise<AxiosResponse<any>> => {
+const UpdateConvenio = async (tenantId: number | undefined, id: string, convenio: ConvenioCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}/CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb060_Delete_Convenio`, {
+        const response = await axios.put(`${newURLBase}/api/v1/bb060/${encodeURIComponent(id)}`, convenio, {
             headers: {
-                tenant_id: tenantId,
-                in_bb060_id: in_bb060_id
+                Tenant_ID: tenantId
+            }
+        });
+        return response;
+    } catch (error) {
+        console.error('Erro ao atualizar convênio:', error);
+        throw error;
+    }
+};
+
+const DeleteConvenio = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
+    try {
+        const response = await axios.delete(`${newURLBase}/api/v1/bb060/${encodeURIComponent(id)}`, {
+            headers: {
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -74,4 +83,4 @@ const DeleteConvenio = async (tenantId: number | undefined, in_bb060_id: string)
     }
 };
 
-export { GetConvenioList, GetConvenioById, SaveConvenio, DeleteConvenio };
+export { GetConvenioCompleto, GetConvenioById, CreateConvenio, UpdateConvenio, DeleteConvenio };

@@ -87,10 +87,10 @@
                         <v-tooltip bottom>
                             <template v-slot:activator="{ props }">
                                 <v-icon small v-bind="props" @click="confirmSoftDelete(item)" class="v-btn-icon">
-                                    {{ active ? 'mdi-cancel' : 'mdi-check' }}
+                                    {{ item.Ativo ? 'mdi-cancel' : 'mdi-check' }}
                                 </v-icon>
                             </template>
-                            <span>{{ active ? 'Desativar' : 'Ativar' }}</span>
+                            <span>{{ item.Ativo ? 'Desativar' : 'Ativar' }}</span>
                         </v-tooltip>
                     </template>
                 </v-data-table>
@@ -135,10 +135,10 @@
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ props }">
                                                 <v-icon small v-bind="props" @click="confirmSoftDelete(item)" class="v-btn-icon">
-                                                    {{ active ? 'mdi-cancel' : 'mdi-check' }}
+                                                    {{ item.Ativo ? 'mdi-cancel' : 'mdi-check' }}
                                                 </v-icon>
                                             </template>
-                                            <span>{{ active ? 'Desativar' : 'Ativar' }}</span>
+                                            <span>{{ item.Ativo ? 'Desativar' : 'Ativar' }}</span>
                                         </v-tooltip>
                                     </v-card-actions>
                                 </v-card>
@@ -204,11 +204,11 @@
 
     <v-dialog v-model="confirmSoftDeleteDialog" max-width="400">
         <v-card>
-            <v-card-title class="text-h5 pa-4 bg-error"> Confirmar {{ active ? 'Inativação' : 'Ativação' }} </v-card-title>
-            <v-card-text> Tem certeza de que deseja {{ active ? 'inativar' : 'ativar' }} esta atividade? </v-card-text>
+            <v-card-title class="text-h5 pa-4 bg-error"> Confirmar {{ itemToSoftDelete?.Ativo ? 'Inativação' : 'Ativação' }} </v-card-title>
+            <v-card-text> Tem certeza de que deseja {{ itemToSoftDelete?.Ativo ? 'inativar' : 'ativar' }} esta atividade? </v-card-text>
             <v-card-actions class="d-flex justify-space-around">
                 <cs_BtnCancelar @click="cancelSoftDelete" />
-                <cs_BtnIsActive :IsActive="active" @click="softDeleteAtividadeConfirmed" />
+                <cs_BtnIsActive :IsActive="itemToSoftDelete?.Ativo" @click="softDeleteAtividadeConfirmed" />
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -223,21 +223,20 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
 import {
     GetAtividadeCompleto,
     GetAtividadeById,
-    SaveAtividade,
+    CreateAtividade,
+    UpdateAtividade,
     DeleteAtividade,
     SoftDeleteAtividade
 } from '../../services/contas/bb011_Atividades/bb011_atividade';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { AtividadeCompleto, Csicp_bb0112, ApiResponse, Lista_bb011_Completo } from '../../types/crm/atividades/bb011_atividades';
-import type { AtividadeById } from '../../types/crm/atividades/bb011_GetAtividadesById';
+import type { AtividadeCompleto, AtividadeById, AtividadeCreate, List } from '../../types/crm/atividades/bb011_atividades';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
@@ -249,7 +248,7 @@ import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes
 
 interface Item {
     ID: string;
-    Codigo: string;
+    Codigo: number;
     Atividade: string;
     Ativo: boolean;
 }
@@ -294,7 +293,6 @@ const itemToDelete = ref<Item | null>(null);
 const itemToEdit = ref<Item | null>(null);
 const itemToSoftDelete = ref<Item | null>(null);
 const active = ref(true);
-const count = false;
 const search = ref('');
 
 //Variáveis de edição para csicp_bb011
@@ -310,7 +308,6 @@ const rules = {
 
 const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
-const router = useRouter();
 const formRef = ref<any>(null);
 
 //variaveis da paginação
@@ -351,23 +348,22 @@ const fetchInactive = () => {
 const fetchData = async () => {
     loading.value = true;
     try {
-        const response: AxiosResponse<ApiResponse<AtividadeCompleto>> = await GetAtividadeCompleto(
+        const response: AxiosResponse<AtividadeCompleto> = await GetAtividadeCompleto(
             tenant,
             active.value,
-            count,
             search.value,
             currentPage.value,
             itemsPerPage.value
         );
         const data = response.data;
-        items.value = data.Lista_bb011_Completo.map((item: Lista_bb011_Completo) => ({
-            ID: item.csicp_bb011.csicp_bb011.ID,
-            Codigo: item.csicp_bb011.csicp_bb011.BB011_Codigo,
-            Atividade: item.csicp_bb011.csicp_bb011.BB011_Atividade,
-            Ativo: item.csicp_bb011.csicp_bb011.BB011_Is_Active
+        items.value = data.List.map((item: List) => ({
+            ID: item.Id,
+            Codigo: item.Bb011Codigo,
+            Atividade: item.Bb011Atividade,
+            Ativo: item.Bb011IsActive
         }));
 
-        totalItems.value = data.PageSize.cs_list_total_itens;
+        totalItems.value = data.TotalCount;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
@@ -398,10 +394,10 @@ const openEditDialog = async (item: Item) => {
     try {
         const data: AtividadeById = await GetAtividadeById(tenant, item.ID);
         // Atribuindo os valores da resposta aos campos da BB011
-        var_ID.value = data.csicp_bb011.csicp_bb011.ID;
-        var_BB011_Codigo.value = data.csicp_bb011.csicp_bb011.BB011_Codigo;
-        var_BB011_Atividade.value = data.csicp_bb011.csicp_bb011.BB011_Atividade;
-        var_BB011_Is_Active.value = data.csicp_bb011.csicp_bb011.BB011_Is_Active;
+        var_ID.value = data.Id;
+        var_BB011_Codigo.value = data.Bb011Codigo;
+        var_BB011_Atividade.value = data.Bb011Atividade;
+        var_BB011_Is_Active.value = data.Bb011IsActive;
     } catch (error) {
         showSnackbar('Erro ao buscar dados da atividade', 'error');
     }
@@ -410,25 +406,36 @@ const openEditDialog = async (item: Item) => {
 async function CreateOrUpdateAtividade() {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb0112 = {
-                ID: var_ID.value ? var_ID.value : '',
-                BB011_Codigo: var_BB011_Codigo.value,
-                BB011_Atividade: var_BB011_Atividade.value,
-                BB011_Is_Active: true
+            const data: AtividadeCreate = {
+                Bb011Codigo: var_BB011_Codigo.value,
+                Bb011Atividade: var_BB011_Atividade.value
             };
 
-            const response = await SaveAtividade(tenant, data);
+            if (itemToEdit.value === null) {
+                // Create
+                const response = await CreateAtividade(tenant, data);
 
-            if (response.data.Out_IsSuccess) {
-                showSnackbar('Atividade salva com sucesso', 'success');
-                fetchData();
-                dialog.value = false;
+                if (response.statusText === 'OK') {
+                    showSnackbar('Atividade criada com sucesso', 'success');
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao criar a atividade. Verifique os dados.', 'error');
+                }
             } else {
-                showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar atividade. Verifique os dados.', 'error');
+                // Update
+                const response = await UpdateAtividade(tenant, var_ID.value, data);
+
+                if (response.statusText === 'OK') {
+                    showSnackbar('Atividade atualizada com sucesso', 'success');
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao atualizar a atividade. Verifique os dados.', 'error');
+                }
             }
+
+            fetchData();
+            dialog.value = false;
         } catch (error) {
             console.error(error);
-            snackbarMessage.value = 'Erro ao atualizar a atividade. Verifique sua conexão ou tente novamente.';
+            showSnackbar('Erro ao salvar a atividade. Verifique sua conexão ou tente novamente.', 'error');
         }
     }
 }
@@ -467,11 +474,11 @@ const softDeleteAtividadeConfirmed = async () => {
     if (!itemToSoftDelete.value) return;
     try {
         await SoftDeleteAtividade(tenant, itemToSoftDelete.value.ID);
-        showSnackbar(`Atividade ${active.value ? 'inativado' : 'ativado'} com sucesso`, 'success');
+        showSnackbar(`Atividade ${itemToSoftDelete.value.Ativo ? 'inativado' : 'ativado'} com sucesso`, 'success');
         fetchData();
         confirmSoftDeleteDialog.value = false;
     } catch (error) {
-        showSnackbar(`Erro ao ${active.value ? 'inativar' : 'ativar'} a atividade`, 'error');
+        showSnackbar(`Erro ao ${itemToSoftDelete.value.Ativo ? 'inativar' : 'ativar'} a atividade`, 'error');
     }
 };
 

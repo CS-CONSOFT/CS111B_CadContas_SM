@@ -1,61 +1,53 @@
-import { URLBase } from '../../configuracoes_axios';
+import { newURLBase } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { AtividadeCompleto, ApiResponse, Csicp_bb0112 } from '../../../types/crm/atividades/bb011_atividades';
-import type { AtividadeById } from '../../../types/crm/atividades/bb011_GetAtividadesById';
+import type { AtividadeCompleto, AtividadeById, AtividadeCreate } from '../../../types/crm/atividades/bb011_atividades';
 
 function GetAtividadeCompleto(
-    tenant: number | undefined,
+    tenantId: number | undefined,
     active: boolean,
-    count: boolean,
     search: string,
-    currentpage: number,
+    pagenumber: number,
     pagesize: number
-): Promise<AxiosResponse<ApiResponse<AtividadeCompleto>>> {
-    return axios.get<ApiResponse<AtividadeCompleto>>(
-        `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb011_Get_List_AtividadeCompleto`,
-        {
-            headers: {
-                tenant_id: tenant,
-                In_IsActive: active,
-                In_IsCount: count,
-                in_search: search,
-                in_currentPage: currentpage,
-                in_pageSize: pagesize
-            }
+): Promise<AxiosResponse<AtividadeCompleto>> {
+    const url =
+        `${newURLBase}/api/v1/bb011?` +
+        `active=${encodeURIComponent(active)}&` +
+        `search=${encodeURIComponent(search)}&` +
+        `pagenumber=${encodeURIComponent(pagenumber)}&` +
+        `pagesize=${encodeURIComponent(pagesize)}`;
+
+    return axios.get<AtividadeCompleto>(url, {
+        headers: {
+            Tenant_ID: tenantId
         }
-    );
+    });
 }
 
-const GetAtividadeById = async (tenantId: number | undefined, in_bb011_id: string): Promise<AtividadeById> => {
-    const url = `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb011_Get_Atividade`;
+const GetAtividadeById = async (tenantId: number | undefined, id: string): Promise<AtividadeById> => {
+    const url = `${newURLBase}/api/v1/bb011/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<AtividadeById> = await axios.get(url, {
             headers: {
-                tenant_id: tenantId,
-                in_bb011_id: in_bb011_id
+                Tenant_ID: tenantId
             }
         });
 
         return response.data;
     } catch (error) {
-        console.error('Erro ao buscar atividades:', error);
+        console.error('Erro ao buscar atividade:', error);
         throw error;
     }
 };
 
-const SaveAtividade = async (tenantId: number | undefined, Atividade: Csicp_bb0112): Promise<AxiosResponse<any>> => {
+const CreateAtividade = async (tenantId: number | undefined, Atividade: AtividadeCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(
-            `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb011_Save_Atividade`,
-            Atividade,
-            {
-                headers: {
-                    tenant_id: tenantId
-                }
+        const response = await axios.post(`${newURLBase}/api/v1/bb011`, Atividade, {
+            headers: {
+                Tenant_ID: tenantId
             }
-        );
+        });
         return response;
     } catch (error) {
         console.error('Erro ao salvar atividade:', error);
@@ -63,12 +55,25 @@ const SaveAtividade = async (tenantId: number | undefined, Atividade: Csicp_bb01
     }
 };
 
-const DeleteAtividade = async (tenantId: number | undefined, in_bb011_id: string): Promise<AxiosResponse<any>> => {
+const UpdateAtividade = async (tenantId: number | undefined, id: string, Atividade: AtividadeCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb011_Delete_Atividade`, {
+        const response = await axios.put(`${newURLBase}/api/v1/bb011/${encodeURIComponent(id)}`, Atividade, {
             headers: {
-                tenant_id: tenantId,
-                in_bb011_id: in_bb011_id
+                Tenant_ID: tenantId
+            }
+        });
+        return response;
+    } catch (error) {
+        console.error('Erro ao atualizar atividade:', error);
+        throw error;
+    }
+};
+
+const DeleteAtividade = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
+    try {
+        const response = await axios.delete(`${newURLBase}/api/v1/bb011/${encodeURIComponent(id)}`, {
+            headers: {
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -78,12 +83,11 @@ const DeleteAtividade = async (tenantId: number | undefined, in_bb011_id: string
     }
 };
 
-const SoftDeleteAtividade = async (tenantId: number | undefined, in_bb011_id: string): Promise<AxiosResponse<any>> => {
+const SoftDeleteAtividade = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb011_SoftDelete_Atividade`, {
+        const response = await axios.patch(`${newURLBase}/api/v1/bb011/changeActive/${encodeURIComponent(id)}`, null, {
             headers: {
-                tenant_id: tenantId,
-                in_bb011_id: in_bb011_id
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -93,4 +97,4 @@ const SoftDeleteAtividade = async (tenantId: number | undefined, in_bb011_id: st
     }
 };
 
-export { GetAtividadeCompleto, GetAtividadeById, SaveAtividade, DeleteAtividade, SoftDeleteAtividade };
+export { GetAtividadeCompleto, GetAtividadeById, CreateAtividade, UpdateAtividade, DeleteAtividade, SoftDeleteAtividade };

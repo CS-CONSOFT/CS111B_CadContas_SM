@@ -1,34 +1,30 @@
 export interface CategoriaCompleta {
-    PageSize: PageSize;
-    Lista_bb029: Lista_bb029[];
-    Code_Erro: Code_Erro;
+    List: List[];
+    CurrentPage: number;
+    TotalPage: number;
+    PageSize: number;
+    TotalCount: number;
+    HasPrevius: boolean;
+    HasNext: boolean;
 }
 
-export interface PageSize {
-    cs_list_total_itens: number;
-    cs_itens_per_page: string;
-    cs_number_of_pages: number;
+export interface List {
+    TenantId: number;
+    Id: string;
+    Bb029Codgcategoria: number;
+    Bb029Categoria: string;
+    Bb029IsActive: boolean;
 }
 
-export interface Lista_bb029 {
-    ID: string;
-    BB029_CodgCategoria: number;
-    BB029_Categoria: string;
-    BB029_Is_Active: boolean;
+export interface CategoriaById {
+    TenantId: number;
+    Id: string;
+    Bb029Codgcategoria: number;
+    Bb029Categoria: string;
+    Bb029IsActive: boolean;
 }
 
-export interface Code_Erro {
-    Code_Erro: string;
-    Mensagem: string;
-}
-
-export interface ApiResponse<T> {
-    Lista_bb029: any;
-    PageSize: any;
-    data: T;
-    status: number;
-    statusText: string;
-    headers: any;
-    config: any;
-    request?: any;
+export interface CategoriaCreate {
+    Bb029Codgcategoria: number;
+    Bb029Categoria: string;
 }

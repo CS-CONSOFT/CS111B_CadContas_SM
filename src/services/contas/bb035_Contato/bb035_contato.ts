@@ -1,41 +1,35 @@
-import { URLBase } from '../../configuracoes_axios';
+import { newURLBase } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { ContatosCompleto, ApiResponse } from '../../../types/crm/contatos/bb035_contatos';
-import type { ContatoById } from '../../../types/crm/contatos/bb035_GetContatoById';
-import type { ContatosTypes } from './bb035_contatoTypes';
+import type { ContatosCompleto, ContatoById, ContatoCreate } from '@/types/crm/contatos/bb035_contatos';
 
-function GetContatosList(
-    tenant: number | undefined,
+function GetContatosCompleto(
+    tenantId: number | undefined,
     active: boolean,
-    count: boolean,
     search: string,
-    currentpage: number,
+    pagenumber: number,
     pagesize: number
-): Promise<AxiosResponse<ApiResponse<ContatosCompleto>>> {
-    return axios.get<ApiResponse<ContatosCompleto>>(
-        `${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_CRM_OutrasFontes/csicp_bb035_Get_List_Contatos`,
-        {
-            headers: {
-                Tenant_id: tenant,
-                In_IsActive: active,
-                In_IsCount: count,
-                in_search: search,
-                in_currentPage: currentpage,
-                in_pageSize: pagesize
-            }
+): Promise<AxiosResponse<ContatosCompleto>> {
+    const url =
+        `${newURLBase}/api/v1/bb035?` +
+        `active=${encodeURIComponent(active)}&` +
+        `search=${encodeURIComponent(search)}&` +
+        `pagenumber=${encodeURIComponent(pagenumber)}&` +
+        `pagesize=${encodeURIComponent(pagesize)}`;
+    return axios.get<ContatosCompleto>(url, {
+        headers: {
+            Tenant_ID: tenantId
         }
-    );
+    });
 }
 
-const GetContatoById = async (tenantId: number | undefined, in_bb035_id: string): Promise<ContatoById> => {
-    const url = `${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_CRM_OutrasFontes/csicp_bb035_Get_Contato_ID`;
+const GetContatoById = async (tenantId: number | undefined, id: string): Promise<ContatoById> => {
+    const url = `${newURLBase}/api/v1/bb035/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<ContatoById> = await axios.get(url, {
             headers: {
-                tenant_id: tenantId,
-                In_bb035_ID: in_bb035_id
+                tenant_id: tenantId
             }
         });
 
@@ -46,9 +40,9 @@ const GetContatoById = async (tenantId: number | undefined, in_bb035_id: string)
     }
 };
 
-const SaveContatoBB035 = async (tenantId: number | undefined, contato: ContatosTypes): Promise<AxiosResponse<any>> => {
+const CreateContato = async (tenantId: number | undefined, contato: ContatoCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_CRM_OutrasFontes/csicp_bb035_Save`, contato, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb035`, contato, {
             headers: {
                 Tenant_id: tenantId
             }
@@ -60,12 +54,25 @@ const SaveContatoBB035 = async (tenantId: number | undefined, contato: ContatosT
     }
 };
 
-const DeleteContatoBB035 = async (tenantId: number | undefined, in_bb035_id: string): Promise<AxiosResponse<any>> => {
+const UpdateContato = async (tenantId: number | undefined, id: string, contato: ContatoCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_CRM_OutrasFontes/csicp_bb035_Delete_Contato`, {
+        const response = await axios.put(`${newURLBase}/api/v1/bb035/${encodeURIComponent(id)}`, contato, {
             headers: {
-                Tenant_id: tenantId,
-                In_BB035_ID: in_bb035_id
+                Tenant_ID: tenantId
+            }
+        });
+        return response;
+    } catch (error) {
+        console.error('Erro ao atualizar contato:', error);
+        throw error;
+    }
+};
+
+const DeleteContato = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
+    try {
+        const response = await axios.delete(`${newURLBase}/api/v1/bb035/${encodeURIComponent(id)}`, {
+            headers: {
+                Tenant_id: tenantId
             }
         });
         return response;
@@ -75,4 +82,4 @@ const DeleteContatoBB035 = async (tenantId: number | undefined, in_bb035_id: str
     }
 };
 
-export { GetContatosList, GetContatoById, SaveContatoBB035, DeleteContatoBB035 };
+export { GetContatosCompleto, GetContatoById, CreateContato, UpdateContato, DeleteContato };

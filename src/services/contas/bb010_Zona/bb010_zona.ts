@@ -1,40 +1,36 @@
-import { URLBase } from '../../configuracoes_axios';
+import { newURLBase } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { ZonaCompleto, ApiResponse, Csicp_bb0102 } from '../../../types/crm/zona/bb010_zona';
-import type { ZonaById } from '../../../types/crm/zona/bb010_GetZonaById';
+import type { ZonaCompleto, ZonaById, ZonaCreate } from '../../../types/crm/zona/bb010_zona';
 
 function GetZonaCompleto(
-    tenant: number | undefined,
+    tenantId: number | undefined,
     active: boolean,
-    count: boolean,
     search: string,
-    currentpage: number,
+    pagenumber: number,
     pagesize: number
-): Promise<AxiosResponse<ApiResponse<ZonaCompleto>>> {
-    return axios.get<ApiResponse<ZonaCompleto>>(
-        `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb010_Get_List_ZonaCompleto`,
-        {
-            headers: {
-                tenant_id: tenant,
-                In_IsActive: active,
-                In_IsCount: count,
-                in_search: search,
-                in_currentPage: currentpage,
-                in_pageSize: pagesize
-            }
+): Promise<AxiosResponse<ZonaCompleto>> {
+    const url =
+        `${newURLBase}/api/v1/bb010?` +
+        `active=${encodeURIComponent(active)}&` +
+        `search=${encodeURIComponent(search)}&` +
+        `pagenumber=${encodeURIComponent(pagenumber)}&` +
+        `pagesize=${encodeURIComponent(pagesize)}`;
+
+    return axios.get<ZonaCompleto>(url, {
+        headers: {
+            Tenant_ID: tenantId
         }
-    );
+    });
 }
 
-const GetZonaById = async (tenantId: number | undefined, in_bb010_id: string): Promise<ZonaById> => {
-    const url = `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb010_Get_Zona`;
+const GetZonaById = async (tenantId: number | undefined, id: string): Promise<ZonaById> => {
+    const url = `${newURLBase}/api/v1/bb010/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<ZonaById> = await axios.get(url, {
             headers: {
-                tenant_id: tenantId,
-                in_bb010_id: in_bb010_id
+                Tenant_ID: tenantId
             }
         });
 
@@ -45,11 +41,11 @@ const GetZonaById = async (tenantId: number | undefined, in_bb010_id: string): P
     }
 };
 
-const SaveZona = async (tenantId: number | undefined, Zona: Csicp_bb0102): Promise<AxiosResponse<any>> => {
+const CreateZona = async (tenantId: number | undefined, Zona: ZonaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb010_Save_Zona`, Zona, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb010`, Zona, {
             headers: {
-                tenant_id: tenantId
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -59,12 +55,25 @@ const SaveZona = async (tenantId: number | undefined, Zona: Csicp_bb0102): Promi
     }
 };
 
-const DeleteZona = async (tenantId: number | undefined, in_bb010_id: string): Promise<AxiosResponse<any>> => {
+const UpdateZona = async (tenantId: number | undefined, id: string, Zona: ZonaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb010_Delete_Zona`, {
+        const response = await axios.put(`${newURLBase}/api/v1/bb010/${encodeURIComponent(id)}`, Zona, {
             headers: {
-                tenant_id: tenantId,
-                in_bb010_id: in_bb010_id
+                Tenant_ID: tenantId
+            }
+        });
+        return response;
+    } catch (error) {
+        console.error('Erro ao atualizar zona:', error);
+        throw error;
+    }
+};
+
+const DeleteZona = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
+    try {
+        const response = await axios.delete(`${newURLBase}/api/v1/bb010/${encodeURIComponent(id)}`, {
+            headers: {
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -74,12 +83,11 @@ const DeleteZona = async (tenantId: number | undefined, in_bb010_id: string): Pr
     }
 };
 
-const SoftDeleteZona = async (tenantId: number | undefined, in_bb010_id: string): Promise<AxiosResponse<any>> => {
+const SoftDeleteZona = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb010_SoftDelete_Zona`, {
+        const response = await axios.patch(`${newURLBase}/api/v1/bb010/changeActive/${encodeURIComponent(id)}`, null, {
             headers: {
-                tenant_id: tenantId,
-                in_bb010_id: in_bb010_id
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -89,4 +97,4 @@ const SoftDeleteZona = async (tenantId: number | undefined, in_bb010_id: string)
     }
 };
 
-export { GetZonaCompleto, GetZonaById, SaveZona, DeleteZona, SoftDeleteZona };
+export { GetZonaCompleto, GetZonaById, CreateZona, UpdateZona, DeleteZona, SoftDeleteZona };

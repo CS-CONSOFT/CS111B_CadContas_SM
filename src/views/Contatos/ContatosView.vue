@@ -415,16 +415,19 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { GetContatosList, GetContatoById, SaveContatoBB035, DeleteContatoBB035 } from '../../services/contas/bb035_Contato/bb035_contato';
+import {
+    GetContatosCompleto,
+    GetContatoById,
+    CreateContato,
+    UpdateContato,
+    DeleteContato
+} from '../../services/contas/bb035_Contato/bb035_contato';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { ContatosCompleto, ApiResponse, Lista_bb035_List } from '../../types/crm/contatos/bb035_contatos';
-import type { ContatoById, Csicp_bb035, Csicp_bb035_end } from '../../types/crm/contatos/bb035_GetContatoById';
-import type { ContatosTypes } from '../../services/contas/bb035_Contato/bb035_contatoTypes';
+import type { ContatosCompleto, List, ContatoById, ContatoCreate, NavCSICP_BB035EndCreate } from '../../types/crm/contatos/bb035_contatos';
 import type { CEP } from '../../submodules/cs_components/src/types/enderecamento/CepTypes';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
@@ -604,25 +607,24 @@ const fetchInactive = () => {
 const fetchData = async () => {
     loading.value = true;
     try {
-        const response: AxiosResponse<ApiResponse<ContatosCompleto>> = await GetContatosList(
+        const response: AxiosResponse<ContatosCompleto> = await GetContatosCompleto(
             tenant,
             active.value,
-            count,
             search.value,
             currentPage.value,
             itemsPerPage.value
         );
         const data = response.data;
-        items.value = data.Lista_bb035_List.map((item: Lista_bb035_List) => ({
-            ID: item.csicp_bb035.Id,
-            Nome: item.csicp_bb035.BB035_PrimeiroNome,
-            Sobrenome: item.csicp_bb035.BB035_Sobrenome,
-            Email: item.csicp_bb035.BB035_EMail,
-            Telefone: item.csicp_bb035.BB035_Telefone,
-            Ativo: item.csicp_bb035.BB035_Is_Active
+        items.value = data.List.map((item: List) => ({
+            ID: item.Id,
+            Nome: item.Bb035Primeironome,
+            Sobrenome: item.Bb035Sobrenome,
+            Email: item.Bb035Email,
+            Telefone: item.Bb035Telefone,
+            Ativo: item.Bb035IsActive
         }));
 
-        totalItems.value = data.PageSize.cs_list_total_itens;
+        totalItems.value = data.TotalCount;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
@@ -683,41 +685,41 @@ const openEditDialog = async (item: Item) => {
         const data: ContatoById = await GetContatoById(tenant, item.ID);
 
         // Atribuindo os dados da estrutura "csicp_bb035"
-        var_Id.value = data.csicp_bb035.Id;
-        var_BB035_PrimeiroNome.value = data.csicp_bb035.BB035_PrimeiroNome;
-        var_BB035_Sobrenome.value = data.csicp_bb035.BB035_Sobrenome;
-        var_BB035_EMail.value = data.csicp_bb035.BB035_EMail;
-        var_BB035_Titulo.value = data.csicp_bb035.BB035_Titulo;
-        var_BB035_Departamento.value = data.csicp_bb035.BB035_Departamento;
-        var_BB035_Data_Aniversario.value = data.csicp_bb035.BB035_Data_Aniversario;
-        var_BB035_Telefone.value = data.csicp_bb035.BB035_Telefone;
-        var_BB035_OutroTelefone.value = data.csicp_bb035.BB035_OutroTelefone;
-        var_BB035_Celular.value = data.csicp_bb035.BB035_Celular;
-        var_BB035_Fax.value = data.csicp_bb035.BB035_Fax;
-        var_BB035_TelefoneResidencia.value = data.csicp_bb035.BB035_TelefoneResidencia;
-        var_BB035_Descricao.value = data.csicp_bb035.BB035_Descricao;
-        var_BB035_Assistente.value = data.csicp_bb035.BB035_Assistente;
-        var_BB035_TelefoneAssist.value = data.csicp_bb035.BB035_TelefoneAssist;
-        var_BB035_EMailSecundario.value = data.csicp_bb035.BB035_EMailSecundario;
-        var_BB035_CPF.value = data.csicp_bb035.BB035_CPF;
-        var_BB035_RG.value = data.csicp_bb035.BB035_RG;
-        var_BB035_Orgao_Exped_RG.value = data.csicp_bb035.BB035_Orgao_Exped_RG;
-        var_BB035_Data_Emissao_RG.value = data.csicp_bb035.BB035_Data_Emissao_RG;
-        var_BB035_Is_Active.value = data.csicp_bb035.BB035_Is_Active;
-        var_BB035_Tratamento_ID.value = data.csicp_bb035.BB035_Tratamento_ID;
-        var_BB035_OrigemContato_ID.value = data.csicp_bb035.BB035_OrigemContato_ID;
+        var_Id.value = data.Id;
+        var_BB035_PrimeiroNome.value = data.Bb035Primeironome;
+        var_BB035_Sobrenome.value = data.Bb035Sobrenome;
+        var_BB035_EMail.value = data.Bb035Email;
+        var_BB035_Titulo.value = data.Bb035Titulo;
+        var_BB035_Departamento.value = data.Bb035Departamento;
+        var_BB035_Data_Aniversario.value = data.Bb035DataAniversario;
+        var_BB035_Telefone.value = data.Bb035Telefone;
+        var_BB035_OutroTelefone.value = data.Bb035Outrotelefone;
+        var_BB035_Celular.value = data.Bb035Celular;
+        var_BB035_Fax.value = data.Bb035Fax;
+        var_BB035_TelefoneResidencia.value = data.Bb035Telefoneresidencia;
+        var_BB035_Descricao.value = data.Bb035Descricao;
+        var_BB035_Assistente.value = data.Bb035Assistente;
+        var_BB035_TelefoneAssist.value = data.Bb035Telefoneassist;
+        var_BB035_EMailSecundario.value = data.Bb035Emailsecundario;
+        var_BB035_CPF.value = data.Bb035Cpf;
+        var_BB035_RG.value = data.Bb035Rg;
+        var_BB035_Orgao_Exped_RG.value = data.Bb035OrgaoExpedRg;
+        var_BB035_Data_Emissao_RG.value = data.Bb035DataEmissaoRg;
+        var_BB035_Is_Active.value = data.Bb035IsActive;
+        var_BB035_Tratamento_ID.value = data.Bb035TratamentoId;
+        var_BB035_OrigemContato_ID.value = data.Bb035OrigemcontatoId;
 
-        // Atribuindo os dados da estrutura "csicp_bb035_end"
-        var_bb035_Id.value = data.csicp_bb035_end.bb035_Id;
-        var_BB035_ContatoID.value = data.csicp_bb035_end.BB035_ContatoID;
-        var_BB035_Logradouro.value = data.csicp_bb035_end.BB035_Logradouro;
-        var_BB035_Numero.value = data.csicp_bb035_end.BB035_Numero;
-        var_BB035_Complemento.value = data.csicp_bb035_end.BB035_Complemento;
-        var_BB035_Bairro.value = data.csicp_bb035_end.BB035_Bairro;
-        var_BB035_Codigo_Cidade.value = data.csicp_bb035_end.BB035_Codigo_Cidade;
-        var_BB035_UF.value = data.csicp_bb035_end.BB035_UF;
-        var_BB035_CEP.value = data.csicp_bb035_end.BB035_CEP;
-        var_BB035_Codigo_Pais.value = data.csicp_bb035_end.BB035_Codigo_Pais;
+        //Atribuindo os dados da estrutura "csicp_bb035_end"
+        var_bb035_Id.value = data.NavCSICP_BB035End.Bb035Id;
+        var_BB035_ContatoID.value = data.NavCSICP_BB035End.Bb035Contatoid;
+        var_BB035_Logradouro.value = data.NavCSICP_BB035End.Bb035Logradouro;
+        var_BB035_Numero.value = data.NavCSICP_BB035End.Bb035Numero;
+        var_BB035_Complemento.value = data.NavCSICP_BB035End.Bb035Complemento;
+        var_BB035_Bairro.value = data.NavCSICP_BB035End.Bb035Bairro;
+        var_BB035_Codigo_Cidade.value = data.NavCSICP_BB035End.Bb035CodigoCidade;
+        var_BB035_UF.value = data.NavCSICP_BB035End.Bb035Uf;
+        var_BB035_CEP.value = data.NavCSICP_BB035End.Bb035Cep;
+        var_BB035_Codigo_Pais.value = data.NavCSICP_BB035End.Bb035CodigoPais;
     } catch (error) {
         showSnackbar('Erro ao buscar dados do contato', 'error');
     }
@@ -726,58 +728,65 @@ const openEditDialog = async (item: Item) => {
 async function CreateOrUpdateContato() {
     if (formRef.value.validate()) {
         try {
-            const csicp_bb035: Csicp_bb035 = {
-                Id: var_Id.value ? var_Id.value : '',
-                BB035_PrimeiroNome: var_BB035_PrimeiroNome.value,
-                BB035_Sobrenome: var_BB035_Sobrenome.value,
-                BB035_EMail: var_BB035_EMail.value,
-                BB035_Titulo: var_BB035_Titulo.value,
-                BB035_Departamento: var_BB035_Departamento.value,
-                BB035_Data_Aniversario: var_BB035_Data_Aniversario.value,
-                BB035_Telefone: var_BB035_Telefone.value,
-                BB035_OutroTelefone: var_BB035_OutroTelefone.value,
-                BB035_Celular: var_BB035_Celular.value,
-                BB035_Fax: var_BB035_Fax.value,
-                BB035_TelefoneResidencia: var_BB035_TelefoneResidencia.value,
-                BB035_Descricao: var_BB035_Descricao.value,
-                BB035_Assistente: var_BB035_Assistente.value,
-                BB035_TelefoneAssist: var_BB035_TelefoneAssist.value,
-                BB035_EMailSecundario: var_BB035_EMailSecundario.value,
-                BB035_CPF: cpfClear.value.toString(),
-                BB035_RG: var_BB035_RG.value,
-                BB035_Orgao_Exped_RG: var_BB035_Orgao_Exped_RG.value,
-                BB035_Data_Emissao_RG: var_BB035_Data_Emissao_RG.value,
-                BB035_Is_Active: true,
-                BB035_Tratamento_ID: var_BB035_Tratamento_ID.value,
-                BB035_OrigemContato_ID: var_BB035_OrigemContato_ID.value
+            const endereco: NavCSICP_BB035EndCreate = {
+                Bb035Id: var_bb035_Id.value,
+                Bb035Logradouro: var_BB035_Logradouro.value,
+                Bb035Numero: var_BB035_Numero.value,
+                Bb035Complemento: var_BB035_Complemento.value,
+                Bb035Bairro: var_BB035_Bairro.value,
+                Bb035CodigoCidade: var_BB035_Codigo_Cidade.value,
+                Bb035Uf: var_BB035_UF.value,
+                Bb035Cep: var_BB035_CEP.value,
+                Bb035CodigoPais: var_BB035_Codigo_Pais.value
             };
 
-            const csicp_bb035_end: Csicp_bb035_end = {
-                bb035_Id: var_bb035_Id.value,
-                BB035_ContatoID: var_Id.value ? var_Id.value : '',
-                BB035_Logradouro: var_BB035_Logradouro.value,
-                BB035_Numero: var_BB035_Numero.value,
-                BB035_Complemento: var_BB035_Complemento.value,
-                BB035_Bairro: var_BB035_Bairro.value,
-                BB035_Codigo_Cidade: var_BB035_Codigo_Cidade.value,
-                BB035_UF: var_BB035_UF.value,
-                BB035_CEP: var_BB035_CEP.value,
-                BB035_Codigo_Pais: var_BB035_Codigo_Pais.value
+            const data: ContatoCreate = {
+                Bb035Primeironome: var_BB035_PrimeiroNome.value,
+                Bb035Sobrenome: var_BB035_Sobrenome.value,
+                Bb035Email: var_BB035_EMail.value,
+                Bb035Titulo: var_BB035_Titulo.value,
+                Bb035Departamento: var_BB035_Departamento.value,
+                Bb035DataAniversario: var_BB035_Data_Aniversario.value,
+                Bb035Telefone: var_BB035_Telefone.value,
+                Bb035Outrotelefone: var_BB035_OutroTelefone.value,
+                Bb035Celular: var_BB035_Celular.value,
+                Bb035Fax: var_BB035_Fax.value,
+                Bb035Telefoneresidencia: var_BB035_TelefoneResidencia.value,
+                Bb035Descricao: var_BB035_Descricao.value,
+                Bb035Assistente: var_BB035_Assistente.value,
+                Bb035Telefoneassist: var_BB035_TelefoneAssist.value,
+                Bb035Emailsecundario: var_BB035_EMailSecundario.value,
+                Bb035Cpf: cpfClear.value.toString(),
+                Bb035Rg: var_BB035_RG.value,
+                Bb035OrgaoExpedRg: var_BB035_Orgao_Exped_RG.value,
+                Bb035DataEmissaoRg: var_BB035_Data_Emissao_RG.value,
+                Bb035TratamentoId: var_BB035_Tratamento_ID.value,
+                Bb035OrigemcontatoId: var_BB035_OrigemContato_ID.value,
+                Bb035CodgCliente7x: 0,
+                Bb035SeqCliente7x: 0,
+                NavCSICP_BB035End: endereco
             };
 
-            const data: ContatosTypes = {
-                csicp_bb035: csicp_bb035,
-                csicp_bb035_end: csicp_bb035_end
-            };
+            if (itemToEdit === null) {
+                // Create
+                const response = await CreateContato(tenant, data);
 
-            const response = await SaveContatoBB035(tenant, data);
-
-            if (response.data.Out_IsSuccess) {
-                showSnackbar('Contato atualizado com sucesso', 'success');
-                fetchData();
-                dialog.value = false;
+                if (response.statusText === 'OK') {
+                    showSnackbar('Contato atualizado com sucesso', 'success');
+                    fetchData();
+                    dialog.value = false;
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao salvar o contato. Verifique os dados.', 'error');
+                }
             } else {
-                showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar contato. Verifique os dados.', 'error');
+                // Update
+                const response = await UpdateContato(tenant, var_Id.value, data);
+
+                if (response.statusText === 'OK') {
+                    showSnackbar('Contato atualizada com sucesso', 'success');
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao atualizar o contato. Verifique os dados.', 'error');
+                }
             }
         } catch (error) {
             console.error(error);
@@ -798,7 +807,7 @@ const cancelDelete = () => {
 const deleteContatoConfirmed = async () => {
     if (!itemToDelete.value) return;
     try {
-        await DeleteContatoBB035(tenant, itemToDelete.value.ID);
+        await DeleteContato(tenant, itemToDelete.value.ID);
         showSnackbar('Contato excluído com sucesso', 'success');
         fetchData();
         confirmDialog.value = false;

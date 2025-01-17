@@ -28,7 +28,11 @@
             </v-row>
         </div>
 
-        <v-container fluid class="pa-0">
+        <v-container v-if="loading" class="d-flex justify-center align-center">
+            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        </v-container>
+
+        <v-container fluid class="pa-0" v-else>
             <v-row>
                 <v-col cols="12">
                     <v-row class="d-flex">
@@ -150,10 +154,10 @@ import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { GetConvenioList, DeleteConvenio } from '../../services/convenio/bb060_convenio';
+import { GetConvenioCompleto, DeleteConvenio } from '../../services/convenio/bb060_convenio';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { ConvenioCompleto, ApiResponse, Convenio_List } from '@/types/convenio/bb060_convenio';
+import type { ConvenioCompleto, List, NavBb060Convmaster, NavBb060Responsavel } from '../../types/convenio/bb060_convenio';
 //Import de componentes
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
 import BtnAdicionar from '../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
@@ -161,7 +165,7 @@ import BtnExcluir from '../../submodules/cs_components/src/components/botoes/cs_
 import BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 
 interface Item {
-    ID: string;
+    ID: number;
     Codigo: string;
     Convenio: string;
     FormaPagamento: string;
@@ -170,22 +174,20 @@ interface Item {
     CentroDeCusto: string;
     CondPagamento: string;
     Proprietario: string;
-    Valor: number;
+    Valor: string;
     AgenteCobrador: string;
     DtInclusao: string;
     DtAlteracao: string;
 }
 
 const items = ref<Item[]>([]);
-const filteredItems = ref<Item[]>([]);
 const confirmDialog = ref(false);
-const confirmSoftDeleteDialog = ref(false);
 const itemToDelete = ref<Item | null>(null);
-const itemToSoftDelete = ref<Item | null>(null);
 const loading = ref(false);
 const active = ref(true);
-const count = false;
 const search = ref('');
+const convMaster = ref<NavBb060Convmaster | null>(null);
+const responsavel = ref<NavBb060Responsavel | null>(null);
 
 const rules = {
     codigo: [validationRules.required, validationRules.numeric],
@@ -220,48 +222,51 @@ const showSnackbar = (message: string, color: string) => {
 const fetchData = async () => {
     loading.value = true;
     try {
-        const response: AxiosResponse<ApiResponse<ConvenioCompleto>> = await GetConvenioList(
+        const response: AxiosResponse<ConvenioCompleto> = await GetConvenioCompleto(
             tenant,
             active.value,
-            count,
             search.value,
             currentPage.value,
             itemsPerPage.value
         );
         const data = response.data;
-        items.value = data.Convenio_List.map((item: Convenio_List) => ({
-            ID: item.csicp_bb060?.bb060_ConvenioId,
-            Codigo: item.csicp_bb060?.bb060_Codigo,
-            Convenio: item.csicp_bb067?.bb067_Descricao,
-            FormaPagamento: item.csicp_bb026?.BB026_FormaPagamento || '---',
-            Responsavel: item.csicp_bb007?.BB007_Responsavel || '---',
-            ConvenioMaster: item.csicp_bb067?.bb067_Descricao || '---',
-            CentroDeCusto: item.csicp_bb005?.BB005_NomeCCusto || '---',
-            CondPagamento: item.csicp_bb008?.BB008_Condicao_Pagto || '---',
-            Proprietario: item.csicp_sy001_UserProp?.SY001_Nome || '---',
-            Valor: `R$ ${item.csicp_bb060?.bb060_vBase.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            AgenteCobrador: item.csicp_bb006?.BB006_NomeReduzido || '---',
-            DtInclusao: item.csicp_bb060?.bb060_dthrInc
-                ? new Date(item.csicp_bb060.bb060_dthrInc).toLocaleDateString('pt-BR', {
+
+        items.value = data.List.map((item: List) => ({
+            ID: item.Bb060Convenioid,
+            Codigo: item.Bb060Codigo,
+            Convenio: item.Bb060Descricao,
+            FormaPagamento: item.NavFormaPagamento?.Bb026Formapagamento || '---',
+            Responsavel: item.NavBb060Responsavel?.Bb007Responsavel || '---',
+            ConvenioMaster: item.NavBb060Convmaster?.Bb067Descricao || '---',
+            CentroDeCusto: item.NavBb060Ccusto?.Bb005Nomeccusto || '---',
+            CondPagamento: item.NavBb060Condicao?.Bb008CondicaoPagto || '---',
+            Proprietario: item.NavUsuarioProprietario?.Sy001Nome || '---',
+            Valor: `R$ ${item.Bb060Vbase.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}`,
+            AgenteCobrador: item.NavBb060Agcobrador?.Bb006Banco || '---',
+            DtInclusao: item.Bb060Dthrinc
+                ? new Date(item.Bb060Dthrinc).toLocaleDateString('pt-BR', {
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric'
                   }) +
                   ' ' +
-                  new Date(item.csicp_bb060.bb060_dthrInc).toLocaleTimeString('pt-BR', {
+                  new Date(item.Bb060Dthrinc).toLocaleTimeString('pt-BR', {
                       hour: '2-digit',
                       minute: '2-digit',
                       second: '2-digit'
                   })
                 : '---',
-            DtAlteracao: item.csicp_bb060?.bb060_dthrAlt
-                ? new Date(item.csicp_bb060.bb060_dthrAlt).toLocaleDateString('pt-BR', {
+            DtAlteracao: item.Bb060Dthralt
+                ? new Date(item.Bb060Dthralt).toLocaleDateString('pt-BR', {
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric'
                   }) +
                   ' ' +
-                  new Date(item.csicp_bb060.bb060_dthrAlt).toLocaleTimeString('pt-BR', {
+                  new Date(item.Bb060Dthralt).toLocaleTimeString('pt-BR', {
                       hour: '2-digit',
                       minute: '2-digit',
                       second: '2-digit'
@@ -269,9 +274,10 @@ const fetchData = async () => {
                 : '---'
         }));
 
-        totalItems.value = data.PageSize.cs_list_total_itens;
+        totalItems.value = data.TotalCount;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
     } catch (error) {
+        console.error('Erro capturado:', error);
         showSnackbar('Erro ao buscar dados.', 'error');
     } finally {
         loading.value = false;
@@ -309,7 +315,7 @@ const cancelDelete = () => {
 const deleteConvenioConfirmed = async () => {
     if (!itemToDelete.value) return;
     try {
-        await DeleteConvenio(tenant, itemToDelete.value.ID);
+        await DeleteConvenio(tenant, itemToDelete.value.ID.toString());
         showSnackbar('Convênio excluído com sucesso', 'success');
         fetchData();
         confirmDialog.value = false;

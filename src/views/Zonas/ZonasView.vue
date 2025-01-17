@@ -74,7 +74,7 @@
                             </template>
                             <span>Editar</span>
                         </v-tooltip>
-                        
+
                         <v-tooltip bottom>
                             <template v-slot:activator="{ props }">
                                 <v-icon small v-bind="props" @click="confirmDelete(item)" class="v-btn-icon"> mdi-delete </v-icon>
@@ -85,10 +85,10 @@
                         <v-tooltip bottom>
                             <template v-slot:activator="{ props }">
                                 <v-icon small v-bind="props" @click="confirmSoftDelete(item)" class="v-btn-icon">
-                                    {{ active ? 'mdi-cancel' : 'mdi-check' }}
+                                    {{ item.Ativo ? 'mdi-cancel' : 'mdi-check' }}
                                 </v-icon>
                             </template>
-                            <span>{{ active ? 'Desativar' : 'Ativar' }}</span>
+                            <span>{{ item.Ativo ? 'Desativar' : 'Ativar' }}</span>
                         </v-tooltip>
                     </template>
                 </v-data-table>
@@ -132,10 +132,10 @@
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ props }">
                                                 <v-icon small v-bind="props" @click="confirmSoftDelete(item)" class="v-btn-icon">
-                                                    {{ active ? 'mdi-cancel' : 'mdi-check' }}
+                                                    {{ item.Ativo ? 'mdi-cancel' : 'mdi-check' }}
                                                 </v-icon>
                                             </template>
-                                            <span>{{ active ? 'Desativar' : 'Ativar' }}</span>
+                                            <span>{{ item.Ativo ? 'Desativar' : 'Ativar' }}</span>
                                         </v-tooltip>
                                     </v-card-actions>
                                 </v-card>
@@ -289,11 +289,11 @@
 
     <v-dialog v-model="confirmSoftDeleteDialog" max-width="400">
         <v-card>
-            <v-card-title class="text-h5 pa-4 bg-error"> Confirmar {{ active ? 'Inativação' : 'Ativação' }} </v-card-title>
-            <v-card-text> Tem certeza de que deseja {{ active ? 'inativar' : 'ativar' }} esta zona? </v-card-text>
+            <v-card-title class="text-h5 pa-4 bg-error"> Confirmar {{ itemToSoftDelete?.Ativo ? 'Inativação' : 'Ativação' }} </v-card-title>
+            <v-card-text> Tem certeza de que deseja {{ itemToSoftDelete?.Ativo ? 'inativar' : 'ativar' }} esta zona? </v-card-text>
             <v-card-actions class="d-flex justify-space-around">
                 <cs_BtnCancelar @click="cancelSoftDelete" />
-                <cs_BtnIsActive :IsActive="active" @click="softDeleteZonaConfirmed" />
+                <cs_BtnIsActive :IsActive="itemToSoftDelete?.Ativo" @click="softDeleteZonaConfirmed" />
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -312,11 +312,17 @@ import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { GetZonaCompleto, GetZonaById, SaveZona, DeleteZona, SoftDeleteZona } from '../../services/contas/bb010_Zona/bb010_zona';
+import {
+    GetZonaCompleto,
+    GetZonaById,
+    CreateZona,
+    UpdateZona,
+    DeleteZona,
+    SoftDeleteZona
+} from '../../services/contas/bb010_Zona/bb010_zona';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { ZonaCompleto, Csicp_bb0102, Lista_bb010_Completo, ApiResponse } from '../../types/crm/zona/bb010_zona';
-import type { ZonaById } from '../../types/crm/zona/bb010_GetZonaById';
+import type { ZonaCompleto, ZonaById, ZonaCreate, List } from '../../types/crm/zona/bb010_zona';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
@@ -332,7 +338,7 @@ import cs_InputCelular from '../../submodules/cs_components/src/components/campo
 
 interface Item {
     ID: string;
-    Codigo: string;
+    Codigo: number;
     Zona: string;
     Ativo: boolean;
 }
@@ -450,23 +456,22 @@ const fetchInactive = () => {
 const fetchData = async () => {
     loading.value = true;
     try {
-        const response: AxiosResponse<ApiResponse<ZonaCompleto>> = await GetZonaCompleto(
+        const response: AxiosResponse<ZonaCompleto> = await GetZonaCompleto(
             tenant,
             active.value,
-            count,
             search.value,
             currentPage.value,
             itemsPerPage.value
         );
         const data = response.data;
-        items.value = data.Lista_bb010_Completo.map((item: Lista_bb010_Completo) => ({
-            ID: item.csicp_bb010.csicp_bb010.ID,
-            Codigo: item.csicp_bb010.csicp_bb010.BB010_Codigo,
-            Zona: item.csicp_bb010.csicp_bb010.BB010_Zona,
-            Ativo: item.csicp_bb010.csicp_bb010.BB010_IsActive
+        items.value = data.List.map((item: List) => ({
+            ID: item.Id,
+            Codigo: item.Bb010Codigo,
+            Zona: item.Bb010Zona,
+            Ativo: item.Bb010Isactive
         }));
 
-        totalItems.value = data.PageSize.cs_list_total_itens;
+        totalItems.value = data.TotalCount;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
@@ -514,26 +519,26 @@ const openEditDialog = async (item: Item) => {
         const data: ZonaById = await GetZonaById(tenant, item.ID);
 
         // Atribuindo os valores da resposta aos campos da BB010
-        var_ID.value = data.csicp_bb010.csicp_bb010.ID;
-        var_BB010_Codigo.value = data.csicp_bb010.csicp_bb010.BB010_Codigo;
-        var_BB010_Zona.value = data.csicp_bb010.csicp_bb010.BB010_Zona;
-        var_BB010_Cod_Vendedor.value = data.csicp_bb010.csicp_bb010.BB010_Cod_Vendedor;
-        var_BB010_Col_Preco_Tabela.value = data.csicp_bb010.csicp_bb010.BB010_Col_Preco_Tabela;
-        var_BB010_Banco01_ID.value = data.csicp_bb010.csicp_bb010.BB010_Banco01_ID;
-        var_BB010_Banco02_ID.value = data.csicp_bb010.csicp_bb010.BB010_Banco02_ID;
-        var_BB010_Banco03_ID.value = data.csicp_bb010.csicp_bb010.BB010_Banco03_ID;
-        var_BB010_CCusto_ID.value = data.csicp_bb010.csicp_bb010.BB010_CCusto_ID;
-        var_BB010_Km.value = data.csicp_bb010.csicp_bb010.BB010_Km;
-        var_BB010_Fone_Contato.value = data.csicp_bb010.csicp_bb010.BB010_Fone_Contato;
-        var_BB010_Promotor.value = data.csicp_bb010.csicp_bb010.BB010_Promotor;
-        var_BB010_Observacao.value = data.csicp_bb010.csicp_bb010.BB010_Observacao;
-        var_BB010_Periodo_Rota.value = data.csicp_bb010.csicp_bb010.BB010_Periodo_Rota;
-        var_BB010_Periodo_Visita.value = data.csicp_bb010.csicp_bb010.BB010_Periodo_Visita;
-        var_BB010_Tabela_Preco.value = data.csicp_bb010.csicp_bb010.BB010_Tabela_Preco;
-        var_BB010_VendedorID.value = data.csicp_bb010.csicp_bb010.BB010_VendedorID;
-        var_BB010_IsActive.value = data.csicp_bb010.csicp_bb010.BB010_IsActive;
-        var_BB010_TipoRotaID.value = data.csicp_bb010.csicp_bb010.BB010_TipoRotaID;
-        var_bb010_CidadeID.value = data.csicp_bb010.csicp_bb010.bb010_CidadeID;
+        var_ID.value = data.Id;
+        var_BB010_Codigo.value = data.Bb010Codigo;
+        var_BB010_Zona.value = data.Bb010Zona;
+        var_BB010_Cod_Vendedor.value = data.Bb010CodVendedor;
+        var_BB010_Col_Preco_Tabela.value = data.Bb010ColPrecoTabela;
+        var_BB010_Banco01_ID.value = data.Bb010Banco01Id;
+        var_BB010_Banco02_ID.value = data.Bb010Banco02Id;
+        var_BB010_Banco03_ID.value = data.Bb010Banco03Id;
+        var_BB010_CCusto_ID.value = data.Bb010CcustoId;
+        var_BB010_Km.value = data.Bb010Km;
+        var_BB010_Fone_Contato.value = data.Bb010FoneContato;
+        var_BB010_Promotor.value = data.Bb010Promotor;
+        var_BB010_Observacao.value = data.Bb010Observacao;
+        var_BB010_Periodo_Rota.value = data.Bb010PeriodoRota;
+        var_BB010_Periodo_Visita.value = data.Bb010PeriodoVisita;
+        var_BB010_Tabela_Preco.value = data.Bb010TabelaPreco;
+        var_BB010_VendedorID.value = data.Bb010Vendedorid;
+        var_BB010_IsActive.value = data.Bb010Isactive;
+        var_BB010_TipoRotaID.value = data.Bb010Tiporotaid;
+        var_bb010_CidadeID.value = data.Bb010Cidadeid;
     } catch (error) {
         showSnackbar('Erro ao buscar dados da zona', 'error');
     }
@@ -542,30 +547,50 @@ const openEditDialog = async (item: Item) => {
 async function CreateOrUpdateZona() {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb0102 = {
-                ID: var_ID.value ? var_ID.value : '',
-                BB010_Codigo: var_BB010_Codigo.value,
-                BB010_Zona: var_BB010_Zona.value,
-                BB010_Cod_Vendedor: var_BB010_Cod_Vendedor.value,
-                BB010_Col_Preco_Tabela: var_BB010_Col_Preco_Tabela.value,
-                BB010_Banco01_ID: var_BB010_Banco01_ID.value,
-                BB010_Banco02_ID: var_BB010_Banco02_ID.value,
-                BB010_Banco03_ID: var_BB010_Banco03_ID.value,
-                BB010_CCusto_ID: var_BB010_CCusto_ID.value,
-                BB010_Km: var_BB010_Km.value,
-                BB010_Fone_Contato: var_BB010_Fone_Contato.value,
-                BB010_Promotor: var_BB010_Promotor.value,
-                BB010_Observacao: var_BB010_Observacao.value,
-                BB010_Periodo_Rota: var_BB010_Periodo_Rota.value,
-                BB010_Periodo_Visita: var_BB010_Periodo_Visita.value,
-                BB010_Tabela_Preco: var_BB010_Tabela_Preco.value,
-                BB010_VendedorID: var_BB010_VendedorID.value,
-                BB010_IsActive: true,
-                BB010_TipoRotaID: var_BB010_TipoRotaID.value,
-                bb010_CidadeID: var_bb010_CidadeID.value
+            const data: ZonaCreate = {
+                Bb010Codigo: var_BB010_Codigo.value,
+                Bb010Zona: var_BB010_Zona.value,
+                Bb010CodVendedor: var_BB010_Cod_Vendedor.value,
+                Bb010ColPrecoTabela: var_BB010_Col_Preco_Tabela.value,
+                Bb010Banco01Id: var_BB010_Banco01_ID.value,
+                Bb010Banco02Id: var_BB010_Banco02_ID.value,
+                Bb010Banco03Id: var_BB010_Banco03_ID.value,
+                Bb010CcustoId: var_BB010_CCusto_ID.value,
+                Bb010Km: var_BB010_Km.value,
+                Bb010FoneContato: var_BB010_Fone_Contato.value,
+                Bb010Promotor: var_BB010_Promotor.value,
+                Bb010Observacao: var_BB010_Observacao.value,
+                Bb010PeriodoRota: var_BB010_Periodo_Rota.value,
+                Bb010PeriodoVisita: var_BB010_Periodo_Visita.value,
+                Bb010TabelaPreco: var_BB010_Tabela_Preco.value,
+                Bb010Vendedorid: var_BB010_VendedorID.value,
+                Bb010Tiporotaid: var_BB010_TipoRotaID.value,
+                Bb010Cidadeid: var_bb010_CidadeID.value
             };
 
-            const response = await SaveZona(tenant, data);
+            if (itemToEdit === null) {
+                // Create
+                const response = await CreateZona(tenant, data);
+
+                if (response.statusText === 'OK') {
+                    showSnackbar('Zona salva com sucesso', 'success');
+                    fetchData();
+                    dialog.value = false;
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar zona. Verifique os dados.', 'error');
+                }
+            } else {
+                // Update
+                const response = await UpdateZona(tenant, var_ID.value, data);
+
+                if (response.statusText === 'OK') {
+                    showSnackbar('Zona atualizada com sucesso', 'success');
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao atualizar a zona. Verifique os dados.', 'error');
+                }
+            }
+
+            const response = await CreateZona(tenant, data);
 
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Zona salva com sucesso', 'success');
@@ -615,11 +640,11 @@ const softDeleteZonaConfirmed = async () => {
     if (!itemToSoftDelete.value) return;
     try {
         await SoftDeleteZona(tenant, itemToSoftDelete.value.ID);
-        showSnackbar(`Zona ${active.value ? 'inativado' : 'ativado'} com sucesso`, 'success');
+        showSnackbar(`Zona ${itemToSoftDelete.value.Ativo ? 'inativado' : 'ativado'} com sucesso`, 'success');
         fetchData();
         confirmSoftDeleteDialog.value = false;
     } catch (error) {
-        showSnackbar(`Erro ao ${active.value ? 'inativar' : 'ativar'} a zona`, 'error');
+        showSnackbar(`Erro ao ${itemToSoftDelete.value.Ativo ? 'inativar' : 'ativar'} a zona`, 'error');
     }
 };
 

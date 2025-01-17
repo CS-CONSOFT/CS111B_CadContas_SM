@@ -1,37 +1,28 @@
 export interface ConvenioMasterCompleto {
-    PageSize: PageSize;
-    ConvenioMaster: ConvenioMaster[];
-    Code_Erro: Code_Erro;
+    List: List[];
+    CurrentPage: number;
+    TotalPage: number;
+    PageSize: number;
+    TotalCount: number;
+    HasPrevius: boolean;
+    HasNext: boolean;
 }
 
-export interface PageSize {
-    cs_list_total_itens: number;
-    cs_itens_per_page: string;
-    cs_number_of_pages: number;
+export interface List {
+    TenantId: number;
+    Bb067Id: number;
+    Bb067Descricao: string;
+    Bb067Codigo: string;
 }
 
-export interface ConvenioMaster {
-    csicp_bb067: Csicp_bb067;
+export interface ConvenioMasterById {
+    TenantId: number;
+    Bb067Id: number;
+    Bb067Descricao: string;
+    Bb067Codigo: string;
 }
 
-export interface Csicp_bb067 {
-    bb067_Id: number;
-    bb067_Codigo: string;
-    bb067_Descricao: string;
-}
-
-export interface Code_Erro {
-    Code_Erro: string;
-    Mensagem: string;
-}
-
-export interface ApiResponse<T> {
-    ConvenioMaster: any;
-    PageSize: any;
-    data: T;
-    status: number;
-    statusText: string;
-    headers: any;
-    config: any;
-    request?: any;
+export interface ConvenioMasterCreate {
+    Bb067Codigo: string;
+    Bb067Descricao: string;
 }

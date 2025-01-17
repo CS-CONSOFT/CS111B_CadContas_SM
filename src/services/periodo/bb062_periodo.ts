@@ -1,37 +1,35 @@
-import { URLBase } from '../configuracoes_axios';
+import { newURLBase } from '../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { PeriodoCompleto, ApiResponse, Csicp_bb062 } from '../../types/crm/periodo/bb062_periodo';
-import type { PeridoById } from '../../types/crm/periodo/bb062_GetPeriodoById';
+import type { PeriodoCompleto, PeridoById, PeriodoCreate } from '../../types/crm/periodo/bb062_periodo';
 
-function GetPeriodoList(
-    tenant: number | undefined,
+function GetPeriodoCompleto(
+    tenantId: number | undefined,
     active: boolean,
-    count: boolean,
     search: string,
-    currentpage: number,
+    pagenumber: number,
     pagesize: number
-): Promise<AxiosResponse<ApiResponse<PeriodoCompleto>>> {
-    return axios.get<ApiResponse<PeriodoCompleto>>(`${URLBase}/CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb062_Get_List`, {
+): Promise<AxiosResponse<PeriodoCompleto>> {
+    const url =
+        `${newURLBase}/api/v1/bb062?` +
+        `active=${encodeURIComponent(active)}&` +
+        `search=${encodeURIComponent(search)}&` +
+        `pagenumber=${encodeURIComponent(pagenumber)}&` +
+        `pagesize=${encodeURIComponent(pagesize)}`;
+    return axios.get<PeriodoCompleto>(url, {
         headers: {
-            Tenant_id: tenant,
-            In_IsActive: active,
-            In_IsCount: count,
-            in_search: search,
-            in_currentPage: currentpage,
-            in_pageSize: pagesize
+            Tenant_ID: tenantId
         }
     });
 }
 
-const GetPeriodoById = async (tenantId: number | undefined, in_bb062_id: string): Promise<PeridoById> => {
-    const url = `${URLBase}/CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb062_Get_PorID`;
+const GetPeriodoById = async (tenantId: number | undefined, id: string): Promise<PeridoById> => {
+    const url = `${newURLBase}/api/v1/bb062/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<PeridoById> = await axios.get(url, {
             headers: {
-                tenant_id: tenantId,
-                in_bb062_id: in_bb062_id
+                Tenant_ID: tenantId
             }
         });
 
@@ -42,9 +40,9 @@ const GetPeriodoById = async (tenantId: number | undefined, in_bb062_id: string)
     }
 };
 
-const SavePeriodo = async (tenantId: number | undefined, periodo: Csicp_bb062): Promise<AxiosResponse<any>> => {
+const CreatePeriodo = async (tenantId: number | undefined, periodo: PeriodoCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}/CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb062_Save`, periodo, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb062`, periodo, {
             headers: {
                 Tenant_id: tenantId
             }
@@ -56,12 +54,25 @@ const SavePeriodo = async (tenantId: number | undefined, periodo: Csicp_bb062): 
     }
 };
 
-const DeletePeriodo = async (tenantId: number | undefined, in_bb062_id: string): Promise<AxiosResponse<any>> => {
+const UpdatePeriodo = async (tenantId: number | undefined, id: string, periodo: PeriodoCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}/CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb062_Delete`, {
+        const response = await axios.put(`${newURLBase}/api/v1/bb062/${encodeURIComponent(id)}`, periodo, {
             headers: {
-                tenant_id: tenantId,
-                in_bb062_id: in_bb062_id
+                Tenant_ID: tenantId
+            }
+        });
+        return response;
+    } catch (error) {
+        console.error('Erro ao atualizar contato:', error);
+        throw error;
+    }
+};
+
+const DeletePeriodo = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
+    try {
+        const response = await axios.delete(`${newURLBase}/api/v1/bb062/${encodeURIComponent(id)}`, {
+            headers: {
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -73,9 +84,9 @@ const DeletePeriodo = async (tenantId: number | undefined, in_bb062_id: string):
 
 const GerarTitulo = async (tenantId: number | undefined, In_bb062_Id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.get(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_Pro_GerarTitulosConvenio`, {
+        const response = await axios.get(`${newURLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_Pro_GerarTitulosConvenio`, {
             headers: {
-                tenant_id: tenantId,
+                Tenant_ID: tenantId,
                 In_bb062_Id: In_bb062_Id
             }
         });
@@ -86,4 +97,4 @@ const GerarTitulo = async (tenantId: number | undefined, In_bb062_Id: string): P
     }
 };
 
-export { GetPeriodoList, GetPeriodoById, SavePeriodo, DeletePeriodo, GerarTitulo };
+export { GetPeriodoCompleto, GetPeriodoById, CreatePeriodo, UpdatePeriodo, DeletePeriodo, GerarTitulo };

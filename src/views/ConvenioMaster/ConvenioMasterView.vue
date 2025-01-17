@@ -133,15 +133,20 @@ import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
 import {
-    GetConvenioMasterList,
+    GetConvenioMasterCompleto,
     GetConvenioMasterById,
-    SaveConvenioMaster,
+    CreateConvenioMaster,
+    UpdateConvenioMaster,
     DeleteConvenioMaster
 } from '../../services/convenio_master/bb067_convenioMaster';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { ConvenioMasterCompleto, ApiResponse, Csicp_bb067, ConvenioMaster } from '../../types/convenio_master/bb067_convenioMaster';
-import type { ConvenioMasterById } from '../../types/convenio_master/bb067_GetConvenioMasterById';
+import type {
+    ConvenioMasterCompleto,
+    List,
+    ConvenioMasterById,
+    ConvenioMasterCreate
+} from '../../types/convenio_master/bb067_convenioMaster';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
@@ -226,22 +231,21 @@ const showSnackbar = (message: string, color: string) => {
 const fetchData = async () => {
     loading.value = true;
     try {
-        const response: AxiosResponse<ApiResponse<ConvenioMasterCompleto>> = await GetConvenioMasterList(
+        const response: AxiosResponse<ConvenioMasterCompleto> = await GetConvenioMasterCompleto(
             tenant,
             active.value,
-            count,
             search.value,
             currentPage.value,
             itemsPerPage.value
         );
         const data = response.data;
-        items.value = data.ConvenioMaster.map((item: ConvenioMaster) => ({
-            ID: item.csicp_bb067.bb067_Id,
-            Codigo: item.csicp_bb067.bb067_Codigo,
-            Descricao: item.csicp_bb067.bb067_Descricao
+        items.value = data.List.map((item: List) => ({
+            ID: item.Bb067Id.toString(),
+            Codigo: item.Bb067Codigo,
+            Descricao: item.Bb067Descricao
         }));
 
-        totalItems.value = data.PageSize.cs_list_total_itens;
+        totalItems.value = data.TotalCount;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
@@ -271,9 +275,9 @@ const openEditDialog = async (item: Item) => {
     try {
         const data: ConvenioMasterById = await GetConvenioMasterById(tenant, item.ID);
         // Atribuindo os valores da resposta aos campos da BB067
-        var_ID.value = data.bb067_Id;
-        var_bb067_Codigo.value = data.bb067_Codigo;
-        var_bb067_Descricao.value = data.bb067_Descricao;
+        var_ID.value = data.Bb067Id;
+        var_bb067_Codigo.value = data.Bb067Codigo;
+        var_bb067_Descricao.value = data.Bb067Descricao;
     } catch (error) {
         showSnackbar('Erro ao buscar dados do convênio master', 'error');
     }
@@ -282,20 +286,30 @@ const openEditDialog = async (item: Item) => {
 async function CreateOrUpdateConvenioMaster() {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb067 = {
-                bb067_Id: var_ID.value ? var_ID.value : 0,
-                bb067_Codigo: var_bb067_Codigo.value,
-                bb067_Descricao: var_bb067_Descricao.value
+            const data: ConvenioMasterCreate = {
+                Bb067Codigo: var_bb067_Codigo.value,
+                Bb067Descricao: var_bb067_Descricao.value
             };
+            if (itemToEdit === null) {
+                // Create
+                const response = await CreateConvenioMaster(tenant, data);
 
-            const response = await SaveConvenioMaster(tenant, data);
-
-            if (response.data.Out_IsSuccess) {
-                showSnackbar('Convênio master salva com sucesso', 'success');
-                fetchData();
-                dialog.value = false;
+                if (response.data.Out_IsSuccess) {
+                    showSnackbar('Convênio master salva com sucesso', 'success');
+                    fetchData();
+                    dialog.value = false;
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar convênio master. Verifique os dados.', 'error');
+                }
             } else {
-                showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar convênio master. Verifique os dados.', 'error');
+                // Update
+                const response = await UpdateConvenioMaster(tenant, var_ID.value.toString(), data);
+
+                if (response.statusText === 'OK') {
+                    showSnackbar('Convênio master atualizado com sucesso', 'success');
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao atualizar convênio master. Verifique os dados.', 'error');
+                }
             }
         } catch (error) {
             showSnackbar('Erro ao atualizar o convênio master. Verifique sua conexão ou tente novamente.', 'error');

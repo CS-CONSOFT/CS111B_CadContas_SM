@@ -184,16 +184,21 @@
 <script setup lang="ts">
 // Import de bibliotecas e etc...
 import { ref, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { GetPeriodoList, DeletePeriodo, GetPeriodoById, SavePeriodo, GerarTitulo } from '../../services/periodo/bb062_periodo';
+import {
+    GetPeriodoCompleto,
+    DeletePeriodo,
+    GetPeriodoById,
+    CreatePeriodo,
+    UpdatePeriodo,
+    GerarTitulo
+} from '../../services/periodo/bb062_periodo';
 import { GetEstaticasBB } from '../../services/estaticas/estaticas_BB';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { PeriodoCompleto, ApiResponse, Lista_bb062_Periodo, Csicp_bb062 } from '../../types/crm/periodo/bb062_periodo';
-import type { PeridoById } from '../../types/crm/periodo/bb062_GetPeriodoById';
+import type { PeriodoCompleto, PeridoById, PeriodoCreate, List } from '../../types/crm/periodo/bb062_periodo';
 //Import de componentes
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
@@ -265,7 +270,6 @@ const itemToGerarTitulo = ref<Item | null>(null);
 const itemToAtualizarStatus = ref<Item | null>(null);
 const itemToEdit = ref<Item | null>(null);
 const active = ref(true);
-const count = false;
 const search = ref('');
 
 // Lista de meses
@@ -324,25 +328,37 @@ const showSnackbar = (message: string, color: string) => {
 const fetchData = async () => {
     loading.value = true;
     try {
-        const response: AxiosResponse<ApiResponse<PeriodoCompleto>> = await GetPeriodoList(
+        const response: AxiosResponse<PeriodoCompleto> = await GetPeriodoCompleto(
             tenant,
             active.value,
-            count,
             search.value,
             currentPage.value,
             itemsPerPage.value
         );
         const data = response.data;
-        items.value = data.Lista_bb062_Periodo.map((item: Lista_bb062_Periodo) => ({
-            ID: item.csicp_bb062.bb062_Id,
-            Ano: item.csicp_bb062.bb062_Ano,
-            Mes: item.csicp_bb062.bb062_Mes,
-            Emissao: item.csicp_bb062.bb062_DtEmissao,
-            Descritivo: item.csicp_bb062.bb062_Descritivo,
-            Status: item.csicp_bb062_sta.Label
-        }));
+        items.value = data.List.map((item: List) => {
+            // Buscar o rótulo do mês baseado no valor do mês (número)
+            const mesLabel = meses.find((mes) => mes.value === item.Bb062Mes)?.label || '';
 
-        totalItems.value = data.PageSize.cs_list_total_itens;
+            return {
+                ID: item.Bb062Id.toString(),
+                Ano: item.Bb062Ano.toString(),
+                Mes: mesLabel,
+                EstabelecimentoId: item.Bb062Estabid,
+                Emissao: item.Bb062Dtemissao
+                    ? new Date(item.Bb062Dtemissao).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric'
+                      })
+                    : '',
+                Vencimento: item.NavBb062Diavencto.Id,
+                Descritivo: item.Bb062Descritivo,
+                Status: item.NavBb062Status.Label
+            };
+        });
+
+        totalItems.value = data.TotalCount;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
@@ -376,15 +392,16 @@ const openEditDialog = async (item: Item) => {
 
     try {
         const data: PeridoById = await GetPeriodoById(tenant, item.ID);
-        // Atribuindo os valores da resposta aos campos da BB029
-        var_bb062_Id.value = data.csicp_bb062.bb062_Id;
-        var_bb062_EstabID.value = data.csicp_bb062.bb062_EstabID;
-        var_bb062_Ano.value = data.csicp_bb062.bb062_Ano;
-        var_bb062_Mes.value = data.csicp_bb062.bb062_Mes;
-        var_bb062_Descritivo.value = data.csicp_bb062.bb062_Descritivo;
-        var_bb062_DtEmissao.value = data.csicp_bb062.bb062_DtEmissao;
-        var_bb062_DiaVenctoID.value = data.csicp_bb062.bb062_DiaVenctoID;
-        var_bb062_StatusID.value = data.csicp_bb062.bb062_StatusID;
+        // Atribuindo os valores da resposta aos campos da BB062
+        var_bb062_Id.value = data.Bb062Id;
+        var_bb062_EstabID.value = data.Bb062Estabid;
+        var_bb062_Ano.value = data.Bb062Ano;
+        var_bb062_Mes.value = data.Bb062Mes;
+        var_bb062_Descritivo.value = data.Bb062Descritivo;
+        // Converter a data para o formato "yyyy-MM-dd"
+        var_bb062_DtEmissao.value = data.Bb062Dtemissao ? new Date(data.Bb062Dtemissao).toISOString().split('T')[0] : '';
+        var_bb062_DiaVenctoID.value = data.Bb062Diavenctoid;
+        var_bb062_StatusID.value = data.Bb062Statusid;
     } catch (error) {
         showSnackbar('Erro ao buscar dados da categoria', 'error');
     }
@@ -393,25 +410,36 @@ const openEditDialog = async (item: Item) => {
 async function CreateOrUpdatePeriodo() {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb062 = {
-                bb062_Id: var_bb062_Id.value ? var_bb062_Id.value : 0,
-                bb062_EstabID: var_bb062_EstabID.value,
-                bb062_Ano: Number(var_bb062_Ano.value),
-                bb062_Mes: Number(var_bb062_Mes.value),
-                bb062_Descritivo: var_bb062_Descritivo.value,
-                bb062_DtEmissao: var_bb062_DtEmissao.value,
-                bb062_DiaVenctoID: var_bb062_DiaVenctoID.value,
-                bb062_StatusID: var_bb062_StatusID.value
+            const data: PeriodoCreate = {
+                Bb062Estabid: var_bb062_EstabID.value,
+                Bb062Ano: Number(var_bb062_Ano.value),
+                Bb062Mes: Number(var_bb062_Mes.value),
+                Bb062Descritivo: var_bb062_Descritivo.value,
+                Bb062Dtemissao: var_bb062_DtEmissao.value,
+                Bb062Diavenctoid: var_bb062_DiaVenctoID.value,
+                Bb062Statusid: var_bb062_StatusID.value
             };
 
-            const response = await SavePeriodo(tenant, data);
+            if (itemToEdit === null) {
+                // Create
+                const response = await CreatePeriodo(tenant, data);
 
-            if (response.data.Out_IsSuccess) {
-                showSnackbar('Período salvo com sucesso', 'success');
-                fetchData();
-                dialog.value = false;
+                if (response.data.Out_IsSuccess) {
+                    showSnackbar('Período salvo com sucesso', 'success');
+                    fetchData();
+                    dialog.value = false;
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar período. Verifique os dados.', 'error');
+                }
             } else {
-                showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar período. Verifique os dados.', 'error');
+                // Update
+                const response = await UpdatePeriodo(tenant, var_bb062_Id.value.toString(), data);
+
+                if (response.statusText === 'OK') {
+                    showSnackbar('Período atualizado com sucesso', 'success');
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao atualizar período. Verifique os dados.', 'error');
+                }
             }
         } catch (error) {
             showSnackbar('Erro ao atualizar o período. Verifique sua conexão ou tente novamente.', 'error');
@@ -479,18 +507,17 @@ async function atualizarStatusConfirmed() {
             return;
         }
 
-        const data: Csicp_bb062 = {
-            bb062_Id: Number(itemToAtualizarStatus.value.ID),
-            bb062_EstabID: itemToAtualizarStatus.value.EstabelecimentoId,
-            bb062_Ano: Number(itemToAtualizarStatus.value.Ano),
-            bb062_Mes: Number(itemToAtualizarStatus.value.Mes),
-            bb062_Descritivo: itemToAtualizarStatus.value.Descritivo,
-            bb062_DtEmissao: itemToAtualizarStatus.value.Emissao,
-            bb062_DiaVenctoID: itemToAtualizarStatus.value.Vencimento,
-            bb062_StatusID: estatica.Id
+        const data: PeriodoCreate = {
+            Bb062Estabid: itemToAtualizarStatus.value.EstabelecimentoId,
+            Bb062Ano: Number(itemToAtualizarStatus.value.Ano),
+            Bb062Mes: Number(itemToAtualizarStatus.value.Mes),
+            Bb062Descritivo: itemToAtualizarStatus.value.Descritivo,
+            Bb062Dtemissao: itemToAtualizarStatus.value.Emissao,
+            Bb062Diavenctoid: itemToAtualizarStatus.value.Vencimento,
+            Bb062Statusid: estatica.Id
         };
 
-        const response = await SavePeriodo(tenant, data);
+        const response = await CreatePeriodo(tenant, data);
 
         if (response.data.Out_IsSuccess) {
             showSnackbar('Status atualizado com sucesso', 'success');

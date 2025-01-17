@@ -67,14 +67,14 @@
 </template>
 <script setup lang="ts">
 // Import de bibliotecas e etc...
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { SaveConvenio } from '../../services/convenio/bb060_convenio';
+import { CreateConvenio } from '../../services/convenio/bb060_convenio';
 // Import de types
-import type { Csicp_bb060 } from '../../types/convenio/bb060_GetConvenioById';
+import type { ConvenioCreate } from '../../types/convenio/bb060_convenio';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
@@ -134,29 +134,27 @@ const showSnackbar = (message: string, color: string) => {
 
 async function CreateOrUpdateConvenio() {
     if (formRef.value && formRef.value.validate()) {
-        const data: Csicp_bb060 = {
-            bb060_ConvenioId: BB060.value.bb060_ConvenioId,
-            bb060_Codigo: BB060.value.bb060_Codigo,
-            bb060_Descricao: BB060.value.bb060_Descricao,
-            bb060_vBase: BB060.value.bb060_vBase,
-            bb060_CCustoID: BB060.value.bb060_CCustoID,
-            bb060_UsuarioProprieID: BB060.value.bb060_UsuarioProprieID,
-            bb060_AgCobradorID: BB060.value.bb060_AgCobradorID,
-            bb060_ResponsavelID: BB060.value.bb060_ResponsavelID,
-            bb060_CondicaoID: BB060.value.bb060_CondicaoID,
-            bb060_TipoCobrancaID: BB060.value.bb060_TipoCobrancaID,
-            bb060_UsuarioInc: BB060.value.bb060_UsuarioInc,
-            bb060_UsuarioAlt: BB060.value.bb060_UsuarioAlt,
-            bb060_dthrInc: BB060.value.bb060_dthrInc,
-            bb060_dthrAlt: BB060.value.bb060_dthrAlt,
-            bb060_EspecieID: BB060.value.bb060_EspecieID,
-            bb060_FPagto_ID: BB060.value.bb060_FPagto_ID,
-            bb060_IsActive: BB060.value.bb060_IsActive,
-            bb060_ConvMasterID: BB060.value.bb060_ConvMasterID
+        const data: ConvenioCreate = {
+            Bb060Codigo: BB060.value.bb060_Codigo,
+            Bb060Descricao: BB060.value.bb060_Descricao,
+            Bb060Vbase: parseFloat(BB060.value.bb060_vBase),
+            Bb060Ccustoid: BB060.value.bb060_CCustoID,
+            Bb060Usuarioproprieid: BB060.value.bb060_UsuarioProprieID,
+            Bb060Agcobradorid: BB060.value.bb060_AgCobradorID,
+            Bb060Responsavelid: BB060.value.bb060_ResponsavelID,
+            Bb060Condicaoid: BB060.value.bb060_CondicaoID,
+            Bb060Tipocobrancaid: BB060.value.bb060_TipoCobrancaID,
+            Bb060Usuarioinc: BB060.value.bb060_UsuarioInc,
+            Bb060Usuarioalt: BB060.value.bb060_UsuarioAlt,
+            Bb060Dthrinc: BB060.value.bb060_dthrInc,
+            Bb060Dthralt: BB060.value.bb060_dthrAlt,
+            Bb060Especieid: BB060.value.bb060_EspecieID,
+            Bb060FpagtoId: BB060.value.bb060_FPagto_ID,
+            Bb060Convmasterid: BB060.value.bb060_ConvMasterID
         };
 
         try {
-            const response = await SaveConvenio(tenant, data);
+            const response = await CreateConvenio(tenant, data);
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Convênio salvo com sucesso', 'success');
                 setTimeout(() => {

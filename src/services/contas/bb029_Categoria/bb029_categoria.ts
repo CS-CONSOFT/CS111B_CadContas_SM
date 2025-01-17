@@ -1,40 +1,36 @@
-import { URLBase } from '../../../services/configuracoes_axios';
+import { newURLBase } from '../../../services/configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { CategoriaCompleta, ApiResponse, Lista_bb029 } from '../../../types/crm/categoria/bb029_categoria';
-import type { CategoriaById } from '../../../types/crm/categoria/bb029_GetCategoriaById';
+import type { CategoriaCompleta, CategoriaById, CategoriaCreate } from '../../../types/crm/categoria/bb029_categoria';
 
 function GetCategoriaCompleto(
-    tenant: number | undefined,
+    tenantId: number | undefined,
     active: boolean,
-    count: boolean,
     search: string,
-    currentpage: number,
+    pagenumber: number,
     pagesize: number
-): Promise<AxiosResponse<ApiResponse<CategoriaCompleta>>> {
-    return axios.get<ApiResponse<CategoriaCompleta>>(
-        `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb029_Get_List_Categoria`,
-        {
-            headers: {
-                Tenant_id: tenant,
-                In_IsActive: active,
-                In_IsCount: count,
-                in_search: search,
-                in_currentPage: currentpage,
-                in_pageSize: pagesize
-            }
+): Promise<AxiosResponse<CategoriaCompleta>> {
+    const url =
+        `${newURLBase}/api/v1/bb029?` +
+        `active=${encodeURIComponent(active)}&` +
+        `search=${encodeURIComponent(search)}&` +
+        `pagenumber=${encodeURIComponent(pagenumber)}&` +
+        `pagesize=${encodeURIComponent(pagesize)}`;
+
+    return axios.get<CategoriaCompleta>(url, {
+        headers: {
+            Tenant_ID: tenantId
         }
-    );
+    });
 }
 
-const GetCategoriaById = async (tenantId: number | undefined, in_bb029_id: string): Promise<CategoriaById> => {
-    const url = `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb029_Get_Categoria_Por_ID`;
+const GetCategoriaById = async (tenantId: number | undefined, id: string): Promise<CategoriaById> => {
+    const url = `${newURLBase}/api/v1/bb029/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<CategoriaById> = await axios.get(url, {
             headers: {
-                tenant_id: tenantId,
-                in_bb029_id: in_bb029_id
+                Tenant_ID: tenantId
             }
         });
 
@@ -45,17 +41,13 @@ const GetCategoriaById = async (tenantId: number | undefined, in_bb029_id: strin
     }
 };
 
-const SaveCategoria = async (tenantId: number | undefined, Categoria: Lista_bb029): Promise<AxiosResponse<any>> => {
+const CreateCategoria = async (tenantId: number | undefined, Categoria: CategoriaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(
-            `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb029_Save_Categoria`,
-            Categoria,
-            {
-                headers: {
-                    tenant_id: tenantId
-                }
+        const response = await axios.post(`${newURLBase}/api/v1/bb029`, Categoria, {
+            headers: {
+                Tenant_ID: tenantId
             }
-        );
+        });
         return response;
     } catch (error) {
         console.error('Erro ao salvar categoria:', error);
@@ -63,12 +55,25 @@ const SaveCategoria = async (tenantId: number | undefined, Categoria: Lista_bb02
     }
 };
 
-const DeleteCategoria = async (tenantId: number | undefined, in_bb029_id: string): Promise<AxiosResponse<any>> => {
+const UpdateCategoria = async (tenantId: number | undefined, id: string, Categoria: CategoriaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_TabelasTotalizacao/csicp_bb029_Delete_Categoria`, {
+        const response = await axios.put(`${newURLBase}/api/v1/bb029/${encodeURIComponent(id)}`, Categoria, {
             headers: {
-                tenant_id: tenantId,
-                in_bb029_id: in_bb029_id
+                Tenant_ID: tenantId
+            }
+        });
+        return response;
+    } catch (error) {
+        console.error('Erro ao atualizar categoria:', error);
+        throw error;
+    }
+};
+
+const DeleteCategoria = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
+    try {
+        const response = await axios.delete(`${newURLBase}/api/v1/bb029/${encodeURIComponent(id)}`, {
+            headers: {
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -78,4 +83,4 @@ const DeleteCategoria = async (tenantId: number | undefined, in_bb029_id: string
     }
 };
 
-export { GetCategoriaCompleto, GetCategoriaById, SaveCategoria, DeleteCategoria };
+export { GetCategoriaCompleto, GetCategoriaById, CreateCategoria, UpdateCategoria, DeleteCategoria };

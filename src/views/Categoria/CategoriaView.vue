@@ -198,13 +198,13 @@ import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 import {
     GetCategoriaCompleto,
     GetCategoriaById,
-    SaveCategoria,
+    CreateCategoria,
+    UpdateCategoria,
     DeleteCategoria
 } from '../../services/contas/bb029_Categoria/bb029_categoria';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { CategoriaCompleta, ApiResponse, Lista_bb029 } from '../../types/crm/categoria/bb029_categoria';
-import type { CategoriaById } from '../../types/crm/categoria/bb029_GetCategoriaById';
+import type { CategoriaCompleta, CategoriaById, CategoriaCreate, List } from '../../types/crm/categoria/bb029_categoria';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
@@ -215,7 +215,7 @@ import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes
 
 interface Item {
     ID: string;
-    Codigo: string;
+    Codigo: number;
     Categoria: string;
     Ativo: boolean;
 }
@@ -298,23 +298,22 @@ const toggleView = () => {
 const fetchData = async () => {
     loading.value = true;
     try {
-        const response: AxiosResponse<ApiResponse<CategoriaCompleta>> = await GetCategoriaCompleto(
+        const response: AxiosResponse<CategoriaCompleta> = await GetCategoriaCompleto(
             tenant,
             active.value,
-            count,
             search.value,
             currentPage.value,
             itemsPerPage.value
         );
         const data = response.data;
-        items.value = data.Lista_bb029.map((item: Lista_bb029) => ({
-            ID: item.ID,
-            Codigo: item.BB029_CodgCategoria,
-            Categoria: item.BB029_Categoria,
-            Ativo: item.BB029_Is_Active
+        items.value = data.List.map((item: List) => ({
+            ID: item.Id,
+            Codigo: item.Bb029Codgcategoria,
+            Categoria: item.Bb029Categoria,
+            Ativo: item.Bb029IsActive
         }));
 
-        totalItems.value = data.PageSize.cs_list_total_itens;
+        totalItems.value = data.TotalCount;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
@@ -345,10 +344,10 @@ const openEditDialog = async (item: Item) => {
     try {
         const data: CategoriaById = await GetCategoriaById(tenant, item.ID);
         // Atribuindo os valores da resposta aos campos da BB029
-        var_ID.value = data.ID;
-        var_BB029_Codigo.value = data.BB029_CodgCategoria;
-        var_BB029_Categoria.value = data.BB029_Categoria;
-        var_BB029_Is_Active.value = data.BB029_Is_Active;
+        var_ID.value = data.Id;
+        var_BB029_Codigo.value = data.Bb029Codgcategoria;
+        var_BB029_Categoria.value = data.Bb029Categoria;
+        var_BB029_Is_Active.value = data.Bb029IsActive;
     } catch (error) {
         showSnackbar('Erro ao buscar dados da categoria', 'error');
     }
@@ -357,21 +356,31 @@ const openEditDialog = async (item: Item) => {
 async function CreateOrUpdateCategoria() {
     if (formRef.value.validate()) {
         try {
-            const data: Lista_bb029 = {
-                ID: var_ID.value ? var_ID.value : '',
-                BB029_CodgCategoria: var_BB029_Codigo.value,
-                BB029_Categoria: var_BB029_Categoria.value,
-                BB029_Is_Active: true
+            const data: CategoriaCreate = {
+                Bb029Codgcategoria: var_BB029_Codigo.value,
+                Bb029Categoria: var_BB029_Categoria.value
             };
 
-            const response = await SaveCategoria(tenant, data);
+            if (itemToEdit.value === null) {
+                // Create
+                const response = await CreateCategoria(tenant, data);
 
-            if (response.data.Out_IsSuccess) {
-                showSnackbar('Categoria salva com sucesso', 'success');
-                fetchData();
-                dialog.value = false;
+                if (response.data.Out_IsSuccess) {
+                    showSnackbar('Categoria salva com sucesso', 'success');
+                    fetchData();
+                    dialog.value = false;
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar categoria. Verifique os dados.', 'error');
+                }
             } else {
-                showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar categoria. Verifique os dados.', 'error');
+                // Update
+                const response = await UpdateCategoria(tenant, var_ID.value, data);
+
+                if (response.statusText === 'OK') {
+                    showSnackbar('Categoria atualizada com sucesso', 'success');
+                } else {
+                    showSnackbar(response.data.Out_Message || 'Falha ao atualizar a categoria. Verifique os dados.', 'error');
+                }
             }
         } catch (error) {
             showSnackbar('Erro ao atualizar a categoria. Verifique sua conexão ou tente novamente.', 'error');

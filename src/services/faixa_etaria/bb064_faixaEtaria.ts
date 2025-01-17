@@ -1,37 +1,42 @@
-import { URLBase } from '../configuracoes_axios';
+import { newURLBase } from '../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { FaixaEtariaCompleto, ApiResponse, Csicp_bb064 } from '../../types/faixa_etaria/bb064_faixaEtaria';
-import type { FaixaEtariaById, Csicp_bb066_List, Csicp_bb065 } from '../../types/faixa_etaria/bb064_GetFaixaEtariaById';
+import type {
+    FaixaEtariaCompleto,
+    FaixaEtariaById,
+    FaixaEtariaCreate,
+    FaixaEtariaConvenioCreate,
+    FaixaEtariaDetalhesCreate
+} from '../../types/faixa_etaria/bb064_faixaEtaria';
 
-function GetFaixaEtariaList(
-    tenant: number | undefined,
+function GetFaixaEtariaCompleto(
+    tenantId: number | undefined,
     active: boolean,
-    count: boolean,
     search: string,
-    currentpage: number,
+    pagenumber: number,
     pagesize: number
-): Promise<AxiosResponse<ApiResponse<FaixaEtariaCompleto>>> {
-    return axios.get<ApiResponse<FaixaEtariaCompleto>>(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb064_Get_List`, {
+): Promise<AxiosResponse<FaixaEtariaCompleto>> {
+    const url =
+        `${newURLBase}/api/v1/bb064?` +
+        `active=${encodeURIComponent(active)}&` +
+        `search=${encodeURIComponent(search)}&` +
+        `pagenumber=${encodeURIComponent(pagenumber)}&` +
+        `pagesize=${encodeURIComponent(pagesize)}`;
+
+    return axios.get<FaixaEtariaCompleto>(url, {
         headers: {
-            Tenant_id: tenant,
-            In_IsActive: active,
-            In_IsCount: count,
-            in_search: search,
-            in_currentPage: currentpage,
-            in_pageSize: pagesize
+            Tenant_ID: tenantId
         }
     });
 }
 
-const GetFaixaEtariaById = async (tenantId: number | undefined, in_bb064_id: string): Promise<FaixaEtariaById> => {
-    const url = `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb064_Get_PorID`;
+const GetFaixaEtariaById = async (tenantId: number | undefined, id: string): Promise<FaixaEtariaById> => {
+    const url = `${newURLBase}/api/v1/bb064/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<FaixaEtariaById> = await axios.get(url, {
             headers: {
-                tenant_id: tenantId,
-                in_bb064_id: in_bb064_id
+                Tenant_ID: tenantId
             }
         });
 
@@ -42,11 +47,11 @@ const GetFaixaEtariaById = async (tenantId: number | undefined, in_bb064_id: str
     }
 };
 
-const SaveFaixaEtaria = async (tenantId: number | undefined, faixaEtaria: Csicp_bb064): Promise<AxiosResponse<any>> => {
+const CreateFaixaEtaria = async (tenantId: number | undefined, faixaEtaria: FaixaEtariaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb064_Save`, faixaEtaria, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb064`, faixaEtaria, {
             headers: {
-                Tenant_id: tenantId
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -56,12 +61,25 @@ const SaveFaixaEtaria = async (tenantId: number | undefined, faixaEtaria: Csicp_
     }
 };
 
-const DeleteFaixaEtaria = async (tenantId: number | undefined, in_bb064_id: string): Promise<AxiosResponse<any>> => {
+const UpdateFaixaEtaria = async (tenantId: number | undefined, id: string, faixaEtaria: FaixaEtariaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb064_Delete`, {
+        const response = await axios.put(`${newURLBase}/api/v1/bb064/${encodeURIComponent(id)}`, faixaEtaria, {
             headers: {
-                tenant_id: tenantId,
-                in_bb064_id: in_bb064_id
+                Tenant_ID: tenantId
+            }
+        });
+        return response;
+    } catch (error) {
+        console.error('Erro ao atualizar convênio:', error);
+        throw error;
+    }
+};
+
+const DeleteFaixaEtaria = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
+    try {
+        const response = await axios.delete(`${newURLBase}/api/v1/bb064/${encodeURIComponent(id)}`, {
+            headers: {
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -73,14 +91,14 @@ const DeleteFaixaEtaria = async (tenantId: number | undefined, in_bb064_id: stri
 
 // ----------------------------------------------------- Detalhes Faixa Etaria BB066 --------------------------------------------------
 
-const SaveDetalhesFaixaEtaria = async (
+const CreateDetalhesFaixaEtaria = async (
     tenantId: number | undefined,
-    detalhesFaixaEtaria: Csicp_bb066_List
+    detalhesFaixaEtaria: FaixaEtariaDetalhesCreate
 ): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb066_Save`, detalhesFaixaEtaria, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb066`, detalhesFaixaEtaria, {
             headers: {
-                Tenant_id: tenantId
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -90,12 +108,11 @@ const SaveDetalhesFaixaEtaria = async (
     }
 };
 
-const DeleteDetalhesFaixaEtaria = async (tenantId: number | undefined, in_bb066_id: string): Promise<AxiosResponse<any>> => {
+const DeleteDetalhesFaixaEtaria = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb066_Delete`, {
+        const response = await axios.delete(`${newURLBase}/api/v1/bb066/${encodeURIComponent(id)}`, {
             headers: {
-                tenant_id: tenantId,
-                in_bb066_id: in_bb066_id
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -107,11 +124,14 @@ const DeleteDetalhesFaixaEtaria = async (tenantId: number | undefined, in_bb066_
 
 // ----------------------------------------------------- Vincular Convênio X Faixa Etaria BB065 --------------------------------------------------
 
-const SaveVinculoConvenioFaixaEtaria = async (tenantId: number | undefined, vincularConvenio: Csicp_bb065): Promise<AxiosResponse<any>> => {
+const CreateVinculoConvenioFaixaEtaria = async (
+    tenantId: number | undefined,
+    vincularConvenio: FaixaEtariaConvenioCreate
+): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb065_Save`, vincularConvenio, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb065`, vincularConvenio, {
             headers: {
-                Tenant_id: tenantId
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -121,12 +141,11 @@ const SaveVinculoConvenioFaixaEtaria = async (tenantId: number | undefined, vinc
     }
 };
 
-const DeleteVinculoConvenioFaixaEtaria = async (tenantId: number | undefined, in_bb065_id: string): Promise<AxiosResponse<any>> => {
+const DeleteVinculoConvenioFaixaEtaria = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb065_Delete`, {
+        const response = await axios.delete(`${newURLBase}/api/v1/bb065/${encodeURIComponent(id)}`, {
             headers: {
-                tenant_id: tenantId,
-                in_bb065_id: in_bb065_id
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -140,9 +159,9 @@ const DeleteVinculoConvenioFaixaEtaria = async (tenantId: number | undefined, in
 
 const AtualizarFaixaEtaria = async (tenantId: number | undefined, In_bb064_ID: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.get(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_Pro_AtualizaFxEtaria`, {
+        const response = await axios.get(`${newURLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_Pro_AtualizaFxEtaria`, {
             headers: {
-                tenant_id: tenantId,
+                Tenant_ID: tenantId,
                 In_bb064_ID: In_bb064_ID
             }
         });
@@ -154,13 +173,15 @@ const AtualizarFaixaEtaria = async (tenantId: number | undefined, In_bb064_ID: s
 };
 
 export {
-    GetFaixaEtariaList,
+    GetFaixaEtariaCompleto,
     GetFaixaEtariaById,
-    SaveFaixaEtaria,
+    CreateFaixaEtaria,
+    UpdateFaixaEtaria,
     DeleteFaixaEtaria,
-    SaveDetalhesFaixaEtaria,
+    CreateDetalhesFaixaEtaria,
     DeleteDetalhesFaixaEtaria,
-    SaveVinculoConvenioFaixaEtaria,
+    CreateVinculoConvenioFaixaEtaria,
     DeleteVinculoConvenioFaixaEtaria,
-    AtualizarFaixaEtaria
+    AtualizarFaixaEtaria,
+    FaixaEtariaConvenioCreate
 };

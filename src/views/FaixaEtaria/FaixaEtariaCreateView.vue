@@ -8,9 +8,9 @@
             </v-row>
         </v-toolbar>
 
-        <v-form ref="formRef">
+        <v-form ref="formRef" class="border rounded">
             <v-row class="d-flex mt-5 px-4">
-                <v-col cols="6" class="align-center">
+                <v-col cols="12" class="align-center">
                     <cs_InputTexto
                         v-model="var_bb064_Descricao"
                         Prm_etiqueta="Descrição"
@@ -18,13 +18,12 @@
                         :Prm_isObrigatorio="true"
                         :rules="rules.nome"
                     />
-                    <v-checkbox v-model="var_bb064_IsActive" label="Ativo?"></v-checkbox>
                 </v-col>
             </v-row>
             <v-row class="d-flex flex-row-reverse my-2">
                 <v-col cols="auto">
                     <cs_BtnSalvar @click="CreateOrUpdateFaixaEtaria()" />
-                    <cs_BtnCancelar class="ml-4" to="/FaixaEtaria" />
+                    <cs_BtnCancelar class="mx-4" to="/FaixaEtaria" />
                 </v-col>
             </v-row>
         </v-form>
@@ -44,9 +43,9 @@ import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { SaveFaixaEtaria } from '../../services/faixa_etaria/bb064_faixaEtaria';
+import { CreateFaixaEtaria } from '../../services/faixa_etaria/bb064_faixaEtaria';
 // Import de Types
-import type { Csicp_bb064 } from '../../types/faixa_etaria/bb064_faixaEtaria';
+import type { FaixaEtariaCreate } from '../../types/faixa_etaria/bb064_faixaEtaria';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_BtnCancelar from '../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
@@ -82,13 +81,11 @@ const showSnackbar = (message: string, color: string) => {
 async function CreateOrUpdateFaixaEtaria() {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb064 = {
-                bb064_FxEtariaId: var_ID.value ? var_ID.value : 0,
-                bb064_Descricao: var_bb064_Descricao.value,
-                bb064_IsActive: var_bb064_IsActive.value
+            const data: FaixaEtariaCreate = {
+                Bb064Descricao: var_bb064_Descricao.value
             };
 
-            const response = await SaveFaixaEtaria(tenant, data);
+            const response = await CreateFaixaEtaria(tenant, data);
 
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Faixa etária master salva com sucesso', 'success');
@@ -98,10 +95,10 @@ async function CreateOrUpdateFaixaEtaria() {
                     });
                 }, 2000);
             } else {
-                showSnackbar(response.data.Out_Message || 'Falha ao salvar ou atualizar faixa etária. Verifique os dados.', 'error');
+                showSnackbar(response.data.Out_Message || 'Falha ao salvar faixa etária. Verifique os dados.', 'error');
             }
         } catch (error) {
-            showSnackbar('Erro ao atualizar a faixa etária. Verifique sua conexão ou tente novamente.', 'error');
+            showSnackbar('Erro ao salvar a faixa etária. Verifique sua conexão ou tente novamente.', 'error');
         }
     }
 }

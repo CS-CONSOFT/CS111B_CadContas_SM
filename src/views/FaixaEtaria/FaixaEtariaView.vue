@@ -110,10 +110,10 @@ import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { GetFaixaEtariaList, DeleteFaixaEtaria, AtualizarFaixaEtaria } from '../../services/faixa_etaria/bb064_faixaEtaria';
+import { GetFaixaEtariaCompleto, DeleteFaixaEtaria, AtualizarFaixaEtaria } from '../../services/faixa_etaria/bb064_faixaEtaria';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { FaixaEtariaCompleto, ApiResponse, TabelaFaixaEtaria } from '../../types/faixa_etaria/bb064_faixaEtaria';
+import type { FaixaEtariaCompleto, List } from '../../types/faixa_etaria/bb064_faixaEtaria';
 //Import de componentes
 import Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
 import cs_BtnAdicionar from '../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
@@ -190,22 +190,21 @@ const showSnackbar = (message: string, color: string) => {
 const fetchData = async () => {
     loading.value = true;
     try {
-        const response: AxiosResponse<ApiResponse<FaixaEtariaCompleto>> = await GetFaixaEtariaList(
+        const response: AxiosResponse<FaixaEtariaCompleto> = await GetFaixaEtariaCompleto(
             tenant,
             active.value,
-            count,
             search.value,
             currentPage.value,
             itemsPerPage.value
         );
         const data = response.data;
-        items.value = data.TabelaFaixaEtaria.map((item: TabelaFaixaEtaria) => ({
-            ID: item.csicp_bb064.bb064_FxEtariaId,
-            Descricao: item.csicp_bb064.bb064_Descricao,
-            Status: item.csicp_bb064.bb064_IsActive
+        items.value = data.List.map((item: List) => ({
+            ID: item.Bb064Fxetariaid.toString(),
+            Descricao: item.Bb064Descricao,
+            Status: item.Bb064Isactive
         }));
 
-        totalItems.value = data.PageSize.cs_list_total_itens;
+        totalItems.value = data.TotalCount;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
