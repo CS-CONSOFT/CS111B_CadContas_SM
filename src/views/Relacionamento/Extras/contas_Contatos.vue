@@ -336,12 +336,11 @@ import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
 import { GetContaById } from '../../../services/contas/bb012_conta';
 import { SaveContato, DeleteContato } from '../../../services/contas/bb01208_Contato/bb01208_contato';
-import { GetContatoById, SaveContatoBB035 } from '../../../services/contas/bb035_Contato/bb035_contato';
+import { GetContatoById, CreateContato } from '../../../services/contas/bb035_Contato/bb035_contato';
 // Import de types
 import type { ContaById, Contatos, Csicp_bb01208 } from '../../../types/crm/bb012_GetContaById';
-import type { ContatoById, Csicp_bb035, Csicp_bb035_end } from '../../../types/crm/contatos/bb035_GetContatoById';
+import type { ContatoById, ContatoCreate, NavCSICP_BB035EndCreate } from '../../../types/crm/contatos/bb035_contatos';
 import type { CEP } from '../../../submodules/cs_components/src/types/enderecamento/CepTypes';
-import type { ContatosTypes } from '../../../services/contas/bb035_Contato/bb035_contatoTypes';
 //Import de componentes
 import cs_InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
@@ -496,7 +495,6 @@ const fetchData = async (id: string) => {
             Grau_ID: item.csicp_bb01208.BB01208_GrauParent_ID
         }));
 
-        //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
         var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
     } catch (error) {
         showSnackbar('Erro ao buscar contato.', 'error');
@@ -607,39 +605,39 @@ const openEditDialog = async (item: Item) => {
         const data: ContatoById = await GetContatoById(tenant, itemToEdit.value.BB035_ID);
 
         // Mapear dados do contato (csicp_bb035)
-        var_bb035_id.value = data.csicp_bb035.Id;
-        var_Tratamento.value = data.csicp_bb035?.BB035_Tratamento_ID ?? 0;
-        var_Nome.value = data.csicp_bb035?.BB035_PrimeiroNome ?? '';
-        var_Sobrenome.value = data.csicp_bb035?.BB035_Sobrenome ?? '';
-        var_Email.value = data.csicp_bb035?.BB035_EMail ?? '';
-        var_EmailSecundario.value = data.csicp_bb035?.BB035_EMailSecundario ?? '';
-        var_Titulo.value = data.csicp_bb035?.BB035_Titulo ?? '';
-        var_Departamento.value = data.csicp_bb035?.BB035_Departamento ?? '';
-        var_Aniversario.value = data.csicp_bb035?.BB035_Data_Aniversario ?? '';
-        var_Telefone.value = data.csicp_bb035?.BB035_Telefone ?? '';
-        var_OutroTelefone.value = data.csicp_bb035?.BB035_OutroTelefone ?? '';
-        var_Celular.value = data.csicp_bb035?.BB035_Celular ?? '';
-        var_Fax.value = data.csicp_bb035?.BB035_Fax ?? '';
-        var_TelefoneResidencia.value = data.csicp_bb035?.BB035_TelefoneResidencia ?? '';
-        var_Assistente.value = data.csicp_bb035?.BB035_Assistente ?? '';
-        var_TelefoneAssistente.value = data.csicp_bb035?.BB035_TelefoneAssist ?? '';
-        var_CPF.value = data.csicp_bb035?.BB035_CPF ?? '';
-        var_RG.value = data.csicp_bb035?.BB035_RG?.toString() ?? '';
-        var_ComplementoRG.value = data.csicp_bb035?.BB035_Orgao_Exped_RG ?? '';
-        var_Descricao.value = data.csicp_bb035?.BB035_Descricao ?? '';
+        var_bb035_id.value = data.Id;
+        var_Nome.value = data.Bb035Primeironome;
+        var_Sobrenome.value = data.Bb035Sobrenome;
+        var_Tratamento.value = data.Bb035TratamentoId;
+        var_Email.value = data.Bb035Email;
+        var_EmailSecundario.value = data.Bb035Emailsecundario;
+        var_Titulo.value = data.Bb035Titulo;
+        var_Departamento.value = data.Bb035Departamento;
+        var_Aniversario.value = data.Bb035DataAniversario;
+        var_Telefone.value = data.Bb035Telefone;
+        var_OutroTelefone.value = data.Bb035Outrotelefone;
+        var_Celular.value = data.Bb035Celular;
+        var_Fax.value = data.Bb035Fax;
+        var_TelefoneResidencia.value = data.Bb035Telefoneresidencia;
+        var_Assistente.value = data.Bb035Assistente;
+        var_TelefoneAssistente.value = data.Bb035Telefoneassist;
+        var_CPF.value = data.Bb035Cpf;
+        var_RG.value = data.Bb035Rg.toString();
+        var_ComplementoRG.value = data.Bb035OrgaoExpedRg;
+        var_Descricao.value = data.Bb035Descricao;
 
         // Mapear dados de endereço (csicp_bb035_end)
-        var_Logradouro.value = data.csicp_bb035_end?.BB035_Logradouro ?? '';
-        var_Numero.value = data.csicp_bb035_end?.BB035_Numero ?? '';
-        var_Complemento.value = data.csicp_bb035_end?.BB035_Complemento ?? '';
-        var_Bairro.value = data.csicp_bb035_end?.BB035_Bairro ?? '';
-        var_SelectedCidade.value = data.csicp_bb035_end?.BB035_Codigo_Cidade ?? '';
-        var_SelectedUF.value = data.csicp_bb035_end?.BB035_UF ?? '';
-        var_CEP.value = data.csicp_bb035_end?.BB035_CEP ?? '';
-        var_SelectedPais.value = data.csicp_bb035_end?.BB035_Codigo_Pais ?? '';
+        var_Logradouro.value = data.NavCSICP_BB035End.Bb035Logradouro;
+        var_Numero.value = data.NavCSICP_BB035End.Bb035Numero;
+        var_Complemento.value = data.NavCSICP_BB035End.Bb035Complemento;
+        var_Bairro.value = data.NavCSICP_BB035End.Bb035Bairro;
+        var_SelectedCidade.value = data.NavCSICP_BB035End.Bb035CodigoCidade;
+        var_SelectedUF.value = data.NavCSICP_BB035End.Bb035Uf;
+        var_CEP.value = data.NavCSICP_BB035End.Bb035Cep;
+        var_SelectedPais.value = data.NavCSICP_BB035End.Bb035CodigoPais;
 
         // Mapear dados de origem de contato e grau de parentesco
-        var_GrauParentesco.value = data.csicp_bb035_Origem?.Id ?? 0;
+        var_GrauParentesco.value = data.NavCSICP_BB035Origem.Id;
     } catch (error) {
         showSnackbar('Erro ao buscar dados do contato', 'error');
     }
@@ -648,50 +646,46 @@ const openEditDialog = async (item: Item) => {
 async function saveContato() {
     if (formRefContato.value.validate()) {
         try {
-            const csicp_bb035: Csicp_bb035 = {
-                Id: var_bb035_id.value,
-                BB035_PrimeiroNome: var_Nome.value,
-                BB035_Sobrenome: var_Sobrenome.value,
-                BB035_EMail: var_Email.value,
-                BB035_Titulo: var_Titulo.value,
-                BB035_Departamento: var_Departamento.value,
-                BB035_Data_Aniversario: var_Aniversario.value,
-                BB035_Telefone: var_Telefone.value,
-                BB035_OutroTelefone: var_OutroTelefone.value,
-                BB035_Celular: var_Celular.value,
-                BB035_Fax: var_Fax.value,
-                BB035_TelefoneResidencia: var_TelefoneResidencia.value,
-                BB035_Descricao: var_Descricao.value,
-                BB035_Assistente: var_Assistente.value,
-                BB035_TelefoneAssist: var_TelefoneAssistente.value,
-                BB035_EMailSecundario: var_EmailSecundario.value,
-                BB035_CPF: var_CPF.value,
-                BB035_RG: parseInt(var_RG.value) || 0,
-                BB035_Orgao_Exped_RG: var_ComplementoRG.value,
-                BB035_Data_Emissao_RG: '',
-                BB035_Is_Active: true,
-                BB035_Tratamento_ID: var_Tratamento.value,
-                BB035_OrigemContato_ID: var_GrauParentesco.value
+            const endereco: NavCSICP_BB035EndCreate = {
+                Bb035Id: var_bb035_id.value,
+                Bb035Logradouro: var_Logradouro.value,
+                Bb035Numero: var_Numero.value,
+                Bb035Complemento: var_Complemento.value,
+                Bb035Bairro: var_Bairro.value,
+                Bb035CodigoCidade: var_SelectedCidade.value,
+                Bb035Uf: var_SelectedUF.value,
+                Bb035Cep: var_CEP.value,
+                Bb035CodigoPais: var_SelectedPais.value
             };
 
-            const csicp_bb035_end: Csicp_bb035_end = {
-                bb035_Id: var_bb035_id.value,
-                BB035_ContatoID: '',
-                BB035_Logradouro: var_Logradouro.value,
-                BB035_Numero: var_Numero.value,
-                BB035_Complemento: var_Complemento.value,
-                BB035_Bairro: var_Bairro.value,
-                BB035_Codigo_Cidade: var_SelectedCidade.value,
-                BB035_UF: var_SelectedUF.value,
-                BB035_CEP: var_CEP.value,
-                BB035_Codigo_Pais: var_SelectedPais.value
+            const data: ContatoCreate = {
+                Bb035Primeironome: var_Nome.value,
+                Bb035Sobrenome: var_Sobrenome.value,
+                Bb035Email: var_Email.value,
+                Bb035Titulo: var_Titulo.value,
+                Bb035Departamento: var_Departamento.value,
+                Bb035DataAniversario: var_Aniversario.value,
+                Bb035Telefone: var_Telefone.value,
+                Bb035Outrotelefone: var_OutroTelefone.value,
+                Bb035Celular: var_Celular.value,
+                Bb035Fax: var_Fax.value,
+                Bb035Telefoneresidencia: var_TelefoneResidencia.value,
+                Bb035Descricao: var_Descricao.value,
+                Bb035Assistente: var_Assistente.value,
+                Bb035Telefoneassist: var_TelefoneAssistente.value,
+                Bb035Emailsecundario: var_EmailSecundario.value,
+                Bb035Cpf: var_CPF.value,
+                Bb035Rg: parseInt(var_RG.value) || 0,
+                Bb035OrgaoExpedRg: var_ComplementoRG.value,
+                Bb035DataEmissaoRg: '',
+                Bb035TratamentoId: var_Tratamento.value,
+                Bb035OrigemcontatoId: var_GrauParentesco.value,
+                Bb035CodgCliente7x: 0,
+                Bb035SeqCliente7x: 0,
+                NavCSICP_BB035End: endereco
             };
 
-            const data: ContatosTypes = {
-                csicp_bb035: csicp_bb035,
-                csicp_bb035_end: csicp_bb035_end
-            };
-            const response = await SaveContatoBB035(tenant, data);
+            const response = await CreateContato(tenant, data);
 
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Contato atualizado com sucesso', 'success');
