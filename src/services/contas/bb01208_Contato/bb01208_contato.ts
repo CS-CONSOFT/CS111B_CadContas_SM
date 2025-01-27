@@ -1,13 +1,16 @@
-import { URLBase } from '../../configuracoes_axios';
+import { newURLBase } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { Csicp_bb01208 } from '../../../types/crm/bb012_conta';
+import type { RelacaoContatosContaCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb01208_relacaocontacontato';
 
-const SaveContato = async (tenantId: number | undefined, contato: Csicp_bb01208): Promise<AxiosResponse<any>> => {
+const CreateRelacaoContaContato = async (
+    tenantId: number | undefined,
+    contato: RelacaoContatosContaCreate
+): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb01208_Save_Contato`, contato, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb01208`, contato, {
             headers: {
-                Tenant_id: tenantId
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -17,12 +20,11 @@ const SaveContato = async (tenantId: number | undefined, contato: Csicp_bb01208)
     }
 };
 
-const DeleteContato = async (tenantId: number | undefined, bb01208_Id: string): Promise<AxiosResponse<any>> => {
+const DeleteRelacaoContaContato = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb01208_Delete_Contato`, {
-            headers: {
-                Tenant_id: tenantId,
-                In_BB01208_ID: bb01208_Id
+        const response = await axios.delete(`${newURLBase}/api/v1/bb01208/${encodeURIComponent(id)}`, {
+            params: {
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -32,4 +34,4 @@ const DeleteContato = async (tenantId: number | undefined, bb01208_Id: string): 
     }
 };
 
-export { SaveContato, DeleteContato };
+export { CreateRelacaoContaContato, DeleteRelacaoContaContato };

@@ -122,10 +122,11 @@ import { ref, onMounted } from 'vue';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
-import { GetContaById } from '../../../services/contas/bb012_conta';
-import { SaveDadosBancarios, DeleteDadosBancarios } from '../../../services/contas/bb012q_ReferenciaBancarias/bb012q_dadosbancarios';
+import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
+import { CreateDadosBancarios, DeleteDadosBancarios } from '../../../services/contas/bb012q_ReferenciaBancarias/bb012q_dadosbancarios';
 // Import de types
-import type { ContaById, DadosBancarios, Csicp_bb012q } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, NavDadosBancariosList } from '../../../types/crm/contas/bb012_contabyid';
+import type { ReferenciasBancariasCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb012q_referenciasbancarias';
 //Import de componentes
 import InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_InputValor from '../../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
@@ -238,19 +239,18 @@ const showSnackbar = (message: string, color: string) => {
 const fetchData = async (id: string) => {
     loading.value = true;
     try {
-        const data: ContaById = await GetContaById(tenant, id);
-        items.value = data.DadosBancarios.map((item: DadosBancarios) => ({
-            ID: item.csicp_bb012q.Id,
-            BB012_ID: item.csicp_bb012q.BB012_ID,
-            Agencia: item.csicp_bb012q.BB012_Agencia,
-            Conta: item.csicp_bb012q.BB012_Conta,
-            Valor: `R$ ${item.csicp_bb012q.BB012_ValorFinanciamento.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            Telefone: item.csicp_bb012q.BB012_Telefone,
-            Email: item.csicp_bb012q.BB012_Email
+        const res: ContaById = await GetContaById(tenant, id);
+        items.value = res.Data.NavDadosBancariosList.map((item: NavDadosBancariosList) => ({
+            ID: item.Id,
+            BB012_ID: item.Bb012Id,
+            Agencia: item.Bb012Agencia,
+            Conta: item.Bb012Conta,
+            Valor: `R$ ${item.Bb012Valorfinanciamento.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            Telefone: item.Bb012Telefone,
+            Email: item.Bb012Email
         }));
 
-        //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
-        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+        var_bb012_Id.value = res.Data.Id;
     } catch (error) {
         showSnackbar('Erro ao buscar referências bancárias.', 'error');
     } finally {
@@ -280,18 +280,19 @@ const openEditDialog = async (item: Item, index: number) => {
     dialog.value = true;
     itemToEdit.value = item;
     try {
-        const data: ContaById = await GetContaById(tenant, props.id);
+        const res: ContaById = await GetContaById(tenant, props.id);
+        const data = res.Data;
 
-        var_Id.value = data.DadosBancarios[index].csicp_bb012q.Id;
-        var_bb012_Id.value = data.DadosBancarios[index].csicp_bb012q.BB012_ID;
-        var_Agencia.value = data.DadosBancarios[index].csicp_bb012q.BB012_Agencia;
-        var_Conta.value = data.DadosBancarios[index].csicp_bb012q.BB012_Conta;
-        var_ValorFinanciamento.value = data.DadosBancarios[index].csicp_bb012q.BB012_ValorFinanciamento;
-        var_NomeGerente.value = data.DadosBancarios[index].csicp_bb012q.BB012_NomeGerente;
-        var_Telefone.value = data.DadosBancarios[index].csicp_bb012q.BB012_Telefone;
-        var_Celular.value = data.DadosBancarios[index].csicp_bb012q.BB012_FaxCelular;
-        var_HomePage.value = data.DadosBancarios[index].csicp_bb012q.BB012_HomePage;
-        var_Email.value = data.DadosBancarios[index].csicp_bb012q.BB012_Email;
+        var_Id.value = data.NavDadosBancariosList[index].Id;
+        var_bb012_Id.value = data.NavDadosBancariosList[index].Bb012Id;
+        var_Agencia.value = data.NavDadosBancariosList[index].Bb012Agencia;
+        var_Conta.value = data.NavDadosBancariosList[index].Bb012Conta;
+        var_ValorFinanciamento.value = data.NavDadosBancariosList[index].Bb012Valorfinanciamento;
+        var_NomeGerente.value = data.NavDadosBancariosList[index].Bb012Nomegerente;
+        var_Telefone.value = data.NavDadosBancariosList[index].Bb012Telefone;
+        var_Celular.value = data.NavDadosBancariosList[index].Bb012Faxcelular;
+        var_HomePage.value = data.NavDadosBancariosList[index].Bb012Homepage;
+        var_Email.value = data.NavDadosBancariosList[index].Bb012Email;
     } catch (error) {
         showSnackbar('Erro ao buscar dados da referência bancária', 'error');
     }
@@ -300,21 +301,19 @@ const openEditDialog = async (item: Item, index: number) => {
 const CreateOrUpdateDadosBancarios = async () => {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb012q = {
-                Id: var_Id.value,
-                BB012_ID: var_bb012_Id.value,
-                BB012_Agencia: var_Agencia.value,
-                BB012_Conta: var_Conta.value,
-                BB012_ValorFinanciamento: var_ValorFinanciamento.value,
-                BB012_NomeGerente: var_NomeGerente.value,
-                BB012_Telefone: var_Telefone.value,
-                BB012_FaxCelular: var_Celular.value,
-                BB012_HomePage: var_HomePage.value,
-                BB012_Email: var_Email.value,
-                bb012q_Is_Active: true
+            const data: ReferenciasBancariasCreate = {
+                Bb012Id: var_bb012_Id.value,
+                Bb012Agencia: var_Agencia.value,
+                Bb012Conta: var_Conta.value,
+                Bb012Valorfinanciamento: var_ValorFinanciamento.value,
+                Bb012Nomegerente: var_NomeGerente.value,
+                Bb012Telefone: var_Telefone.value,
+                Bb012Faxcelular: var_Celular.value,
+                Bb012Homepage: var_HomePage.value,
+                Bb012Email: var_Email.value
             };
 
-            const response = await SaveDadosBancarios(tenant, data);
+            const response = await CreateDadosBancarios(tenant, data);
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Referência bancária salva com sucesso', 'success');
                 fetchData(props.id);

@@ -107,10 +107,11 @@ import { ref, onMounted } from 'vue';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
-import { GetContaById } from '../../../services/contas/bb012_conta';
-import { SaveRetencao, DeleteRetencao } from '../../../services/contas/bb012o_RetencaoImposto/bb012o_retencaoimposto';
+import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
+import { CreateRetencao, DeleteRetencao } from '../../../services/contas/bb012o_RetencaoImposto/bb012o_retencaoimposto';
 // Import de types
-import type { ContaById, Retencao_Impostos, Csicp_bb012o } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, NavRetencaoImpostosList } from '../../../types/crm/contas/bb012_contabyid';
+import type { RetencaoImpostoCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb012o_retencao';
 //Import de componentes
 import cs_InputPercentual from '../../../submodules/cs_components/src/components/campos/cs_InputPercentual.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
@@ -203,17 +204,17 @@ const showSnackbar = (message: string, color: string) => {
 const fetchData = async (id: string) => {
     loading.value = true;
     try {
-        const data: ContaById = await GetContaById(tenant, id);
-        items.value = data.Retencao_Impostos.map((item: Retencao_Impostos) => ({
-            ID: item.csicp_bb012o.ID,
-            BB012_ID: item.csicp_bb012o.BB012_ID,
-            Imposto: item.csicp_aa037_Imp.Label,
-            Retem: item.csicp_bb012o.BB012o_Retem,
-            Percentual: `${(item.csicp_bb012o.BB012o_Percentual / 100).toFixed(2)}%`
+        const res: ContaById = await GetContaById(tenant, id);
+        items.value = res.Data.NavRetencaoImpostosList.map((item: NavRetencaoImpostosList) => ({
+            ID: item.Id,
+            BB012_ID: item.Bb012Id,
+            //CAMPO ERRADO, NECESSARIO ADICIONAR A AA037 NA LISTA DE RETENCAO DE IMPOSTOS
+            Imposto: item.Bb012oCodigo.toString(),
+            Retem: item.Bb012oRetem,
+            Percentual: `${item.Bb012oPercentual.toFixed(2)}%`
         }));
 
-        // Solução temporária para sempre ter o ID da BB012 preenchido para usar nas APIs.
-        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+        var_bb012_Id.value = res.Data.Id;
     } catch (error) {
         showSnackbar('Erro ao buscar conta.', 'error');
     } finally {
@@ -238,13 +239,14 @@ const openEditDialog = async (item: Item, index: number) => {
     dialog.value = true;
     itemToEdit.value = item;
     try {
-        const data: ContaById = await GetContaById(tenant, props.id);
+        const res: ContaById = await GetContaById(tenant, props.id);
+        const data = res.Data;
 
-        var_Id.value = data.Retencao_Impostos[index].csicp_bb012o.ID;
-        var_bb012_Id.value = data.Retencao_Impostos[index].csicp_bb012o.BB012_ID;
-        var_Imposto.value = data.Retencao_Impostos[index].csicp_bb012o.bb012o_Imposto_ID;
-        var_Retem.value = data.Retencao_Impostos[index].csicp_bb012o.BB012o_Retem;
-        var_Percentual.value = data.Retencao_Impostos[index].csicp_bb012o.BB012o_Percentual;
+        var_Id.value = data.NavRetencaoImpostosList[index].Id;
+        var_bb012_Id.value = data.NavRetencaoImpostosList[index].Bb012Id;
+        var_Imposto.value = data.NavRetencaoImpostosList[index].Bb012oImpostoId;
+        var_Retem.value = data.NavRetencaoImpostosList[index].Bb012oRetem;
+        var_Percentual.value = data.NavRetencaoImpostosList[index].Bb012oPercentual;
     } catch (error) {
         showSnackbar('Erro ao buscar dados da retenção de imposto', 'error');
     }
@@ -253,16 +255,15 @@ const openEditDialog = async (item: Item, index: number) => {
 const CreateOrUpdateImposto = async () => {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb012o = {
-                ID: var_Id.value ? var_Id.value : '',
-                BB012_ID: var_bb012_Id.value,
-                BB012o_Codigo: 0,
-                BB012o_Retem: var_Retem.value,
-                BB012o_Percentual: var_Percentual.value,
-                bb012o_Imposto_ID: var_Imposto.value
+            const data: RetencaoImpostoCreate = {
+                Bb012Id: var_bb012_Id.value,
+                Bb012oCodigo: 0,
+                Bb012oRetem: var_Retem.value,
+                Bb012oPercentual: var_Percentual.value,
+                Bb012oImpostoId: var_Imposto.value
             };
 
-            const response = await SaveRetencao(tenant, data);
+            const response = await CreateRetencao(tenant, data);
 
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Retenção de imposto salva com sucesso', 'success');

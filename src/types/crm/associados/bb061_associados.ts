@@ -1,116 +1,974 @@
 export interface AssociadosCompleto {
-    csicp_bb061: Csicp_bb061;
-    csicp_bb012: Csicp_bb012;
-    csicp_bb061_tp: Csicp_bb061_tp;
-    csicp_bb060: Csicp_bb060;
-    csicp_bb01208: Csicp_bb01208;
-    csicp_bb035: Csicp_bb035;
+    Success: boolean;
+    Message: string;
+    Data: Data;
 }
 
-export interface Csicp_bb061 {
-    bb061_Id: number;
-    bb060_ConvenioID: number;
-    bb061_tipoAssID: number;
-    bb012_ContaId: string;
-    bb061_DependenteID: string;
-    bb061_Valor: number;
-    bb061_IsActive: boolean;
+export interface Data {
+    List: List[];
+    CurrentPage: number;
+    TotalPage: number;
+    PageSize: number;
+    TotalCount: number;
+    HasPrevius: boolean;
+    HasNext: boolean;
 }
 
-export interface Csicp_bb012 {
-    ID: string;
-    BB012_Codigo: number;
-    BB012_Nome_Cliente: string;
-    BB012_Nome_Fantasia: string;
-    BB012_Data_Aniversario: string;
-    BB012_Data_Cadastro: string;
-    BB012_Telefone: string;
-    BB012_FaxCelular: string;
-    BB012_Home_Page: string;
-    BB012_Email: string;
-    BB012_Data_Entrada_Sit: string;
-    BB012_Data_Saida_Sit: string;
-    BB012_Descricao: string;
-    BB012_Is_Active: boolean;
-    BB012_Tipo_Conta_ID: number;
-    BB012_Grupoconta_ID: number;
-    BB012_ClasseConta_ID: number;
-    BB012_StatusConta_ID: number;
-    BB012_Sit_Conta_ID: number;
-    BB012_ModRelacao_ID: number;
-    BB012_Sequence: number;
-    bb012_dUltAlteracao: string;
-    bb012_EstabCadID: string;
-    bb012_KeyAcess: string;
-    bb012_ID_Indicador: string;
-    bb012_CountAppMCon: number;
-    bb012_OriCadastroID: number;
+export interface List {
+    Bb061Id: number;
+    Bb060Convenioid: number;
+    Bb061Tipoassid: number;
+    Bb012Contaid: string;
+    Bb061Dependenteid: string;
+    Bb061Valor: number;
+    Bb061Isactive: boolean;
+    NavBb060Convenio: NavBb060Convenio;
+    NavBb061Tipoass: NavBb061Tipoass;
 }
 
-export interface Csicp_bb061_tp {
+export interface NavBb060Convenio {
+    TenantId: number;
+    Bb060Convenioid: number;
+    Bb060Codigo: string;
+    Bb060Descricao: string;
+    Bb060Vbase: number;
+    Bb060Ccustoid: string;
+    Bb060Usuarioproprieid: string;
+    Bb060Agcobradorid: string;
+    Bb060Responsavelid: string;
+    Bb060Condicaoid: string;
+    Bb060Tipocobrancaid: string;
+    Bb060Usuarioinc: string;
+    Bb060Usuarioalt: string;
+    Bb060Dthrinc: string;
+    Bb060Dthralt: string;
+    Bb060Especieid: string;
+    Bb060FpagtoId: string;
+    Bb060Isactive: boolean;
+    Bb060Convmasterid: number;
+    NavBb060Agcobrador: NavBb060Agcobrador;
+    NavBb060Ccusto: NavBb060Ccusto;
+    NavBb060Condicao: NavBb060Condicao;
+    NavBb060Convmaster: NavBb060Convmaster;
+    NavBb060Responsavel: NavBb060Responsavel;
+    NavBb060Tipocobranca: NavBb060Tipocobranca;
+    NavFormaPagamento: NavFormaPagamento;
+    NavUsuarioProprietario: NavUsuarioProprietario;
+}
+
+export interface NavBb060Agcobrador {
+    TenantId: number;
+    Id: string;
+    Bb006Filial: number;
+    Bb006Codgbanco: number;
+    Bb006Banco: string;
+    Bb006Nomereduzido: string;
+    Bb006Nobanco: number;
+    Bb006Agencia: number;
+    Bb006AgenciaDv: string;
+    Bb006Noconta: number;
+    Bb006Contadv: string;
+    Bb006Dvagenciacc: string;
+    Bb006Endereco: string;
+    Bairroid: string;
+    Cidadeid: string;
+    Bb006Telefone: string;
+    Bb006Fax: string;
+    Bb006Email: string;
+    Bb006Homepage: string;
+    Bb006Contato: string;
+    Bb006Diasretencao: number;
+    Bb006Diasretencaodesc: number;
+    Bb006Saldoatual: number;
+    Bb006Txcobsimples: number;
+    Bb006Txdesconto: number;
+    Bb006Contacontabil: string;
+    Bb006Codghistorico: number;
+    Bb006Limitecredito: number;
+    Bb006Msgboleto: string;
+    Bb006Codempresabanco: string;
+    Bb006Nroseqremessa: number;
+    Bb006Perccomissao: number;
+    Bb006Movtatesouraria: number;
+    Bb006Nomeagencia: string;
+    Bb006Classificacao: number;
+    Bb006Codgeracaocrec: number;
+    Empresaid: string;
+    Bb006Tipocobrancaid: string;
+    Ufid: string;
+    Bb006Isactive: boolean;
+    Bb006BancoId: number;
+    Bb006CodcobradorId: string;
+    Bb006ApiId: number;
+    NavBairro: NavBairro;
+    NavBb006Tipocobranca: NavBb006Tipocobranca;
+}
+
+export interface NavBairro {
+    TenantId: number;
+    Id: string;
+    Bb013Codigo: number;
+    Bb013Bairro: string;
+    Bb013Codgcidade: string;
+}
+
+export interface NavBb006Tipocobranca {
+    TenantId: number;
+    Id: string;
+    Bb009Filial: number;
+    Bb009Codigo: number;
+    Bb009Tipocobranca: string;
+    Empresaid: string;
+    Bb009Isactive: boolean;
+}
+
+export interface NavBb060Ccusto {
+    TenantId: number;
+    Id: string;
+    Bb005Filial: number;
+    Bb005Codigo: number;
+    Bb005Nomeccusto: string;
+    Bb005Colunaimpressao: number;
+    Empresaid: string;
+    Bb005Isactive: boolean;
+}
+
+export interface NavBb060Condicao {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb008Filial: number;
+    Bb008Codigo: number;
+    Bb008CondicaoPagto: string;
+    Bb008Tipo: number;
+    Bb008Condicao: string;
+    Bb008Codformapagto: number;
+    Bb008Vlrmaxformapagto: number;
+    Bb008Vlrminformapagto: number;
+    Bb008Entliquidada: number;
+    Bb008Parcliquidadas: number;
+    Bb008AprovaVenda: number;
+    Bb008PercAcrescimo: number;
+    Bb008PercDesconto: number;
+    Bb008Indprecovenda: number;
+    Bb008Percentrada: number;
+    Bb008Valoracrescimo: number;
+    Bb008Fatorjuros: number;
+    Bb008Isactive: boolean;
+    Bb008Tipoid: number;
+    Bb008Qtdparcela: number;
+}
+
+export interface NavBb060Convmaster {
+    TenantId: number;
+    Bb067Id: number;
+    Bb067Descricao: string;
+    Bb067Codigo: string;
+}
+
+export interface NavBb060Responsavel {
+    TenantId: number;
+    Id: string;
+    Bb007Filial: number;
+    Bb007Codigo: number;
+    Bb007Responsavel: string;
+    Bb007Nomereduzido: string;
+    Bb007Classificacao: number;
+    Bb007UsuarioId: string;
+    Bb007Codgsupervisor: string;
+    Bb007Codggerente: string;
+    Bb007Geracpagar: number;
+    Bb007Coms1: number;
+    Bb007Coms2: number;
+    Bb007Coms3: number;
+    Bb007Coms4: number;
+    Bb007Coms5: number;
+    Bb007Basecomicms: number;
+    Bb007Basecomicmsret: number;
+    Bb007Basecomipi: number;
+    Bb007Basecomfrete: number;
+    Bb007Basecomacrfinan: number;
+    Bb007Basecomdespesas: number;
+    Bb007Basecomseguro: number;
+    Bb007Maxdescvenda: number;
+    Bb007Codgccusto: number;
+    Bb007Codgalmox: number;
+    Bb007Codgatividade: number;
+    Bb007Senha: string;
+    Bb007Nomebanco: string;
+    Bb007Agencia: string;
+    Bb007Conta: string;
+    Bb007Coreregistro: string;
+    Bb007Vinculocliente: number;
+    Bb007Observacao: string;
+    Bb007Nrohandheld: number;
+    Bb007Userhandheld: string;
+    Bb007Senhahandheld: string;
+    Bb007Handheldsuperv: number;
+    Bb007Imphandheld: string;
+    Bb007Nomeusuario: string;
+    Bb031Funcaoid: string;
+    Bb032Cargoid: string;
+    Bb007Dtadmissao: string;
+    Bb007Dtdemissao: string;
+    Bb007Codgregiao: string;
+    Bb007Faixaautorizacao: string;
+    Bb007Ccustoid: string;
+    Bb007Almoxid: string;
+    Empresaid: string;
+    Bb007Isactive: boolean;
+    Bb007Contafornid: string;
+    Bb007Cpf: string;
+    NavBb007Ccusto: NavBb007Ccusto;
+    NavBb007CodggerenteNavigation: NavBb007CodggerenteNavigation;
+    NavBb007CodgsupervisorNavigation: NavBb007CodgsupervisorNavigation;
+    NavBb031Funcao: NavBb031Funcao;
+    NavBb032Cargo: NavBb032Cargo;
+}
+
+export interface NavBb007Ccusto {
+    TenantId: number;
+    Id: string;
+    Bb005Filial: number;
+    Bb005Codigo: number;
+    Bb005Nomeccusto: string;
+    Bb005Colunaimpressao: number;
+    Empresaid: string;
+    Bb005Isactive: boolean;
+}
+
+export interface NavBb007CodggerenteNavigation {
+    TenantId: number;
+    Id: string;
+    Bb007Filial: number;
+    Bb007Codigo: number;
+    Bb007Responsavel: string;
+    Bb007Nomereduzido: string;
+    Bb007Classificacao: number;
+    Bb007UsuarioId: string;
+    Bb007Codgsupervisor: string;
+    Bb007Codggerente: string;
+    Bb007Geracpagar: number;
+    Bb007Coms1: number;
+    Bb007Coms2: number;
+    Bb007Coms3: number;
+    Bb007Coms4: number;
+    Bb007Coms5: number;
+    Bb007Basecomicms: number;
+    Bb007Basecomicmsret: number;
+    Bb007Basecomipi: number;
+    Bb007Basecomfrete: number;
+    Bb007Basecomacrfinan: number;
+    Bb007Basecomdespesas: number;
+    Bb007Basecomseguro: number;
+    Bb007Maxdescvenda: number;
+    Bb007Codgccusto: number;
+    Bb007Codgalmox: number;
+    Bb007Codgatividade: number;
+    Bb007Senha: string;
+    Bb007Nomebanco: string;
+    Bb007Agencia: string;
+    Bb007Conta: string;
+    Bb007Coreregistro: string;
+    Bb007Vinculocliente: number;
+    Bb007Observacao: string;
+    Bb007Nrohandheld: number;
+    Bb007Userhandheld: string;
+    Bb007Senhahandheld: string;
+    Bb007Handheldsuperv: number;
+    Bb007Imphandheld: string;
+    Bb007Nomeusuario: string;
+    Bb031Funcaoid: string;
+    Bb032Cargoid: string;
+    Bb007Dtadmissao: string;
+    Bb007Dtdemissao: string;
+    Bb007Codgregiao: string;
+    Bb007Faixaautorizacao: string;
+    Bb007Ccustoid: string;
+    Bb007Almoxid: string;
+    Empresaid: string;
+    Bb007Isactive: boolean;
+    Bb007Contafornid: string;
+    Bb007Cpf: string;
+    Bb007Ccusto: Bb007Ccusto;
+    Bb007CodggerenteNavigation: string;
+    Bb007CodgsupervisorNavigation: string;
+    Bb031Funcao: Bb031Funcao;
+    Bb032Cargo: Bb032Cargo;
+}
+
+export interface Bb007Ccusto {
+    TenantId: number;
+    Id: string;
+    Bb005Filial: number;
+    Bb005Codigo: number;
+    Bb005Nomeccusto: string;
+    Bb005Colunaimpressao: number;
+    Empresaid: string;
+    Bb005Isactive: boolean;
+}
+
+export interface Bb031Funcao {
+    TenantId: number;
+    Id: string;
+    Bb031Codgfuncaoid: number;
+    Bb031Descricao: string;
+    Bb031Cbo: string;
+    Bb031Isactive: boolean;
+}
+
+export interface Bb032Cargo {
+    TenantId: number;
+    Id: string;
+    Bb032Codgcargoid: number;
+    Bb032Cargo: string;
+    Bb032Isactive: boolean;
+}
+
+export interface NavBb007CodgsupervisorNavigation {
+    TenantId: number;
+    Id: string;
+    Bb007Filial: number;
+    Bb007Codigo: number;
+    Bb007Responsavel: string;
+    Bb007Nomereduzido: string;
+    Bb007Classificacao: number;
+    Bb007UsuarioId: string;
+    Bb007Codgsupervisor: string;
+    Bb007Codggerente: string;
+    Bb007Geracpagar: number;
+    Bb007Coms1: number;
+    Bb007Coms2: number;
+    Bb007Coms3: number;
+    Bb007Coms4: number;
+    Bb007Coms5: number;
+    Bb007Basecomicms: number;
+    Bb007Basecomicmsret: number;
+    Bb007Basecomipi: number;
+    Bb007Basecomfrete: number;
+    Bb007Basecomacrfinan: number;
+    Bb007Basecomdespesas: number;
+    Bb007Basecomseguro: number;
+    Bb007Maxdescvenda: number;
+    Bb007Codgccusto: number;
+    Bb007Codgalmox: number;
+    Bb007Codgatividade: number;
+    Bb007Senha: string;
+    Bb007Nomebanco: string;
+    Bb007Agencia: string;
+    Bb007Conta: string;
+    Bb007Coreregistro: string;
+    Bb007Vinculocliente: number;
+    Bb007Observacao: string;
+    Bb007Nrohandheld: number;
+    Bb007Userhandheld: string;
+    Bb007Senhahandheld: string;
+    Bb007Handheldsuperv: number;
+    Bb007Imphandheld: string;
+    Bb007Nomeusuario: string;
+    Bb031Funcaoid: string;
+    Bb032Cargoid: string;
+    Bb007Dtadmissao: string;
+    Bb007Dtdemissao: string;
+    Bb007Codgregiao: string;
+    Bb007Faixaautorizacao: string;
+    Bb007Ccustoid: string;
+    Bb007Almoxid: string;
+    Empresaid: string;
+    Bb007Isactive: boolean;
+    Bb007Contafornid: string;
+    Bb007Cpf: string;
+    Bb007Ccusto: Bb007Ccusto2;
+    Bb007CodggerenteNavigation: string;
+    Bb007CodgsupervisorNavigation: string;
+    Bb031Funcao: Bb031Funcao2;
+    Bb032Cargo: Bb032Cargo2;
+}
+
+export interface Bb007Ccusto2 {
+    TenantId: number;
+    Id: string;
+    Bb005Filial: number;
+    Bb005Codigo: number;
+    Bb005Nomeccusto: string;
+    Bb005Colunaimpressao: number;
+    Empresaid: string;
+    Bb005Isactive: boolean;
+}
+
+export interface Bb031Funcao2 {
+    TenantId: number;
+    Id: string;
+    Bb031Codgfuncaoid: number;
+    Bb031Descricao: string;
+    Bb031Cbo: string;
+    Bb031Isactive: boolean;
+}
+
+export interface Bb032Cargo2 {
+    TenantId: number;
+    Id: string;
+    Bb032Codgcargoid: number;
+    Bb032Cargo: string;
+    Bb032Isactive: boolean;
+}
+
+export interface NavBb031Funcao {
+    TenantId: number;
+    Id: string;
+    Bb031Codgfuncaoid: number;
+    Bb031Descricao: string;
+    Bb031Cbo: string;
+    Bb031Isactive: boolean;
+}
+
+export interface NavBb032Cargo {
+    TenantId: number;
+    Id: string;
+    Bb032Codgcargoid: number;
+    Bb032Cargo: string;
+    Bb032Isactive: boolean;
+}
+
+export interface NavBb060Tipocobranca {
+    TenantId: number;
+    Id: string;
+    Bb009Filial: number;
+    Bb009Codigo: number;
+    Bb009Tipocobranca: string;
+    Empresaid: string;
+    Bb009Isactive: boolean;
+}
+
+export interface NavFormaPagamento {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb026Filial: number;
+    Bb026Codigo: number;
+    Bb026Formapagamento: string;
+    Bb026Dadoschequesn: number;
+    Bb026Dadoscartaosn: number;
+    Bb026Vinccupomfiscal: number;
+    Bb026Classificacao: number;
+    Bb026Crplanocontaid: string;
+    Bb026Dbplanocontaid2: string;
+    Bb026NroAutenticacoes: number;
+    Bb026ValorMinimo: number;
+    Bb026ValorMaximo: number;
+    Bb026TrocoMaximo: number;
+    Bb026Pontosangria: number;
+    Bb026Tipo: number;
+    Bb026Parcelapordepto: boolean;
+    Bb026Condpagtofixoid: string;
+    Bb026Administradoraid: string;
+    Bb026UtilizaPinpad: boolean;
+    Bb026Consultacheque: boolean;
+    Bb026Impressaocheque: boolean;
+    Bb026Chequebompara: boolean;
+    Bb026Solicitaemitente: boolean;
+    Bb026Solicitaqtd: boolean;
+    Bb026Solicitacondpagto: boolean;
+    Bb026Aceitapagto: boolean;
+    Bb026Aceitarecebimento: boolean;
+    Bb026Permitetroco: boolean;
+    Bb026Sangriaautomatica: boolean;
+    Bb026Naoabregaveta: boolean;
+    Bb026TipovinculoId: number;
+    Bb026Isactive: boolean;
+    Bb026ClasseId: number;
+    Bb026EspecieId: string;
+    Bb026Meiopagtoimpfiscal: string;
+    Bb026Tipoespecie: number;
+    Bb026Pcomissaovend: number;
+    Bb026Aceitavpresente: boolean;
+    Bb026Capturarecebpvpdv: boolean;
+    Bb026Islibentregaliq: boolean;
+    Bb026Isaplicaaprovcond: boolean;
+    Bb026Isagrupa: boolean;
+    NavBb026Administradora: NavBb026Administradora;
+    NavBb026Condpagtofixo: NavBb026Condpagtofixo;
+}
+
+export interface NavBb026Administradora {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb019Filial: number;
+    Bb019Codigo: number;
+    Bb019Administradora: string;
+    Bb019TaxaDeCobranca: number;
+    Bb019Venctopadrao: number;
+    Bb019Contaid: string;
+    Bb019Usafatoracresc: number;
+    Bb019Finanproprio: number;
+    Bb019Tac: number;
+    Bb019Email: string;
+    Bb019Homepage: string;
+    Bb019TipofinancId: number;
+    Bb019Isactive: boolean;
+    Bb019Dialimitevenctopadrao: number;
+    Bb019Codigocredenciadora: string;
+    Bb019LogoAdm: string;
+    Bb019Filename: string;
+    Bb019Path: string;
+}
+
+export interface NavBb026Condpagtofixo {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb008Filial: number;
+    Bb008Codigo: number;
+    Bb008CondicaoPagto: string;
+    Bb008Tipo: number;
+    Bb008Condicao: string;
+    Bb008Codformapagto: number;
+    Bb008Vlrmaxformapagto: number;
+    Bb008Vlrminformapagto: number;
+    Bb008Entliquidada: number;
+    Bb008Parcliquidadas: number;
+    Bb008AprovaVenda: number;
+    Bb008PercAcrescimo: number;
+    Bb008PercDesconto: number;
+    Bb008Indprecovenda: number;
+    Bb008Percentrada: number;
+    Bb008Valoracrescimo: number;
+    Bb008Fatorjuros: number;
+    Bb008Isactive: boolean;
+    Bb008Tipoid: number;
+    Bb008Qtdparcela: number;
+}
+
+export interface NavUsuarioProprietario {
+    TenantId: number;
+    Id: string;
+    Sy001Usuario: string;
+    Sy001Nome: string;
+    Sy001Senha: string;
+    Sy001Bloqueado: boolean;
+    Sy001DataValidade: string;
+    Sy001Autalterarsenha: number;
+    NavSY001_AlterarSenha: NavSY001_AlterarSenha;
+    Sy001Altsenhapxlogin: number;
+    NavSy001Altsenhapxlogin: NavSy001Altsenhapxlogin;
+    Sy001ExpiraSenha: number;
+    NavSy001ExpiraSenha: NavSy001ExpiraSenha;
+    Sy001Senhexpaposndias: number;
+    Sy001Dtexpiracaologin: string;
+    Sy001Deptolotado: string;
+    Sy001Cargo: string;
+    Sy001Email: string;
+    Sy001Imagem: string;
+    Sy001Dataultimoacesso: string;
+    Userid: number;
+    Sy001IdiomaId: number;
+    NavSy001IdiomaId: NavSy001IdiomaId;
+    Sy001Senhacs: string;
+    Sy001Celular: string;
+    OsusrE9aCsicpSy001Imgs: OsusrE9aCsicpSy001Imgs[];
+}
+
+export interface NavSY001_AlterarSenha {
+    Id: number;
+    Label: string;
+    Tiporegistro: number;
+    Order: number;
+}
+
+export interface NavSy001Altsenhapxlogin {
+    Id: number;
+    Label: string;
+    Tiporegistro: number;
+    Order: number;
+}
+
+export interface NavSy001ExpiraSenha {
+    Id: number;
+    Label: string;
+    Tiporegistro: number;
+    Order: number;
+}
+
+export interface NavSy001IdiomaId {
     Id: number;
     Label: string;
     Order: number;
-    Is_Active: boolean;
+    IsActive: boolean;
 }
 
-export interface Csicp_bb060 {
-    bb060_ConvenioId: number;
-    bb060_Codigo: string;
-    bb060_Descricao: string;
-    bb060_vBase: number;
-    bb060_CCustoID: string;
-    bb060_UsuarioProprieID: string;
-    bb060_AgCobradorID: string;
-    bb060_ResponsavelID: string;
-    bb060_CondicaoID: string;
-    bb060_TipoCobrancaID: string;
-    bb060_UsuarioInc: string;
-    bb060_UsuarioAlt: string;
-    bb060_dthrInc: string;
-    bb060_dthrAlt: string;
-    bb060_EspecieID: string;
-    bb060_FPagto_ID: string;
-    bb060_IsActive: boolean;
-    bb060_ConvMasterID: number;
-}
-
-export interface Csicp_bb01208 {
+export interface OsusrE9aCsicpSy001Imgs {
+    TenantId: number;
     Id: string;
-    BB012_ID: string;
-    BB012_ContatoID: string;
-    BB036_CandidatoID: string;
-    BB043_CampanhaId: string;
-    BB042_PotencialID: string;
-    BB040_AtividadeID: string;
-    BB041_CasoID: string;
-    BB01208_Is_Active: boolean;
-    ConcorrenteID: string;
-    BB01208_GrauParent_ID: number;
+    UsuarioId: string;
+    Nome: string;
+    Tipo: string;
+    Ispadrao: boolean;
+    Path: string;
 }
 
-export interface Csicp_bb035 {
+export interface NavBb061Tipoass {
+    Id: number;
+    Label: string;
+    Order: number;
+    IsActive: boolean;
+    OsusrE9aCsicpBb061s: OsusrE9aCsicpBb061s[];
+}
+
+export interface OsusrE9aCsicpBb061s {
+    TenantId: number;
+    Bb061Id: number;
+    Bb060Convenioid: number;
+    Bb061Tipoassid: number;
+    Bb012Contaid: string;
+    Bb061Dependenteid: string;
+    Bb061Valor: number;
+    Bb061Isactive: boolean;
+    Bb060Convenio: Bb060Convenio;
+    Bb061Tipoass: string;
+}
+
+export interface Bb060Convenio {
+    TenantId: number;
+    Bb060Convenioid: number;
+    Bb060Codigo: string;
+    Bb060Descricao: string;
+    Bb060Vbase: number;
+    Bb060Ccustoid: string;
+    Bb060Usuarioproprieid: string;
+    Bb060Agcobradorid: string;
+    Bb060Responsavelid: string;
+    Bb060Condicaoid: string;
+    Bb060Tipocobrancaid: string;
+    Bb060Usuarioinc: string;
+    Bb060Usuarioalt: string;
+    Bb060Dthrinc: string;
+    Bb060Dthralt: string;
+    Bb060Especieid: string;
+    Bb060FpagtoId: string;
+    Bb060Isactive: boolean;
+    Bb060Convmasterid: number;
+    Bb060Agcobrador: Bb060Agcobrador;
+    Bb060Ccusto: Bb060Ccusto;
+    FormaPagamento: FormaPagamento;
+    Bb060Condicao: Bb060Condicao;
+    Bb060Convmaster: Bb060Convmaster;
+    Bb060Responsavel: Bb060Responsavel;
+    Bb060Tipocobranca: Bb060Tipocobranca;
+}
+
+export interface Bb060Agcobrador {
+    TenantId: number;
     Id: string;
-    BB035_PrimeiroNome: string;
-    BB035_Sobrenome: string;
-    BB035_EMail: string;
-    BB035_Titulo: string;
-    BB035_Departamento: string;
-    BB035_Data_Aniversario: string;
-    BB035_Telefone: string;
-    BB035_OutroTelefone: string;
-    BB035_Celular: string;
-    BB035_Fax: string;
-    BB035_TelefoneResidencia: string;
-    BB035_Descricao: string;
-    BB035_Assistente: string;
-    BB035_TelefoneAssist: string;
-    BB035_EMailSecundario: string;
-    BB035_CPF: string;
-    BB035_RG: number;
-    BB035_Orgao_Exped_RG: string;
-    BB035_Data_Emissao_RG: string;
-    BB035_Is_Active: boolean;
-    BB035_Tratamento_ID: number;
-    BB035_OrigemContato_ID: number;
+    Bb006Filial: number;
+    Bb006Codgbanco: number;
+    Bb006Banco: string;
+    Bb006Nomereduzido: string;
+    Bb006Nobanco: number;
+    Bb006Agencia: number;
+    Bb006AgenciaDv: string;
+    Bb006Noconta: number;
+    Bb006Contadv: string;
+    Bb006Dvagenciacc: string;
+    Bb006Endereco: string;
+    Bairroid: string;
+    Cidadeid: string;
+    Bb006Telefone: string;
+    Bb006Fax: string;
+    Bb006Email: string;
+    Bb006Homepage: string;
+    Bb006Contato: string;
+    Bb006Diasretencao: number;
+    Bb006Diasretencaodesc: number;
+    Bb006Saldoatual: number;
+    Bb006Txcobsimples: number;
+    Bb006Txdesconto: number;
+    Bb006Contacontabil: string;
+    Bb006Codghistorico: number;
+    Bb006Limitecredito: number;
+    Bb006Msgboleto: string;
+    Bb006Codempresabanco: string;
+    Bb006Nroseqremessa: number;
+    Bb006Perccomissao: number;
+    Bb006Movtatesouraria: number;
+    Bb006Nomeagencia: string;
+    Bb006Classificacao: number;
+    Bb006Codgeracaocrec: number;
+    Empresaid: string;
+    Bb006Tipocobrancaid: string;
+    Ufid: string;
+    Bb006Isactive: boolean;
+    Bb006BancoId: number;
+    Bb006CodcobradorId: string;
+    Bb006ApiId: number;
+    Bairro: Bairro;
+    Bb006Tipocobranca: Bb006Tipocobranca;
+}
+
+export interface Bairro {
+    TenantId: number;
+    Id: string;
+    Bb013Codigo: number;
+    Bb013Bairro: string;
+    Bb013Codgcidade: string;
+}
+
+export interface Bb006Tipocobranca {
+    TenantId: number;
+    Id: string;
+    Bb009Filial: number;
+    Bb009Codigo: number;
+    Bb009Tipocobranca: string;
+    Empresaid: string;
+    Bb009Isactive: boolean;
+}
+
+export interface Bb060Ccusto {
+    TenantId: number;
+    Id: string;
+    Bb005Filial: number;
+    Bb005Codigo: number;
+    Bb005Nomeccusto: string;
+    Bb005Colunaimpressao: number;
+    Empresaid: string;
+    Bb005Isactive: boolean;
+}
+
+export interface FormaPagamento {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb026Filial: number;
+    Bb026Codigo: number;
+    Bb026Formapagamento: string;
+    Bb026Dadoschequesn: number;
+    Bb026Dadoscartaosn: number;
+    Bb026Vinccupomfiscal: number;
+    Bb026Classificacao: number;
+    Bb026Crplanocontaid: string;
+    Bb026Dbplanocontaid2: string;
+    Bb026NroAutenticacoes: number;
+    Bb026ValorMinimo: number;
+    Bb026ValorMaximo: number;
+    Bb026TrocoMaximo: number;
+    Bb026Pontosangria: number;
+    Bb026Tipo: number;
+    Bb026Parcelapordepto: boolean;
+    Bb026Condpagtofixoid: string;
+    Bb026Administradoraid: string;
+    Bb026UtilizaPinpad: boolean;
+    Bb026Consultacheque: boolean;
+    Bb026Impressaocheque: boolean;
+    Bb026Chequebompara: boolean;
+    Bb026Solicitaemitente: boolean;
+    Bb026Solicitaqtd: boolean;
+    Bb026Solicitacondpagto: boolean;
+    Bb026Aceitapagto: boolean;
+    Bb026Aceitarecebimento: boolean;
+    Bb026Permitetroco: boolean;
+    Bb026Sangriaautomatica: boolean;
+    Bb026Naoabregaveta: boolean;
+    Bb026TipovinculoId: number;
+    Bb026Isactive: boolean;
+    Bb026ClasseId: number;
+    Bb026EspecieId: string;
+    Bb026Meiopagtoimpfiscal: string;
+    Bb026Tipoespecie: number;
+    Bb026Pcomissaovend: number;
+    Bb026Aceitavpresente: boolean;
+    Bb026Capturarecebpvpdv: boolean;
+    Bb026Islibentregaliq: boolean;
+    Bb026Isaplicaaprovcond: boolean;
+    Bb026Isagrupa: boolean;
+    Bb026Administradora: Bb026Administradora;
+    Bb026Condpagtofixo: Bb026Condpagtofixo;
+}
+
+export interface Bb026Administradora {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb019Filial: number;
+    Bb019Codigo: number;
+    Bb019Administradora: string;
+    Bb019TaxaDeCobranca: number;
+    Bb019Venctopadrao: number;
+    Bb019Contaid: string;
+    Bb019Usafatoracresc: number;
+    Bb019Finanproprio: number;
+    Bb019Tac: number;
+    Bb019Email: string;
+    Bb019Homepage: string;
+    Bb019TipofinancId: number;
+    Bb019Isactive: boolean;
+    Bb019Dialimitevenctopadrao: number;
+    Bb019Codigocredenciadora: string;
+    Bb019LogoAdm: string;
+    Bb019Filename: string;
+    Bb019Path: string;
+}
+
+export interface Bb026Condpagtofixo {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb008Filial: number;
+    Bb008Codigo: number;
+    Bb008CondicaoPagto: string;
+    Bb008Tipo: number;
+    Bb008Condicao: string;
+    Bb008Codformapagto: number;
+    Bb008Vlrmaxformapagto: number;
+    Bb008Vlrminformapagto: number;
+    Bb008Entliquidada: number;
+    Bb008Parcliquidadas: number;
+    Bb008AprovaVenda: number;
+    Bb008PercAcrescimo: number;
+    Bb008PercDesconto: number;
+    Bb008Indprecovenda: number;
+    Bb008Percentrada: number;
+    Bb008Valoracrescimo: number;
+    Bb008Fatorjuros: number;
+    Bb008Isactive: boolean;
+    Bb008Tipoid: number;
+    Bb008Qtdparcela: number;
+}
+
+export interface Bb060Condicao {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb008Filial: number;
+    Bb008Codigo: number;
+    Bb008CondicaoPagto: string;
+    Bb008Tipo: number;
+    Bb008Condicao: string;
+    Bb008Codformapagto: number;
+    Bb008Vlrmaxformapagto: number;
+    Bb008Vlrminformapagto: number;
+    Bb008Entliquidada: number;
+    Bb008Parcliquidadas: number;
+    Bb008AprovaVenda: number;
+    Bb008PercAcrescimo: number;
+    Bb008PercDesconto: number;
+    Bb008Indprecovenda: number;
+    Bb008Percentrada: number;
+    Bb008Valoracrescimo: number;
+    Bb008Fatorjuros: number;
+    Bb008Isactive: boolean;
+    Bb008Tipoid: number;
+    Bb008Qtdparcela: number;
+}
+
+export interface Bb060Convmaster {
+    TenantId: number;
+    Bb067Id: number;
+    Bb067Descricao: string;
+    Bb067Codigo: string;
+}
+
+export interface Bb060Responsavel {
+    TenantId: number;
+    Id: string;
+    Bb007Filial: number;
+    Bb007Codigo: number;
+    Bb007Responsavel: string;
+    Bb007Nomereduzido: string;
+    Bb007Classificacao: number;
+    Bb007UsuarioId: string;
+    Bb007Codgsupervisor: string;
+    Bb007Codggerente: string;
+    Bb007Geracpagar: number;
+    Bb007Coms1: number;
+    Bb007Coms2: number;
+    Bb007Coms3: number;
+    Bb007Coms4: number;
+    Bb007Coms5: number;
+    Bb007Basecomicms: number;
+    Bb007Basecomicmsret: number;
+    Bb007Basecomipi: number;
+    Bb007Basecomfrete: number;
+    Bb007Basecomacrfinan: number;
+    Bb007Basecomdespesas: number;
+    Bb007Basecomseguro: number;
+    Bb007Maxdescvenda: number;
+    Bb007Codgccusto: number;
+    Bb007Codgalmox: number;
+    Bb007Codgatividade: number;
+    Bb007Senha: string;
+    Bb007Nomebanco: string;
+    Bb007Agencia: string;
+    Bb007Conta: string;
+    Bb007Coreregistro: string;
+    Bb007Vinculocliente: number;
+    Bb007Observacao: string;
+    Bb007Nrohandheld: number;
+    Bb007Userhandheld: string;
+    Bb007Senhahandheld: string;
+    Bb007Handheldsuperv: number;
+    Bb007Imphandheld: string;
+    Bb007Nomeusuario: string;
+    Bb031Funcaoid: string;
+    Bb032Cargoid: string;
+    Bb007Dtadmissao: string;
+    Bb007Dtdemissao: string;
+    Bb007Codgregiao: string;
+    Bb007Faixaautorizacao: string;
+    Bb007Ccustoid: string;
+    Bb007Almoxid: string;
+    Empresaid: string;
+    Bb007Isactive: boolean;
+    Bb007Contafornid: string;
+    Bb007Cpf: string;
+    Bb007Ccusto: Bb007Ccusto2;
+    Bb007CodggerenteNavigation: string;
+    Bb007CodgsupervisorNavigation: string;
+    Bb031Funcao: Bb031Funcao2;
+    Bb032Cargo: Bb032Cargo2;
+}
+
+export interface Bb007Ccusto2 {
+    TenantId: number;
+    Id: string;
+    Bb005Filial: number;
+    Bb005Codigo: number;
+    Bb005Nomeccusto: string;
+    Bb005Colunaimpressao: number;
+    Empresaid: string;
+    Bb005Isactive: boolean;
+}
+
+export interface Bb031Funcao2 {
+    TenantId: number;
+    Id: string;
+    Bb031Codgfuncaoid: number;
+    Bb031Descricao: string;
+    Bb031Cbo: string;
+    Bb031Isactive: boolean;
+}
+
+export interface Bb032Cargo2 {
+    TenantId: number;
+    Id: string;
+    Bb032Codgcargoid: number;
+    Bb032Cargo: string;
+    Bb032Isactive: boolean;
+}
+
+export interface Bb060Tipocobranca {
+    TenantId: number;
+    Id: string;
+    Bb009Filial: number;
+    Bb009Codigo: number;
+    Bb009Tipocobranca: string;
+    Empresaid: string;
+    Bb009Isactive: boolean;
+}
+
+export interface AssociadoCreate {
+    Bb060Convenioid: number;
+    Bb061Tipoassid: number;
+    Bb012Contaid: string;
+    Bb061Dependenteid: string;
+    Bb061Valor: number;
 }

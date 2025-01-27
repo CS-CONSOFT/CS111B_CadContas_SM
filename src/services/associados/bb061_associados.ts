@@ -1,31 +1,32 @@
-import { URLBase } from '../configuracoes_axios';
+import { newURLBase } from '../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { AssociadosCompleto, Csicp_bb061 } from '../../types/crm/associados/bb061_associados';
+import type { AssociadosCompleto, AssociadoCreate } from '../../types/crm/associados/bb061_associados';
 
-const GetAssociadosList = async (tenantId: number | undefined, in_bb012_id: string): Promise<AssociadosCompleto[]> => {
-    const url = `${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb061_Get_Associados`;
+function GetAssociadosCompleto(
+    tenantId: number | undefined,
+    active: boolean,
+    pagenumber: number,
+    pagesize: number
+): Promise<AxiosResponse<AssociadosCompleto>> {
+    const url =
+        `${newURLBase}/api/v1/bb011?` +
+        `active=${encodeURIComponent(active)}&` +
+        `pagenumber=${encodeURIComponent(pagenumber)}&` +
+        `pagesize=${encodeURIComponent(pagesize)}`;
 
+    return axios.get<AssociadosCompleto>(url, {
+        headers: {
+            Tenant_ID: tenantId
+        }
+    });
+}
+
+const CreateAssociado = async (tenantId: number | undefined, associado: AssociadoCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response: AxiosResponse<AssociadosCompleto[]> = await axios.get(url, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb061`, associado, {
             headers: {
-                tenant_id: tenantId,
-                in_bb012_id: in_bb012_id
-            }
-        });
-
-        return response.data;
-    } catch (error) {
-        console.error('Erro ao buscar associados:', error);
-        throw error;
-    }
-};
-
-const SaveAssociado = async (tenantId: number | undefined, associado: Csicp_bb061): Promise<AxiosResponse<any>> => {
-    try {
-        const response = await axios.post(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb061_Save`, associado, {
-            headers: {
-                tenant_id: tenantId
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -35,12 +36,11 @@ const SaveAssociado = async (tenantId: number | undefined, associado: Csicp_bb06
     }
 };
 
-const DeleteAssociado = async (tenantId: number | undefined, in_bb061_id: string): Promise<AxiosResponse<any>> => {
+const DeleteAssociado = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb061_Delete`, {
+        const response = await axios.delete(`${newURLBase}/api/v1/bb061/${encodeURIComponent(id)}`, {
             headers: {
-                tenant_id: tenantId,
-                in_bb061_id: in_bb061_id
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -50,12 +50,11 @@ const DeleteAssociado = async (tenantId: number | undefined, in_bb061_id: string
     }
 };
 
-const SoftDeleteAssociado = async (tenantId: number | undefined, in_bb061_id: string): Promise<AxiosResponse<any>> => {
+const SoftDeleteAssociado = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_Tabelas_LIB/rest/CS_Convenio/csicp_bb061_SoftDelete_Convenio`, {
+        const response = await axios.patch(`${newURLBase}/api/v1/bb061/changeActive/${encodeURIComponent(id)}`, null, {
             headers: {
-                tenant_id: tenantId,
-                in_bb061_id: in_bb061_id
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -65,4 +64,4 @@ const SoftDeleteAssociado = async (tenantId: number | undefined, in_bb061_id: st
     }
 };
 
-export { GetAssociadosList, SaveAssociado, DeleteAssociado, SoftDeleteAssociado };
+export { GetAssociadosCompleto, CreateAssociado, DeleteAssociado, SoftDeleteAssociado };

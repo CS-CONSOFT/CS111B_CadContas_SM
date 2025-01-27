@@ -35,8 +35,6 @@
         </v-card>
     </v-card>
 
-
-
     <v-dialog v-model="dialog" max-width="500">
         <v-card>
             <v-card-title class="pa-4 bg-lightprimary">
@@ -85,10 +83,11 @@ import { ref, onMounted } from 'vue';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
-import { GetContaById } from '../../../services/contas/bb012_conta';
-import { SaveNota, DeleteNota } from '../../../services/contas/bb01203_Nota/bb01203_nota';
+import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
+import { CreateNota, DeleteNota } from '../../../services/contas/bb01203_Nota/bb01203_nota';
 // Import de types
-import type { ContaById, Csicp_bb01203, Notas } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, NavNotasList } from '../../../types/crm/contas/bb012_contabyid';
+import { NotasCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb01203_notas';
 //Import de componentes
 import cs_InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
@@ -163,15 +162,14 @@ const fetchData = async (id: string) => {
     loading.value = true;
 
     try {
-        const data: ContaById = await GetContaById(tenant, id);
-        items.value = data.Notas.map((item: Notas) => ({
-            ID: item.csicp_bb01203.Id,
-            BB012_ID: item.csicp_bb01203.BB012_ID,
-            Nota: item.csicp_bb01203.BB012_Nota
+        const res: ContaById = await GetContaById(tenant, id);
+        items.value = res.Data.NavNotasList.map((item: NavNotasList) => ({
+            ID: item.Id,
+            BB012_ID: item.Bb012Id,
+            Nota: item.Bb012Nota
         }));
 
-        //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
-        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+        var_bb012_Id.value = res.Data.Id;
     } catch (error) {
         showSnackbar('Erro ao buscar conta.', 'error');
     } finally {
@@ -195,11 +193,12 @@ const openEditDialog = async (item: Item, index: number) => {
     itemToEdit.value = item;
 
     try {
-        const data: ContaById = await GetContaById(tenant, props.id);
+        const res: ContaById = await GetContaById(tenant, props.id);
+        const data = res.Data;
 
-        var_Id.value = data.Notas[index].csicp_bb01203.Id;
-        var_bb012_Id.value = data.Notas[index].csicp_bb01203.BB012_ID;
-        var_Nota.value = data.Notas[index].csicp_bb01203.BB012_Nota;
+        var_Id.value = data.NavNotasList[index].Id;
+        var_bb012_Id.value = data.NavNotasList[index].Bb012Id;
+        var_Nota.value = data.NavNotasList[index].Bb012Nota;
     } catch (error) {
         showSnackbar('Erro ao buscar dados da nota', 'error');
     }
@@ -208,21 +207,19 @@ const openEditDialog = async (item: Item, index: number) => {
 const CreateOrUpdateNota = async () => {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb01203 = {
-                Id: var_Id.value ? var_Id.value : '',
-                BB012_ID: var_bb012_Id.value,
-                BB012_ContatoID: '',
-                BB012_CandidatoID: '',
-                BB043_CampanhaID: '',
-                BB042_PotencialId: '',
-                BB040_AtividadeID: '',
-                BB041_CasoId: '',
-                BB046_ConcorrenteID: '',
-                BB012_Nota: var_Nota.value,
-                BB01203_Is_Active: true
+            const data: NotasCreate = {
+                Bb012Id: var_bb012_Id.value,
+                Bb012Contatoid: '',
+                Bb012Candidatoid: '',
+                Bb043Campanhaid: '',
+                Bb042Potencialid: '',
+                Bb040Atividadeid: '',
+                Bb041Casoid: '',
+                Bb046Concorrenteid: '',
+                Bb012Nota: var_Nota.value
             };
 
-            const response = await SaveNota(tenant, data);
+            const response = await CreateNota(tenant, data);
 
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Nota salva com sucesso', 'success');

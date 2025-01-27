@@ -94,10 +94,11 @@ import { ref, onMounted } from 'vue';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
-import { GetContaById } from '../../../services/contas/bb012_conta';
-import { SaveBens, DeleteBens } from '../../../services/contas/bb012c_Bens/bb012c_bens';
+import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
+import { CreateBens, DeleteBens } from '../../../services/contas/bb012c_Bens/bb012c_bens';
 // Import de types
-import type { ContaById, Bens, Csicp_bb012c } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, NavBensList } from '../../../types/crm/contas/bb012_contabyid';
+import type { BensCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb012c_bens';
 //Import de componentes
 import cs_InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_InputValor from '../../../submodules/cs_components/src/components/campos/cs_InputValor.vue';
@@ -190,17 +191,16 @@ const showSnackbar = (message: string, color: string) => {
 const fetchData = async (id: string) => {
     loading.value = true;
     try {
-        const data: ContaById = await GetContaById(tenant, id);
-        items.value = data.Bens.map((item: Bens) => ({
-            ID: item.csicp_bb012c.ID,
-            BB012_ID: item.csicp_bb012c.BB012_ID,
-            Descricao: item.csicp_bb012c.BB012c_DescEmpresa,
-            Proprietario: item.csicp_bb012c.BB012c_ProprietRamo,
-            Valor: `R$ ${item.csicp_bb012c.BB012c_Valor_Media.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        const res: ContaById = await GetContaById(tenant, id);
+        items.value = res.Data.NavBensList.map((item: NavBensList) => ({
+            ID: item.Id,
+            BB012_ID: item.Bb012Id,
+            Descricao: item.Bb012cDescempresa,
+            Proprietario: item.Bb012cProprietramo,
+            Valor: `R$ ${item.Bb012cValorMedia.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
         }));
 
-        // Solução temporária para sempre ter o ID da BB012 preenchido para usar nas APIs.
-        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+        var_bb012_Id.value = res.Data.Id;
     } catch (error) {
         showSnackbar('Erro ao buscar bem.', 'error');
     } finally {
@@ -226,14 +226,14 @@ const openEditDialog = async (item: Item, index: number) => {
     dialog.value = true;
     itemToEdit.value = item;
     try {
-        const data: ContaById = await GetContaById(tenant, props.id);
+        const res: ContaById = await GetContaById(tenant, props.id);
 
-        var_Id.value = data.Bens[index].csicp_bb012c.ID;
-        var_bb012_Id.value = data.Bens[index].csicp_bb012c.BB012_ID;
-        var_Descricao.value = data.Bens[index].csicp_bb012c.BB012c_DescEmpresa;
-        var_Proprietario.value = data.Bens[index].csicp_bb012c.BB012c_ProprietRamo;
-        var_ValorMedio.value = data.Bens[index].csicp_bb012c.BB012c_Valor_Media;
-        var_Telefone.value = data.Bens[index].csicp_bb012c.BB012c_Fone;
+        var_Id.value = res.Data.NavBensList[index].Id;
+        var_bb012_Id.value = res.Data.NavBensList[index].Bb012Id;
+        var_Descricao.value = res.Data.NavBensList[index].Bb012cDescempresa;
+        var_Proprietario.value = res.Data.NavBensList[index].Bb012cProprietramo;
+        var_ValorMedio.value = res.Data.NavBensList[index].Bb012cValorMedia;
+        var_Telefone.value = res.Data.NavBensList[index].Bb012cFone;
     } catch (error) {
         showSnackbar('Erro ao buscar dados do bem', 'error');
     }
@@ -242,17 +242,15 @@ const openEditDialog = async (item: Item, index: number) => {
 const CreateOrUpdateBens = async () => {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb012c = {
-                ID: var_Id.value ? var_Id.value : '',
-                BB012_ID: var_bb012_Id.value,
-                BB012c_DescEmpresa: var_Descricao.value,
-                BB012c_ProprietRamo: var_Proprietario.value,
-                BB012c_Valor_Media: var_ValorMedio.value,
-                BB012c_Fone: var_Telefone.value,
-                BB012c_Is_Active: true
+            const data: BensCreate = {
+                Bb012Id: var_bb012_Id.value,
+                Bb012cDescempresa: var_Descricao.value,
+                Bb012cProprietramo: var_Proprietario.value,
+                Bb012cValorMedia: var_ValorMedio.value,
+                Bb012cFone: var_Telefone.value
             };
 
-            const response = await SaveBens(tenant, data);
+            const response = await CreateBens(tenant, data);
 
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Bem salvo com sucesso', 'success');

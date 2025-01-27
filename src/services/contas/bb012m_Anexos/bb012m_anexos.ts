@@ -1,13 +1,13 @@
-import { URLBase } from '../../configuracoes_axios';
+import { newURLBase } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { Csicp_bb012m } from '../../../types/crm/bb012_GetContaById';
+import type { AnexosCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb012m_anexos';
 
-const SaveAnexos = async (tenantId: number | undefined, anexos: Csicp_bb012m): Promise<AxiosResponse<any>> => {
+const CreateAnexos = async (tenantId: number | undefined, anexos: AnexosCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb012m_Save_ImagensAnexos`, anexos, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb012m`, anexos, {
             headers: {
-                Tenant_id: tenantId
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -17,12 +17,11 @@ const SaveAnexos = async (tenantId: number | undefined, anexos: Csicp_bb012m): P
     }
 };
 
-const DeleteAnexos = async (tenantId: number | undefined, bb012m_Id: string): Promise<AxiosResponse<any>> => {
+const DeleteAnexos = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb012m_Delete_ImagensAnexos`, {
-            headers: {
-                Tenant_id: tenantId,
-                In_BB012m_ID: bb012m_Id
+        const response = await axios.delete(`${newURLBase}/api/v1/bb012m/${encodeURIComponent(id)}`, {
+            params: {
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -32,4 +31,4 @@ const DeleteAnexos = async (tenantId: number | undefined, bb012m_Id: string): Pr
     }
 };
 
-export { SaveAnexos, DeleteAnexos };
+export { CreateAnexos, DeleteAnexos };

@@ -682,7 +682,8 @@ const openEditDialog = async (item: Item) => {
     itemToEdit.value = item;
 
     try {
-        const data: ContatoById = await GetContatoById(tenant, item.ID);
+        const res: ContatoById = await GetContatoById(tenant, item.ID);
+        const data = res.Data;
 
         // Atribuindo os dados da estrutura "csicp_bb035"
         var_Id.value = data.Id;

@@ -38,9 +38,9 @@ import { ref, onMounted } from 'vue';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
-import { GetContaById } from '../../../services/contas/bb012_conta';
+import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
 // Import de types
-import type { ContaById, MeuCrediario } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, NavMeuCrediarioList } from '../../../types/crm/contas/bb012_contabyid';
 //Import de componentes
 
 interface Item {
@@ -101,16 +101,15 @@ const fetchData = async (id: string) => {
     loading.value = true;
 
     try {
-        const data: ContaById = await GetContaById(tenant, id);
+        const res: ContaById = await GetContaById(tenant, id);
 
-        items.value = data.MeuCrediario.map((item: MeuCrediario) => ({
+        items.value = res.Data.NavMeuCrediarioList.map((item: NavMeuCrediarioList) => ({
             ID: item.Id,
-            BB012_ID: item.bb012_ContaId,
-            parsedJson: item.bb01209_json ? JSON.parse(item.bb01209_json) : undefined
+            BB012_ID: item.Bb012Contaid,
+            parsedJson: item.Bb01209Json ? JSON.parse(item.Bb01209Json) : undefined
         }));
 
-        // Solução temporária para sempre ter o ID da BB012 preenchido para usar nas APIs.
-        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+        var_bb012_Id.value = res.Data.Id;
     } catch (error) {
         showSnackbar('Erro ao buscar conta.', 'error');
     } finally {

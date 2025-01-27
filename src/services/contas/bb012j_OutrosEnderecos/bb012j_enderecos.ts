@@ -1,13 +1,13 @@
-import { URLBase } from '../../configuracoes_axios';
+import { newURLBase } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { OutrosEnderecosType } from './bb012j_enderecoTypes';
+import type { OutrosEnderecosCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb012j_outrosenderecos';
 
-const SaveOutrosEnderecos = async (tenantId: number | undefined, endereco: OutrosEnderecosType): Promise<AxiosResponse<any>> => {
+const CreateOutrosEnderecos = async (tenantId: number | undefined, endereco: OutrosEnderecosCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb012j_Save_OutrosEndereco`, endereco, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb012j`, endereco, {
             headers: {
-                Tenant_id: tenantId
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -17,12 +17,11 @@ const SaveOutrosEnderecos = async (tenantId: number | undefined, endereco: Outro
     }
 };
 
-const DeleteOutrosEnderecos = async (tenantId: number | undefined, bb012j_Id: string): Promise<AxiosResponse<any>> => {
+const DeleteOutrosEnderecos = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb012j_Delete_OutrosEndereco`, {
-            headers: {
-                Tenant_id: tenantId,
-                In_BB012j_ID: bb012j_Id
+        const response = await axios.delete(`${newURLBase}/api/v1/bb012j/${encodeURIComponent(id)}`, {
+            params: {
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -32,4 +31,4 @@ const DeleteOutrosEnderecos = async (tenantId: number | undefined, bb012j_Id: st
     }
 };
 
-export { SaveOutrosEnderecos, DeleteOutrosEnderecos };
+export { CreateOutrosEnderecos, DeleteOutrosEnderecos };

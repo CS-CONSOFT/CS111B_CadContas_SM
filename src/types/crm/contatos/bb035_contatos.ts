@@ -38,6 +38,12 @@ export interface List {
 }
 
 export interface ContatoById {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     TenantId: number;
     Id: string;
     Bb035Primeironome: string;

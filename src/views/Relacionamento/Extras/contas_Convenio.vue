@@ -62,15 +62,16 @@ import { ref, onMounted } from 'vue';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
-import { GetContaById } from '../../../services/contas/bb012_conta';
-import { SaveMembroConvAvalista, DeleteMembroConvAvalista } from '../../../services/contas/bb01207_MembroConvenio/bb1207_membroconvenio';
+import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
+import { CreateMembroConvAvalista, DeleteMembroConvAvalista } from '../../../services/contas/bb01207_MembroConvenio/bb1207_membroconvenio';
 // Import de types
-import type { ContaById, Convenios, Csicp_bb01207 } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, NavConvenioList } from '../../../types/crm/contas/bb012_contabyid';
 //Import de componentes
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnExcluir from '../../../submodules/cs_components/src/components/botoes/cs_BtnExcluir.vue';
 import cs_SelectContas from '../../../submodules/cs_components/src/components/selects/cs_SelectContas.vue';
+import { AvalistaCreate } from '@/types/crm/contas/tabelasAuxiliares/bb01207_avalistas';
 
 interface Item {
     ID: string;
@@ -135,15 +136,14 @@ const showSnackbar = (message: string, color: string) => {
 const fetchData = async (id: string) => {
     loading.value = true;
     try {
-        const data: ContaById = await GetContaById(tenant, id);
-        items.value = data.Convenios.map((item: Convenios) => ({
-            ID: item.csicp_bb01207.Id,
-            BB012_ID: item.csicp_bb01207.BB012_ID,
-            Convenio: item.csicp_bb012.BB012_Nome_Cliente
+        const res: ContaById = await GetContaById(tenant, id);
+        items.value = res.Data.NavMembrosCompleto.NavConvenioList.map((item: NavConvenioList) => ({
+            ID: item.Id,
+            BB012_ID: item.Bb012Id,
+            Convenio: item.Bb012Membroid
         }));
 
-        //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
-        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+        var_bb012_Id.value = res.Data.Id;
     } catch (error) {
         showSnackbar('Erro ao buscar convênio.', 'error');
     } finally {
@@ -154,15 +154,13 @@ const fetchData = async (id: string) => {
 const CreateOrUpdateConvenio = async () => {
     if (var_SelectedConta.value != '') {
         try {
-            const data: Csicp_bb01207 = {
-                Id: var_Id.value ? var_Id.value : '',
-                BB012_Tipo_Reg_MembroConveni: var_TipRegistro.value,
-                BB012_ID: var_bb012_Id.value,
-                BB012_MembroID: var_SelectedConta.value,
-                BB01207_Is_Active: true
+            const data: AvalistaCreate = {
+                Bb012TipoRegMembroconveni: var_TipRegistro.value,
+                Bb012Id: var_bb012_Id.value,
+                Bb012Membroid: var_SelectedConta.value
             };
 
-            const response = await SaveMembroConvAvalista(tenant, data);
+            const response = await CreateMembroConvAvalista(tenant, data);
 
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Convênio salva com sucesso', 'success');

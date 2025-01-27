@@ -119,18 +119,21 @@
 </template>
 <script setup lang="ts">
 // Import de bibliotecas e etc...
-import { ref, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
-import { GetContaById } from '../../../services/contas/bb012_conta';
-import { GetAssociadosList, SaveAssociado, DeleteAssociado, SoftDeleteAssociado } from '../../../services/associados/bb061_associados';
+import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
+import {
+    GetAssociadosCompleto,
+    CreateAssociado,
+    DeleteAssociado,
+    SoftDeleteAssociado
+} from '../../../services/associados/bb061_associados';
 // Import de types
-import type { AssociadosCompleto, Csicp_bb061 } from '../../../types/crm/associados/bb061_associados';
-import type { ContaById } from '../../../types/crm/bb012_GetContaById';
+import type { AssociadosCompleto, AssociadoCreate } from '../../../types/crm/associados/bb061_associados';
+import type { ContaById } from '../../../types/crm/contas/bb012_contabyid';
 //Import de componentes
-import cs_InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_BtnIsActive from '../../../submodules/cs_components/src/components/botoes/cs_BtnIsActive.vue';
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
@@ -200,9 +203,10 @@ const showSnackbar = (message: string, color: string) => {
 
 const fetchData = async (id: string) => {
     try {
-        const data: ContaById = await GetContaById(tenant, id);
+        const res: ContaById = await GetContaById(tenant, id);
+        const data = res.Data;
 
-        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+        var_bb012_Id.value = data.Id;
 
         fetchAssociados(var_bb012_Id.value);
     } catch (error) {
@@ -214,18 +218,19 @@ const fetchAssociados = async (id: string) => {
     loading.value = true;
 
     try {
-        const response: AssociadosCompleto[] = await GetAssociadosList(tenant, id);
+        const response = await GetAssociadosCompleto(tenant, true, 1, 999);
+        const data: AssociadosCompleto = response.data;
 
-        associados.value = response.map((associados) => ({
-            ID: associados.csicp_bb061.bb061_Id.toString(),
-            Codigo: associados.csicp_bb060.bb060_Codigo || '',
-            Convenio: associados.csicp_bb060.bb060_Descricao || '',
-            CodigoConta: associados.csicp_bb012.BB012_Codigo,
-            Conta: associados.csicp_bb012.BB012_Nome_Cliente || '',
-            Associado: `${associados.csicp_bb035.BB035_PrimeiroNome} ${associados.csicp_bb035.BB035_Sobrenome}` || '',
-            TipoAssociado: associados.csicp_bb061_tp.Label || '',
-            Ativo: associados.csicp_bb061.bb061_IsActive,
-            Valor: associados.csicp_bb061.bb061_Valor.toFixed(2)
+        associados.value = data.Data.List.map((associados) => ({
+            ID: associados.Bb061Id.toString(),
+            Codigo: associados.NavBb060Convenio.Bb060Codigo || '',
+            Convenio: associados.NavBb060Convenio.Bb060Descricao || '',
+            CodigoConta: Number(associados.Bb012Contaid) || 0,
+            Conta: associados.Bb012Contaid || '',
+            Associado: `${associados} ${associados}` || '',
+            TipoAssociado: associados.NavBb061Tipoass.Label || '',
+            Ativo: associados.Bb061Isactive,
+            Valor: associados.Bb061Valor.toFixed(2)
         }));
     } catch (error) {
         console.error('Erro ao buscar associados:', error);
@@ -248,17 +253,15 @@ const openDialog = () => {
 const CreateOrUpdateAssociado = async () => {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb061 = {
-                bb061_Id: var_bb061_Id.value,
-                bb060_ConvenioID: var_bb060_ConvenioID.value,
-                bb061_tipoAssID: var_bb061_tipoAssID.value,
-                bb012_ContaId: var_bb012_ContaId.value,
-                bb061_DependenteID: var_bb061_DependenteID.value,
-                bb061_Valor: var_bb061_Valor.value,
-                bb061_IsActive: true
+            const data: AssociadoCreate = {
+                Bb060Convenioid: var_bb060_ConvenioID.value,
+                Bb061Tipoassid: var_bb061_tipoAssID.value,
+                Bb012Contaid: var_bb012_ContaId.value,
+                Bb061Dependenteid: var_bb061_DependenteID.value,
+                Bb061Valor: var_bb061_Valor.value
             };
 
-            const response = await SaveAssociado(tenant, data);
+            const response = await CreateAssociado(tenant, data);
 
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Associado salvo com sucesso', 'success');

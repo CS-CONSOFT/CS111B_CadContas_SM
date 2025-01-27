@@ -95,12 +95,12 @@ import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 import { ETokenGenericoLabel } from '@/utils/EnumTokenGenerico';
 // Import de API's
-import { GetContaById } from '../../../services/contas/bb012_conta';
+import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
 import { helperHandleUploadImg } from '../../../services/cdn/cs_UploadImgHelper';
-import { SaveAnexos, DeleteAnexos } from '../../../services/contas/bb012m_Anexos/bb012m_anexos';
+import { CreateAnexos, DeleteAnexos } from '../../../services/contas/bb012m_Anexos/bb012m_anexos';
 // Import de types
-import type { ContaById, GED_List } from '../../../types/crm/bb012_GetContaById';
-import type { Csicp_bb012m } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, NavGEDList } from '../../../types/crm/contas/bb012_contabyid';
+import type { AnexosCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb012m_anexos';
 //Import de componentes
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
 import cs_BtnCancelar from '../../../submodules/cs_components/src/components/botoes/cs_BtnCancelar.vue';
@@ -218,20 +218,19 @@ const fetchData = async (id: string) => {
     loading.value = true;
 
     try {
-        const data: ContaById = await GetContaById(tenant, id);
-        items.value = data.GED_List.map((item: GED_List) => ({
-            ID: item.csicp_bb012m.ID,
-            BB012_ID: item.csicp_bb012m.BB012_ID,
-            ImagemPath: item.csicp_bb012m.bb012m_Path,
-            Imagem: item.csicp_bb012m.BB012m_Content,
-            Nome: item.csicp_bb012m.BB012m_Filename,
-            Documento: item.csicp_bb012mdc.Label,
-            TipoDocumento: item.csicp_bb012mtd.Label,
-            TipoArquivo: item.csicp_bb012m.BB012m_FileType
+        const res: ContaById = await GetContaById(tenant, id);
+        items.value = res.Data.NavGEDList.map((item: NavGEDList) => ({
+            ID: item.Id,
+            BB012_ID: item.Bb012Id,
+            ImagemPath: item.Bb012mPath,
+            Imagem: item.Bb012mContent,
+            Nome: item.Bb012mFilename,
+            Documento: item.NavBB012MDC.Label,
+            TipoDocumento: item.NavBB012MTD.Label,
+            TipoArquivo: item.Bb012mFiletype
         }));
 
-        //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
-        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+        var_bb012_Id.value = res.Data.Id;
     } catch (error) {
         showSnackbar('Erro ao buscar conta.', 'error');
     } finally {
@@ -251,29 +250,27 @@ async function sendImg(selectedImage: File) {
 
         if (response.Out_Success) {
             // Cria o corpo da requisição com os dados da imagem
-            const data: Csicp_bb012m = {
-                ID: var_Id.value,
-                BB012_ID: var_bb012_Id.value,
-                BB012_ContatoID: '',
-                BB012_CandidatoID: '',
-                BB043_CampanhaID: '',
-                BB042_PotencialID: '',
-                BB040_AtividadeID: '',
-                BB041_CasoID: '',
-                BB012m_Codigo_Cliente: 0,
-                BB012m_Descricao: var_SelectedDocumento.value.title,
-                BB012m_Content: response.binary,
-                BB012m_FileType: selectedImage.type,
-                BB012m_Filename: selectedImage.name,
-                BB012M_Is_Active: true,
-                bb012m_TipoDoctoID: var_SelectedTpAnexo.value,
-                bb012m_DoctoID: var_SelectedDocumento.value.value,
-                bb012m_DataDocto: '',
-                bb012m_Path: response.Out_Path
+            const data: AnexosCreate = {
+                Bb012Id: var_bb012_Id.value,
+                Bb012Contatoid: '',
+                Bb012Candidatoid: '',
+                Bb043Campanhaid: '',
+                Bb042Potencialid: '',
+                Bb040Atividadeid: '',
+                Bb041Casoid: '',
+                Bb012mCodigoCliente: 0,
+                Bb012mDescricao: var_SelectedDocumento.value.title,
+                Bb012mContent: response.binary,
+                Bb012mFiletype: selectedImage.type,
+                Bb012mFilename: selectedImage.name,
+                Bb012mTipodoctoid: var_SelectedTpAnexo.value,
+                Bb012mDoctoid: var_SelectedDocumento.value.value,
+                Bb012mDatadocto: '',
+                Bb012mPath: response.Out_Path
             };
 
             // Envia a imagem para o serviço de backend
-            const res = await SaveAnexos(tenant, data);
+            const res = await CreateAnexos(tenant, data);
 
             // Exibe uma mensagem de sucesso ou erro
             if (res.data.Out_IsSuccess) {

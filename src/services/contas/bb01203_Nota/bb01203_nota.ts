@@ -1,13 +1,13 @@
-import { URLBase } from '../../configuracoes_axios';
+import { newURLBase } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { Csicp_bb01203 } from '../../../types/crm/bb012_conta';
+import type { NotasCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb01203_notas';
 
-const SaveNota = async (tenantId: number | undefined, nota: Csicp_bb01203): Promise<AxiosResponse<any>> => {
+const CreateNota = async (tenantId: number | undefined, nota: NotasCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb01203_Save_Nota`, nota, {
+        const response = await axios.post(`${newURLBase}/api/v1/bb1203`, nota, {
             headers: {
-                Tenant_id: tenantId
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -17,12 +17,11 @@ const SaveNota = async (tenantId: number | undefined, nota: Csicp_bb01203): Prom
     }
 };
 
-const DeleteNota = async (tenantId: number | undefined, bb01203_Id: string): Promise<AxiosResponse<any>> => {
+const DeleteNota = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${URLBase}CSR_BB100_ClienteFor_IS/rest/CS_Contas/csicp_bb01203_Delete_Nota`, {
-            headers: {
-                Tenant_id: tenantId,
-                In_BB01203_ID: bb01203_Id
+        const response = await axios.delete(`${newURLBase}/api/v1/bb1203/${encodeURIComponent(id)}`, {
+            params: {
+                Tenant_ID: tenantId
             }
         });
         return response;
@@ -32,4 +31,4 @@ const DeleteNota = async (tenantId: number | undefined, bb01203_Id: string): Pro
     }
 };
 
-export { SaveNota, DeleteNota };
+export { CreateNota, DeleteNota };

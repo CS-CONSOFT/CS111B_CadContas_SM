@@ -174,12 +174,12 @@ import { ref, onMounted, watch } from 'vue';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
-import { GetContaById } from '../../../services/contas/bb012_conta';
-import { SaveOutrosEnderecos, DeleteOutrosEnderecos } from '../../../services/contas/bb012j_OutrosEnderecos/bb012j_enderecos';
+import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
+import { CreateOutrosEnderecos, DeleteOutrosEnderecos } from '../../../services/contas/bb012j_OutrosEnderecos/bb012j_enderecos';
 // Import de types
-import type { ContaById, Csicp_bb012062, Csicp_bb012j, Outros_Endereco } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, NavOutrosEnderecosList } from '../../../types/crm/contas/bb012_contabyid';
 import type { CEP } from '../../../submodules/cs_components/src/types/enderecamento/CepTypes';
-import type { OutrosEnderecosType } from '../../../services/contas/bb012j_OutrosEnderecos/bb012j_enderecoTypes';
+import type { OutrosEnderecosCreate, NavBB1206_Enderecos } from '../../../types/crm/contas/tabelasAuxiliares/bb012j_outrosenderecos';
 //Import de componentes
 import cs_InputTexto from '../../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_BtnAdicionar from '../../../submodules/cs_components/src/components/botoes/cs_BtnAdicionar.vue';
@@ -304,18 +304,17 @@ const handleCepInfo = (info: CEP) => {
 const fetchData = async (id: string) => {
     loading.value = true;
     try {
-        const data: ContaById = await GetContaById(tenant, id);
-        items.value = data.Outros_Endereco.map((item: Outros_Endereco) => ({
-            ID: item.csicp_bb012j.ID,
-            BB012_ID: item.csicp_bb012j.BB012_ID,
-            Tipo: item.csicp_bb012j_TpEnd.Label,
-            Cidade: item.Endereco.csicp_aa028.AA028_Cidade,
-            Logradouro: `${item.Endereco.csicp_bb01206.BB012_Logradouro} - ${item.Endereco.csicp_bb01206.BB012_CEP}`,
-            Email: item.csicp_bb012j.BB012j_Email
+        const res: ContaById = await GetContaById(tenant, id);
+        items.value = res.Data.NavOutrosEnderecosList.map((item: NavOutrosEnderecosList) => ({
+            ID: item.Id,
+            BB012_ID: item.Bb012Id,
+            Tipo: item.NavTipoEndereco.Label,
+            Cidade: item.NavBB1206_Enderecos.NavAA028_Cidade.Aa028Cidade,
+            Logradouro: `${item.NavBB1206_Enderecos.Bb012Logradouro} - ${item.NavBB1206_Enderecos.Bb012Cep}`,
+            Email: item.Bb012jEmail
         }));
 
-        //Solução temporaria para sempre ter o ID da BB012 preenchido para usar nas APIs.
-        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+        var_bb012_Id.value = res.Data.Id;
     } catch (error) {
         showSnackbar('Erro ao buscar bem.', 'error');
     } finally {
@@ -351,24 +350,25 @@ const openEditDialog = async (item: Item, index: number) => {
     dialog.value = true;
     itemToEdit.value = item;
     try {
-        const data: ContaById = await GetContaById(tenant, props.id);
+        const res: ContaById = await GetContaById(tenant, props.id);
+        const data = res.Data;
 
-        var_bb012j.value = data.Outros_Endereco[index].csicp_bb012j.ID;
-        var_bb01206_Id.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.Id;
-        var_bb012_Id.value = data.Outros_Endereco[index].csicp_bb012j.BB012_ID;
-        var_TipoEndereco.value = data.Outros_Endereco[index].csicp_bb012j.BB012j_TipoEndereco;
-        var_Logradouro.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.BB012_Logradouro;
-        var_Numero.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.BB012_Numero;
-        var_Complemento.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.BB012_Complemento;
-        var_Perimetro.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.BB012_Perimetro;
-        var_SelectedPais.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.BB012_Codigo_Pais;
-        var_SelectedUF.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.BB012_UF;
-        var_SelectedCidade.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.BB012_Codigo_Cidade;
-        var_Bairro.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.BB012_Bairro;
-        var_CEP.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.BB012_CEP.toString();
-        var_Email.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.bb012_email;
-        var_Telefone.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.bb012_Telefone;
-        var_Fax.value = data.Outros_Endereco[index].Endereco.csicp_bb01206.bb012_Celular;
+        var_bb012j.value = data.NavOutrosEnderecosList[index].Id;
+        var_bb01206_Id.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Id;
+        var_bb012_Id.value = data.NavOutrosEnderecosList[index].Bb012Id;
+        var_TipoEndereco.value = data.NavOutrosEnderecosList[index].Bb012jTipoendereco;
+        var_Logradouro.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012Logradouro;
+        var_Numero.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012Numero;
+        var_Complemento.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012Complemento;
+        var_Perimetro.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012Perimetro;
+        var_SelectedPais.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012CodigoPais;
+        var_SelectedUF.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012Uf;
+        var_SelectedCidade.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012CodigoCidade;
+        var_Bairro.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012Bairro;
+        var_CEP.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012Cep.toString();
+        var_Email.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012Email;
+        var_Telefone.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012Telefone;
+        var_Fax.value = data.NavOutrosEnderecosList[index].NavBB1206_Enderecos.Bb012Celular;
     } catch (error) {
         showSnackbar('Erro ao buscar dados do endereço', 'error');
     }
@@ -377,49 +377,51 @@ const openEditDialog = async (item: Item, index: number) => {
 const CreateOrUpdateOutrosEnderecos = async () => {
     if (formRef.value.validate()) {
         try {
-            const BB012j: Csicp_bb012j = {
-                ID: var_bb012j.value ? var_bb012j.value : '',
-                BB012_ID: var_bb012_Id.value,
-                BB012j_Telefone: var_Telefone.value,
-                BB012j_Fax: var_Fax.value,
-                BB012j_Email: var_Email.value,
-                BB012j_TipoEndereco: var_TipoEndereco.value!
-            };
-
-            const BB01206: Csicp_bb012062 = {
+            const BB01206: NavBB1206_Enderecos = {
                 Id: var_bb01206_Id.value ? var_bb01206_Id.value : '',
-                BB012_ID: '',
-                BB012J_EnderecoID: var_bb012j.value ? var_bb012j.value : '',
-                BB012_Logradouro: var_Logradouro.value,
-                BB012_Numero: var_Numero.value,
-                BB012_Complemento: var_Complemento.value,
-                BB012_Perimetro: var_Perimetro.value,
-                BB012_CodgBairro: '',
-                BB012_Bairro: var_Bairro.value,
-                BB012_Codigo_Cidade: var_SelectedCidade.value,
-                BB012_UF: var_SelectedUF.value,
-                BB012_CEP: Number(var_CEP.value),
-                BB012_Codigo_Pais: var_SelectedPais.value,
-                BB012_Entrega_Logradouro: '',
-                BB012_Entrega_Numero: '',
-                BB012_Entrega_Complement: '',
-                BB012_Entrega_CodgBairro: '',
-                BB012_Entrega_Bairro: '',
-                BB012_Entrega_Cod_Cidade: '',
-                BB012_Entrega_Uf: '',
-                BB012_Entrega_CEP: 0,
-                BB012_Entrega_Pais: '',
-                BB012_Entrega_Perimetro: '',
-                bb012_Telefone: var_Telefone.value,
-                bb012_Celular: var_Fax.value,
-                bb012_email: var_Email.value
+                Bb012Id: '',
+                Bb012jEnderecoid: var_bb012j.value ? var_bb012j.value : '',
+                Bb012Logradouro: var_Logradouro.value,
+                Bb012Numero: var_Numero.value,
+                Bb012Complemento: var_Complemento.value,
+                Bb012Perimetro: var_Perimetro.value,
+                Bb012Codgbairro: '',
+                Bb012Bairro: var_Bairro.value,
+                Bb012CodigoCidade: var_SelectedCidade.value,
+                Bb012Uf: var_SelectedUF.value,
+                Bb012Cep: Number(var_CEP.value),
+                Bb012CodigoPais: var_SelectedPais.value,
+                Bb012EntregaLogradouro: '',
+                Bb012EntregaNumero: '',
+                Bb012EntregaComplement: '',
+                Bb012EntregaCodgbairro: '',
+                Bb012EntregaBairro: '',
+                Bb012EntregaCodCidade: '',
+                Bb012EntregaUf: '',
+                Bb012EntregaCep: 0,
+                Bb012EntregaPais: '',
+                Bb012EntregaPerimetro: '',
+                Bb012Telefone: var_Telefone.value,
+                Bb012Celular: var_Fax.value,
+                Bb012Email: var_Email.value,
+                TenantId: 0
             };
 
-            const in_bb012j_OutrosEnd: OutrosEnderecosType = {
+            const BB012j: OutrosEnderecosCreate = {
+                Id: var_bb012j.value ? var_bb012j.value : '',
+                Bb012Id: var_bb012_Id.value,
+                Bb012jTelefone: var_Telefone.value,
+                Bb012jFax: var_Fax.value,
+                Bb012jEmail: var_Email.value,
+                Bb012jTipoendereco: var_TipoEndereco.value!,
+                NavBB1206_Enderecos: BB01206
+            };
+
+            const data: any = {
                 csicp_bb012j: BB012j,
                 csicp_bb01206: BB01206
             };
-            const response = await SaveOutrosEnderecos(tenant, in_bb012j_OutrosEnd);
+            const response = await CreateOutrosEnderecos(tenant, data);
 
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Endereço salvo com sucesso', 'success');

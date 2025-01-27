@@ -83,7 +83,7 @@
             </v-card-text>
             <v-card-actions class="d-flex justify-space-around">
                 <cs_BtnCancelar @click="closeDialog" />
-                <cs_BtnSalvar @click="adicionarContato" />
+                <cs_BtnSalvar @click="adicionarRelacaoContaContato" />
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -97,11 +97,12 @@
                 <v-form ref="formRefContato">
                     <div class="d-flex">
                         <v-col cols="6">
-                            <cs_InputTexto
+                            <cs_SelectTratamento
                                 v-model="var_Tratamento"
                                 Prm_etiqueta="Tratamento"
                                 :Prm_limpavel="false"
                                 :Prm_isObrigatorio="false"
+                                style="margin-bottom: 22px"
                             />
 
                             <div class="d-flex">
@@ -237,7 +238,7 @@
                             </div>
 
                             <div class="d-flex">
-                                <v-col cols="4" class="pa-0">
+                                <v-col cols="6" class="pa-0">
                                     <cs_InputCep
                                         :initialCep="var_CEP"
                                         :readonly="false"
@@ -245,7 +246,7 @@
                                         @cep-info="handleCepInfo"
                                     />
                                 </v-col>
-                                <v-col cols="8" class="pa-0 pl-4">
+                                <v-col cols="6" class="pa-0 pl-4">
                                     <cs_InputTexto
                                         v-model="var_Logradouro"
                                         Prm_etiqueta="Logradouro"
@@ -334,11 +335,12 @@ import { ref, onMounted } from 'vue';
 import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
-import { GetContaById } from '../../../services/contas/bb012_conta';
-import { SaveContato, DeleteContato } from '../../../services/contas/bb01208_Contato/bb01208_contato';
+import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
+import { CreateRelacaoContaContato, DeleteRelacaoContaContato } from '../../../services/contas/bb01208_Contato/bb01208_contato';
 import { GetContatoById, CreateContato } from '../../../services/contas/bb035_Contato/bb035_contato';
 // Import de types
-import type { ContaById, Contatos, Csicp_bb01208 } from '../../../types/crm/bb012_GetContaById';
+import type { ContaById, NavContatosList } from '../../../types/crm/contas/bb012_contabyid';
+import type { RelacaoContatosContaCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb01208_relacaocontacontato';
 import type { ContatoById, ContatoCreate, NavCSICP_BB035EndCreate } from '../../../types/crm/contatos/bb035_contatos';
 import type { CEP } from '../../../submodules/cs_components/src/types/enderecamento/CepTypes';
 //Import de componentes
@@ -353,6 +355,7 @@ import cs_InputCep from '../../../submodules/cs_components/src/components/campos
 import cs_SelectPaises from '../../../submodules/cs_components/src/components/selects/cs_SelectPaises.vue';
 import cs_SelectUF from '../../../submodules/cs_components/src/components/selects/cs_SelectUF.vue';
 import cs_SelectCidades from '../../../submodules/cs_components/src/components/selects/cs_SelectCidades.vue';
+import cs_SelectTratamento from '../../../submodules/cs_components/src/components/selects/cs_SelectTratamento.vue';
 
 interface Item {
     ID: string;
@@ -442,7 +445,7 @@ const var_TelefoneResidencia = ref<string>('');
 const var_Assistente = ref<string>('');
 const var_TelefoneAssistente = ref<string>('');
 const var_CPF = ref<string>('');
-const var_RG = ref<string>('');
+const var_RG = ref<number | undefined>();
 const var_ComplementoRG = ref<string>('');
 const var_Logradouro = ref<string>('');
 const var_Numero = ref<string>('');
@@ -484,19 +487,21 @@ const onPaisSelecionado = (value: any) => {
 const fetchData = async (id: string) => {
     loading.value = true;
     try {
-        const data: ContaById = await GetContaById(tenant, id);
-        items.value = data.Contatos.map((item: Contatos) => ({
-            ID: item.csicp_bb01208.Id,
-            BB012_ID: item.csicp_bb01208.BB012_ID,
-            BB035_ID: item.csicp_bb035.Id,
-            Contato: `${item.csicp_bb035.BB035_PrimeiroNome} ${item.csicp_bb035.BB035_Sobrenome}`,
-            Grau: item.csicp_bb035_gpa.Label,
-            Telefone: item.csicp_bb035.BB035_Telefone,
-            Grau_ID: item.csicp_bb01208.BB01208_GrauParent_ID
+        const res: ContaById = await GetContaById(tenant, id);
+        console.log(res);
+        items.value = res.Data.NavContatosList.map((item: NavContatosList) => ({
+            ID: item.Id,
+            BB012_ID: item.Bb012Id,
+            BB035_ID: item.Bb012Contatoid,
+            Contato: `${item.NavCSICP_BB035.Bb035Primeironome} ${item.NavCSICP_BB035.Bb035Sobrenome}`,
+            Grau: item.NavCSICP_BB035Gpa.Label,
+            Telefone: item.NavCSICP_BB035.Bb035Telefone,
+            Grau_ID: item.Bb01208GrauparentId
         }));
 
-        var_bb012_Id.value = data.csicp_bb012.csicp_bb012.ID;
+        var_bb012_Id.value = res.Data.Id;
     } catch (error) {
+        console.error('Erro capturado:', error);
         showSnackbar('Erro ao buscar contato.', 'error');
     } finally {
         loading.value = false;
@@ -516,21 +521,22 @@ function startEditGrauParentesco(index: number, grau: number) {
 const UpdateGrauParentesco = async (index: number) => {
     if (editingIndex.value !== null) {
         try {
-            const data: Csicp_bb01208 = {
-                Id: items.value[index].ID,
-                BB012_ID: items.value[index].BB012_ID,
-                BB012_ContatoID: items.value[index].BB035_ID,
-                BB036_CandidatoID: '',
-                BB043_CampanhaId: '',
-                BB042_PotencialID: '',
-                BB040_AtividadeID: '',
-                BB041_CasoID: '',
-                BB01208_Is_Active: true,
-                ConcorrenteID: '',
-                BB01208_GrauParent_ID: editableGrauParentesco.value
+            const data: RelacaoContatosContaCreate = {
+                Bb012Id: items.value[index].BB012_ID,
+                Bb012Contatoid: items.value[index].BB035_ID,
+                Bb036Candidatoid: '',
+                Bb043Campanhaid: '',
+                Bb042Potencialid: '',
+                Bb040Atividadeid: '',
+                Bb041Casoid: '',
+                Concorrenteid: '',
+                Bb01208GrauparentId: editableGrauParentesco.value,
+                Bb01208CodgCliente7x: 0,
+                Bb01208SeqCliente7x: 0,
+                Bb01208OrigemcontatoId: 0
             };
 
-            const response = await SaveContato(tenant, data);
+            const response = await CreateRelacaoContaContato(tenant, data);
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Grau de parentesco atualizado com sucesso', 'success');
                 fetchData(props.id);
@@ -561,24 +567,25 @@ const openDialog = () => {
     var_SelectedGrauParentesco.value = 0;
 };
 
-const adicionarContato = async () => {
+const adicionarRelacaoContaContato = async () => {
     if (formRef.value.validate()) {
         try {
-            const data: Csicp_bb01208 = {
-                Id: var_Id.value ? var_Id.value : '',
-                BB012_ID: var_bb012_Id.value,
-                BB012_ContatoID: var_SelectedContato.value,
-                BB036_CandidatoID: '',
-                BB043_CampanhaId: '',
-                BB042_PotencialID: '',
-                BB040_AtividadeID: '',
-                BB041_CasoID: '',
-                BB01208_Is_Active: true,
-                ConcorrenteID: '',
-                BB01208_GrauParent_ID: var_SelectedGrauParentesco.value
+            const data: RelacaoContatosContaCreate = {
+                Bb012Id: var_bb012_Id.value,
+                Bb012Contatoid: var_SelectedContato.value,
+                Bb036Candidatoid: '',
+                Bb043Campanhaid: '',
+                Bb042Potencialid: '',
+                Bb040Atividadeid: '',
+                Bb041Casoid: '',
+                Concorrenteid: '',
+                Bb01208GrauparentId: var_SelectedGrauParentesco.value,
+                Bb01208CodgCliente7x: 0,
+                Bb01208SeqCliente7x: 0,
+                Bb01208OrigemcontatoId: 0
             };
 
-            const response = await SaveContato(tenant, data);
+            const response = await CreateRelacaoContaContato(tenant, data);
             if (response.data.Out_IsSuccess) {
                 showSnackbar('Contato salva com sucesso', 'success');
                 fetchData(props.id);
@@ -602,43 +609,44 @@ const openEditDialog = async (item: Item) => {
     dialogEdit.value = true;
     itemToEdit.value = item;
     try {
-        const data: ContatoById = await GetContatoById(tenant, itemToEdit.value.BB035_ID);
-
+        const res: ContatoById = await GetContatoById(tenant, itemToEdit.value.BB035_ID);
+        const data = res.Data;
+        console.log(data);
         // Mapear dados do contato (csicp_bb035)
-        var_bb035_id.value = data.Id;
-        var_Nome.value = data.Bb035Primeironome;
-        var_Sobrenome.value = data.Bb035Sobrenome;
-        var_Tratamento.value = data.Bb035TratamentoId;
-        var_Email.value = data.Bb035Email;
-        var_EmailSecundario.value = data.Bb035Emailsecundario;
-        var_Titulo.value = data.Bb035Titulo;
-        var_Departamento.value = data.Bb035Departamento;
-        var_Aniversario.value = data.Bb035DataAniversario;
-        var_Telefone.value = data.Bb035Telefone;
-        var_OutroTelefone.value = data.Bb035Outrotelefone;
-        var_Celular.value = data.Bb035Celular;
-        var_Fax.value = data.Bb035Fax;
-        var_TelefoneResidencia.value = data.Bb035Telefoneresidencia;
-        var_Assistente.value = data.Bb035Assistente;
-        var_TelefoneAssistente.value = data.Bb035Telefoneassist;
-        var_CPF.value = data.Bb035Cpf;
-        var_RG.value = data.Bb035Rg.toString();
-        var_ComplementoRG.value = data.Bb035OrgaoExpedRg;
-        var_Descricao.value = data.Bb035Descricao;
+        var_bb035_id.value = data?.Id ?? 0;
+        var_Nome.value = data?.Bb035Primeironome ?? '';
+        var_Sobrenome.value = data?.Bb035Sobrenome ?? '';
+        var_Tratamento.value = data?.Bb035TratamentoId ?? 0;
+        var_Email.value = data?.Bb035Email ?? '';
+        var_EmailSecundario.value = data?.Bb035Emailsecundario ?? '';
+        var_Titulo.value = data?.Bb035Titulo ?? '';
+        var_Departamento.value = data?.Bb035Departamento ?? '';
+        var_Aniversario.value = data?.Bb035DataAniversario ? new Date(data.Bb035DataAniversario).toISOString().split('T')[0] : '';
+        var_Telefone.value = data?.Bb035Telefone ?? '';
+        var_OutroTelefone.value = data?.Bb035Outrotelefone ?? '';
+        var_Celular.value = data?.Bb035Celular ?? '';
+        var_Fax.value = data?.Bb035Fax ?? '';
+        var_TelefoneResidencia.value = data?.Bb035Telefoneresidencia ?? '';
+        var_Assistente.value = data?.Bb035Assistente ?? '';
+        var_TelefoneAssistente.value = data?.Bb035Telefoneassist ?? '';
+        var_CPF.value = data?.Bb035Cpf ?? '';
+        var_RG.value = data?.Bb035Rg ?? '';
+        var_ComplementoRG.value = data?.Bb035OrgaoExpedRg ?? '';
+        var_Descricao.value = data?.Bb035Descricao ?? '';
 
         // Mapear dados de endereço (csicp_bb035_end)
-        var_Logradouro.value = data.NavCSICP_BB035End.Bb035Logradouro;
-        var_Numero.value = data.NavCSICP_BB035End.Bb035Numero;
-        var_Complemento.value = data.NavCSICP_BB035End.Bb035Complemento;
-        var_Bairro.value = data.NavCSICP_BB035End.Bb035Bairro;
-        var_SelectedCidade.value = data.NavCSICP_BB035End.Bb035CodigoCidade;
-        var_SelectedUF.value = data.NavCSICP_BB035End.Bb035Uf;
-        var_CEP.value = data.NavCSICP_BB035End.Bb035Cep;
-        var_SelectedPais.value = data.NavCSICP_BB035End.Bb035CodigoPais;
+        var_Logradouro.value = data?.NavCSICP_BB035End?.Bb035Logradouro ?? '';
+        var_Numero.value = data?.NavCSICP_BB035End?.Bb035Numero ?? '';
+        var_Complemento.value = data?.NavCSICP_BB035End?.Bb035Complemento ?? '';
+        var_Bairro.value = data?.NavCSICP_BB035End?.Bb035Bairro ?? '';
+        var_SelectedCidade.value = data?.NavCSICP_BB035End?.Bb035CodigoCidade ?? '';
+        var_SelectedUF.value = data?.NavCSICP_BB035End?.Bb035Uf ?? '';
+        var_CEP.value = data?.NavCSICP_BB035End?.Bb035Cep ?? '';
+        var_SelectedPais.value = data?.NavCSICP_BB035End?.Bb035CodigoPais ?? '';
 
         // Mapear dados de origem de contato e grau de parentesco
-        var_GrauParentesco.value = data.NavCSICP_BB035Origem.Id;
     } catch (error) {
+        console.error('Erro capturado:', error);
         showSnackbar('Erro ao buscar dados do contato', 'error');
     }
 };
@@ -675,7 +683,7 @@ async function saveContato() {
                 Bb035Telefoneassist: var_TelefoneAssistente.value,
                 Bb035Emailsecundario: var_EmailSecundario.value,
                 Bb035Cpf: var_CPF.value,
-                Bb035Rg: parseInt(var_RG.value) || 0,
+                Bb035Rg: var_RG.value || 0,
                 Bb035OrgaoExpedRg: var_ComplementoRG.value,
                 Bb035DataEmissaoRg: '',
                 Bb035TratamentoId: var_Tratamento.value,
@@ -711,7 +719,7 @@ const cancelDelete = () => {
 const deleteContatoConfirmed = async () => {
     if (!itemToDelete.value) return;
     try {
-        await DeleteContato(tenant, itemToDelete.value.ID);
+        await DeleteRelacaoContaContato(tenant, itemToDelete.value.ID);
         showSnackbar('Contato excluído com sucesso', 'success');
         fetchData(props.id);
         confirmDialog.value = false;

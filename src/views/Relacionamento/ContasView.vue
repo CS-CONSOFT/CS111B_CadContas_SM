@@ -3,30 +3,38 @@
         <div>
             <v-row class="pa-4 pt-7">
                 <p class="text-h2 mb-5">Contas</p>
+
+                <v-spacer></v-spacer>
+
+                <v-col cols="4" class="d-flex justify-end">
+                    <v-btn v-if="active" prepend-icon="mdi-cancel" flat class="mr-2 bg-error" @click="fetchInactive">Inativos</v-btn>
+                    <v-btn v-else prepend-icon="mdi-delete-empty" flat class="bg-secondary mr-2" @click="fetchActive">Ativos</v-btn>
+                    <BtnAdicionar @click="redirectToCreate" />
+                </v-col>
                 <v-divider></v-divider>
             </v-row>
 
             <div class="px-4 mb-2">
                 <v-row class="align-start">
-                    <v-col cols="8" class="d-flex gap-4">
+                    <v-col cols="9" class="d-flex gap-4">
                         <cs_InputTexto v-model="search" Prm_etiqueta="Nome Cliente" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
 
                         <cs_InputTexto v-model="searchCodigo" Prm_etiqueta="Código" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
+
+                        <cs_InputTexto v-model="filterCPF" Prm_etiqueta="CPF/CNPJ" :Prm_limpavel="true" :Prm_isObrigatorio="false" />
                     </v-col>
                     <v-spacer></v-spacer>
 
-                    <v-col cols="4" class="d-flex align-center justify-end">
-                        <v-btn v-if="active" prepend-icon="mdi-cancel" flat class="mr-2 bg-error" @click="fetchInactive">Inativos</v-btn>
-                        <v-btn v-else prepend-icon="mdi-delete-empty" flat class="bg-secondary mr-2" @click="fetchActive">Ativos</v-btn>
-                        <BtnAdicionar @click="redirectToCreate" />
-                        <!--
-                        <v-btn icon @click="toggleView">
-                            <v-icon>{{ isListView ? 'mdi-view-grid' : 'mdi-view-list' }}</v-icon>
+                    <v-col cols="3" class="d-flex align-center justify-end">
+                        <v-btn class="mr-2" color="primary" prepend-icon="mdi-magnify" variant="flat" @click="fetchData()">
+                            Pesquisar
                         </v-btn>
-                        -->
+
+                        <v-btn class="bg-lightprimary" prepend-icon="mdi-broom" variant="flat" @click="clearFilters()"> Limpar </v-btn>
                     </v-col>
                 </v-row>
             </div>
+
             <div class="px-4 mb-5">
                 <v-row class="align-center">
                     <v-expansion-panels variant="accordion">
@@ -36,13 +44,6 @@
                             <v-expansion-panel-text>
                                 <v-row class="d-flex align-start">
                                     <v-col cols="12" class="d-flex gap-4 justify-between" style="height: 75px">
-                                        <cs_InputTexto
-                                            v-model="filterCPF"
-                                            Prm_etiqueta="CPF/CNPJ"
-                                            :Prm_limpavel="true"
-                                            :Prm_isObrigatorio="false"
-                                        />
-
                                         <cs_SelectMRelacionamento
                                             v-model="filterMrel"
                                             Prm_etiqueta="Modelo de Relação"
@@ -73,14 +74,6 @@
                                             :Prm_isObrigatorio="false"
                                             :Prm_limpavel="true"
                                         />
-
-                                        <v-btn color="primary" prepend-icon="mdi-filter" variant="flat" @click="filterList()">
-                                            Filtrar
-                                        </v-btn>
-
-                                        <v-btn color="warning" prepend-icon="mdi-broom" variant="flat" @click="clearFilters()">
-                                            Limpar
-                                        </v-btn>
                                     </v-col>
                                 </v-row>
                             </v-expansion-panel-text>
@@ -89,17 +82,20 @@
                 </v-row>
             </div>
 
-            <v-card class="border-sm mt-1" elevation="0" v-if="isListView">
+            <v-container v-if="loading" class="d-flex justify-center align-center">
+                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+            </v-container>
+
+            <v-card class="border-sm mt-1" elevation="0" v-else>
                 <v-data-table
                     :headers="headers"
-                    :items="filteredItems"
+                    :items="items"
                     :items-per-page="itemsPerPage"
                     :loading="loading"
                     @update:items-per-page="updateItemsPerPage"
                     hide-default-footer
                     loading-text="Carregando dados..."
                     class="month-table"
-                    :search="search"
                 >
                     <template v-slot:column.header.GrupoClasse>
                         <div>Grupo<br />Classe</div>
@@ -177,48 +173,6 @@
                     </template>
                 </v-data-table>
             </v-card>
-
-            <v-container fluid v-else class="pa-0">
-                <v-row>
-                    <v-col cols="12">
-                        <v-row class="d-flex">
-                            <v-col
-                                cols="12"
-                                md="4"
-                                v-for="item in items"
-                                :key="item.ID"
-                                class="mb-1"
-                                @update:items-per-page="updateItemsPerPage"
-                            >
-                                <v-card class="border-sm border-opacity-50 pa-0 mt-1" flat>
-                                    <v-card-title class="font-weight-bold bg-lightprimary">{{ item.Nome }}</v-card-title>
-                                    <v-card-text class="mt-5">
-                                        <div class="pa-0 my-1">
-                                            <v-chip
-                                                :color="item.IsActive ? 'success' : 'error'"
-                                                class="font-weight-bold"
-                                                rounded="lg"
-                                                size="small"
-                                                >{{ item.IsActive ? 'Ativo' : 'Inativo' }}</v-chip
-                                            >
-                                        </div>
-                                    </v-card-text>
-                                    <v-card-actions class="pl-4">
-                                        <v-icon small @click="" class="v-btn-icon">mdi-pencil</v-icon>
-                                        <v-icon small @click="" class="v-btn-icon">mdi-delete</v-icon>
-                                        <v-icon small @click="" class="v-btn-icon">{{ active ? 'mdi-cancel' : 'mdi-check' }}</v-icon>
-                                    </v-card-actions>
-                                </v-card>
-                            </v-col>
-                        </v-row>
-                    </v-col>
-                </v-row>
-                <v-row class="d-block-inline align-center">
-                    <v-col cols="12" class="d-flex justify-center">
-                        <cs_Pagination v-model:currentPage="currentPage" :totalItems="totalItems" v-model:itemsPerPage="itemsPerPage" />
-                    </v-col>
-                </v-row>
-            </v-container>
         </div>
     </v-container>
 
@@ -257,13 +211,12 @@
 // Import de bibliotecas e etc...
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { DeleteConta, GetContasList, SoftDeleteConta } from '../../services/contas/bb012_conta';
+import { GetContasCompleta, DeleteConta, SoftDeleteConta } from '../../services/contas/bb012_Contas/bb012_conta';
 // Import de Types
 import type { AxiosResponse } from 'axios';
-import type { ContaCompleta, ApiResponse, Lista_csicp_bb012 } from '../../types/crm/bb012_conta';
+import type { ContaCompleta, List } from '@/types/crm/contas/bb012_conta';
 //Import de componentes
 import cs_InputTexto from '../../submodules/cs_components/src/components/campos/cs_InputTexto.vue';
 import cs_Pagination from '../../submodules/cs_components/src/components/navigation/Pagination.vue';
@@ -345,29 +298,22 @@ const headers = ref([
 ]);
 
 const items = ref<Item[]>([]);
-const filteredItems = ref<Item[]>([]);
 const confirmDialog = ref(false);
 const confirmSoftDeleteDialog = ref(false);
 const itemToDelete = ref<Item | null>(null);
 const itemToSoftDelete = ref<Item | null>(null);
 const loading = ref(false);
 const active = ref(true);
-const count = false;
 const search = ref('');
-const searchCodigo = ref('');
+const searchCodigo = ref<string>('');
 
 // Definindo os valores para os filtros
 const filterCPF = ref<string>('');
-const filterMrel = ref<number>(0);
-const filterGrupo = ref<number>(0);
-const filterClasse = ref<number>(0);
-const filterStatus = ref<number>(0);
-const filterSituacao = ref<number>(0);
-
-const rules = {
-    codigo: [validationRules.required, validationRules.numeric],
-    nome: [validationRules.required]
-};
+const filterMrel = ref<number | undefined>();
+const filterGrupo = ref<number | undefined>();
+const filterClasse = ref<number | undefined>();
+const filterStatus = ref<number | undefined>();
+const filterSituacao = ref<number | undefined>();
 
 const user = getUserFromLocalStorage();
 const tenant = user?.TenantId;
@@ -379,9 +325,6 @@ const itemsPerPage = ref(50);
 const totalItems = ref(0);
 const totalPages = ref(0);
 
-//Variavel para controlar o modo de exibição da tela
-const isListView = ref(true);
-
 //Variaveis do Snackbar
 const snackbar = ref(false);
 const snackbarMessage = ref('');
@@ -392,10 +335,6 @@ const showSnackbar = (message: string, color: string) => {
     snackbarMessage.value = message;
     snackbarColor.value = color;
     snackbar.value = true;
-};
-
-const toggleView = () => {
-    isListView.value = !isListView.value;
 };
 
 const fetchActive = () => {
@@ -423,50 +362,56 @@ const formatCPFOrCNPJ = (value: string | null | undefined): string => {
     return value;
 };
 
+// Função para remover formatações
+const normalizeCPF = (cpf: unknown): string => {
+    return typeof cpf === 'string' ? cpf.replace(/\D/g, '') : '';
+};
+
 const fetchData = async () => {
     loading.value = true;
+
     try {
-        const response: AxiosResponse<ApiResponse<ContaCompleta>> = await GetContasList(
+        const response: AxiosResponse<ContaCompleta> = await GetContasCompleta(
             tenant,
             active.value,
-            count,
-            searchCodigo.value,
-            search.value,
             currentPage.value,
             itemsPerPage.value,
-            3,
-            '',
-            ''
+            filterCPF.value,
+            filterMrel.value,
+            filterGrupo.value,
+            filterClasse.value,
+            filterStatus.value,
+            filterSituacao.value,
+            searchCodigo.value,
+            search.value
         );
 
-        const data = response.data;
+        const res = response.data;
 
-        items.value = data.Lista_csicp_bb012.map((item: Lista_csicp_bb012) => ({
-            ID: item.csicp_bb012.csicp_bb012.ID,
-            Nome: `${item.csicp_bb012.csicp_bb012.BB012_Codigo} - ${item.csicp_bb012.csicp_bb012.BB012_Nome_Cliente}`,
-            Endereco: item.BB01206_Endereco.csicp_bb01206.BB012_Logradouro,
-            Contato: item.csicp_bb012.csicp_bb012.BB012_FaxCelular,
-            CPF: formatCPFOrCNPJ(String(item.BB01202.csicp_bb01202.BB012_CPF || item.BB01202.csicp_bb01202.BB012_CNPJ)),
-            Modalidade: item.csicp_bb012.csicp_bb012_MRel.Label,
-            Grupo: item.csicp_bb012.csicp_bb012_GruCta.Label,
-            Classe: item.csicp_bb012.csicp_bb012_ClaCta.Label,
-            Status: item.csicp_bb012.csicp_bb012_StaCta.Label,
-            Situacao: item.csicp_bb012.csicp_bb012_SitCta.Label,
-            MrelId: item.csicp_bb012.csicp_bb012_MRel.Id,
-            GrupoId: item.csicp_bb012.csicp_bb012_GruCta.Id,
-            ClasseId: item.csicp_bb012.csicp_bb012_ClaCta.Id,
-            StatusId: item.csicp_bb012.csicp_bb012_StaCta.Id,
-            SituacaoId: item.csicp_bb012.csicp_bb012_SitCta.Id,
-            IsActive: item.csicp_bb012.csicp_bb012.BB012_Is_Active
+        items.value = res.Data.List.map((item: List) => ({
+            ID: item.Id || '',
+            Nome: item.Bb012Codigo && item.Bb012NomeCliente ? `${item.Bb012Codigo} - ${item.Bb012NomeCliente}` : '',
+            Endereco: item.NavGetBB1206?.Bb012Logradouro || '',
+            Contato: item.Bb012Faxcelular || '',
+            CPF:
+                item.NavGetBB1202?.Bb012Cpf || item.NavGetBB1202?.Bb012Cnpj
+                    ? formatCPFOrCNPJ(String(item.NavGetBB1202.Bb012Cpf || item.NavGetBB1202.Bb012Cnpj))
+                    : '',
+            Modalidade: item.NavBB012_ModeloRelacao?.Label || '',
+            Grupo: item.NavBB012_GrupoConta?.Label || '',
+            Classe: item.NavBB012_ClasseConta?.Label || '',
+            Status: item.NavBB012_StatusConta?.Label || '',
+            Situacao: item.NavBB012_SitConta?.Label || '',
+            MrelId: Number(item.Bb012ModrelacaoId) || 0,
+            GrupoId: Number(item.Bb012GrupocontaId) || 0,
+            ClasseId: Number(item.Bb012ClassecontaId) || 0,
+            StatusId: Number(item.Bb012StatuscontaId) || 0,
+            SituacaoId: Number(item.Bb012SitContaId) || 0,
+            IsActive: item.Bb012IsActive ?? false
         }));
 
-        totalItems.value = data.PageSize.cs_list_total_itens;
+        totalItems.value = res.Data.TotalCount;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
-
-        filteredItems.value = [...items.value];
-
-        // Aplique o filtro aos novos dados
-        filterList();
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
     } finally {
@@ -474,38 +419,17 @@ const fetchData = async () => {
     }
 };
 
-// Função para remover formatações
-const normalizeCPF = (cpf: unknown): string => {
-    return typeof cpf === 'string' ? cpf.replace(/\D/g, '') : '';
-};
-
-// Função de filtro
-const filterList = () => {
-    filteredItems.value = items.value.filter((item) => {
-        const normalizedItemCPF = normalizeCPF(item.CPF); // Normaliza o CPF do item
-        const normalizedFilterCPF = normalizeCPF(filterCPF.value); // Normaliza o valor do filtro
-
-        return (
-            (!filterCPF.value || normalizedItemCPF.includes(normalizedFilterCPF)) &&
-            (!filterMrel.value || item.MrelId === filterMrel.value) &&
-            (!filterGrupo.value || item.GrupoId === filterGrupo.value) &&
-            (!filterClasse.value || item.ClasseId === filterClasse.value) &&
-            (!filterStatus.value || item.StatusId === filterStatus.value) &&
-            (!filterSituacao.value || item.SituacaoId === filterSituacao.value)
-        );
-    });
-};
-
 const clearFilters = () => {
+    search.value = '';
+    searchCodigo.value = '';
     filterCPF.value = '';
-    filterMrel.value = 0;
-    filterGrupo.value = 0;
-    filterClasse.value = 0;
-    filterStatus.value = 0;
-    filterSituacao.value = 0;
+    filterMrel.value = undefined;
+    filterGrupo.value = undefined;
+    filterClasse.value = undefined;
+    filterStatus.value = undefined;
+    filterSituacao.value = undefined;
 
-    // Restaura a lista completa
-    filteredItems.value = [...items.value];
+    fetchData();
 };
 
 // Array de opções do menu de ações
@@ -637,7 +561,7 @@ const updateItemsPerPage = (itemsPerPageValue: number) => {
     }
 };
 
-watch([currentPage, itemsPerPage, search, searchCodigo], fetchData);
+watch([currentPage, itemsPerPage], fetchData);
 
 onMounted(() => {
     fetchData();
