@@ -197,7 +197,8 @@ const fetchData = async () => {
             currentPage.value,
             itemsPerPage.value
         );
-        const data = response.data;
+        const res = response.data;
+        const data = res.Data;
         items.value = data.List.map((item: List) => ({
             ID: item.Bb064Fxetariaid.toString(),
             Descricao: item.Bb064Descricao,

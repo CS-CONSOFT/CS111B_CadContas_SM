@@ -1,4 +1,10 @@
 export interface PeriodoCompleto {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     List: List[];
     CurrentPage: number;
     TotalPage: number;
@@ -65,6 +71,12 @@ export interface Bb062Diavencto {
 }
 
 export interface PeridoById {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     TenantId: number;
     Bb062Id: number;
     Bb062Ano: number;
@@ -119,7 +131,6 @@ export interface Bb062Diavencto {
     Bb037Qtddiasmcompra: number;
     Bb037Isactive: boolean;
 }
-
 export interface PeriodoCreate {
     Bb062Ano: number;
     Bb062Mes: number;

@@ -1,4 +1,10 @@
 export interface ConvenioCompleto {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     List: List[];
     CurrentPage: number;
     TotalPage: number;
@@ -590,7 +596,12 @@ export interface OsusrE9aCsicpSy001Imgs {
 }
 
 export interface ConvenioById {
-    Bb060ConvMasterid: any;
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     TenantId: number;
     Bb060Convenioid: number;
     Bb060Codigo: string;
@@ -616,6 +627,8 @@ export interface ConvenioById {
     NavBb060Convmaster: NavBb060Convmaster;
     NavBb060Responsavel: NavBb060Responsavel;
     NavBb060Tipocobranca: NavBb060Tipocobranca;
+    NavFormaPagamento: NavFormaPagamento;
+    NavUsuarioProprietario: NavUsuarioProprietario;
 }
 
 export interface NavBb060Agcobrador {
@@ -1000,6 +1013,173 @@ export interface NavBb060Tipocobranca {
     Bb009Tipocobranca: string;
     Empresaid: string;
     Bb009Isactive: boolean;
+}
+
+export interface NavFormaPagamento {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb026Filial: number;
+    Bb026Codigo: number;
+    Bb026Formapagamento: string;
+    Bb026Dadoschequesn: number;
+    Bb026Dadoscartaosn: number;
+    Bb026Vinccupomfiscal: number;
+    Bb026Classificacao: number;
+    Bb026Crplanocontaid: string;
+    Bb026Dbplanocontaid2: string;
+    Bb026NroAutenticacoes: number;
+    Bb026ValorMinimo: number;
+    Bb026ValorMaximo: number;
+    Bb026TrocoMaximo: number;
+    Bb026Pontosangria: number;
+    Bb026Tipo: number;
+    Bb026Parcelapordepto: boolean;
+    Bb026Condpagtofixoid: string;
+    Bb026Administradoraid: string;
+    Bb026UtilizaPinpad: boolean;
+    Bb026Consultacheque: boolean;
+    Bb026Impressaocheque: boolean;
+    Bb026Chequebompara: boolean;
+    Bb026Solicitaemitente: boolean;
+    Bb026Solicitaqtd: boolean;
+    Bb026Solicitacondpagto: boolean;
+    Bb026Aceitapagto: boolean;
+    Bb026Aceitarecebimento: boolean;
+    Bb026Permitetroco: boolean;
+    Bb026Sangriaautomatica: boolean;
+    Bb026Naoabregaveta: boolean;
+    Bb026TipovinculoId: number;
+    Bb026Isactive: boolean;
+    Bb026ClasseId: number;
+    Bb026EspecieId: string;
+    Bb026Meiopagtoimpfiscal: string;
+    Bb026Tipoespecie: number;
+    Bb026Pcomissaovend: number;
+    Bb026Aceitavpresente: boolean;
+    Bb026Capturarecebpvpdv: boolean;
+    Bb026Islibentregaliq: boolean;
+    Bb026Isaplicaaprovcond: boolean;
+    Bb026Isagrupa: boolean;
+    NavBb026Administradora: NavBb026Administradora;
+    NavBb026Condpagtofixo: NavBb026Condpagtofixo;
+}
+
+export interface NavBb026Administradora {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb019Filial: number;
+    Bb019Codigo: number;
+    Bb019Administradora: string;
+    Bb019TaxaDeCobranca: number;
+    Bb019Venctopadrao: number;
+    Bb019Contaid: string;
+    Bb019Usafatoracresc: number;
+    Bb019Finanproprio: number;
+    Bb019Tac: number;
+    Bb019Email: string;
+    Bb019Homepage: string;
+    Bb019TipofinancId: number;
+    Bb019Isactive: boolean;
+    Bb019Dialimitevenctopadrao: number;
+    Bb019Codigocredenciadora: string;
+    Bb019LogoAdm: string;
+    Bb019Filename: string;
+    Bb019Path: string;
+}
+
+export interface NavBb026Condpagtofixo {
+    TenantId: number;
+    Id: string;
+    Empresaid: string;
+    Bb008Filial: number;
+    Bb008Codigo: number;
+    Bb008CondicaoPagto: string;
+    Bb008Tipo: number;
+    Bb008Condicao: string;
+    Bb008Codformapagto: number;
+    Bb008Vlrmaxformapagto: number;
+    Bb008Vlrminformapagto: number;
+    Bb008Entliquidada: number;
+    Bb008Parcliquidadas: number;
+    Bb008AprovaVenda: number;
+    Bb008PercAcrescimo: number;
+    Bb008PercDesconto: number;
+    Bb008Indprecovenda: number;
+    Bb008Percentrada: number;
+    Bb008Valoracrescimo: number;
+    Bb008Fatorjuros: number;
+    Bb008Isactive: boolean;
+    Bb008Tipoid: number;
+    Bb008Qtdparcela: number;
+}
+
+export interface NavUsuarioProprietario {
+    TenantId: number;
+    Id: string;
+    Sy001Usuario: string;
+    Sy001Nome: string;
+    Sy001Senha: string;
+    Sy001Bloqueado: boolean;
+    Sy001DataValidade: string;
+    Sy001Autalterarsenha: number;
+    NavSY001_AlterarSenha: NavSY001_AlterarSenha;
+    Sy001Altsenhapxlogin: number;
+    NavSy001Altsenhapxlogin: NavSy001Altsenhapxlogin;
+    Sy001ExpiraSenha: number;
+    NavSy001ExpiraSenha: NavSy001ExpiraSenha;
+    Sy001Senhexpaposndias: number;
+    Sy001Dtexpiracaologin: string;
+    Sy001Deptolotado: string;
+    Sy001Cargo: string;
+    Sy001Email: string;
+    Sy001Imagem: string;
+    Sy001Dataultimoacesso: string;
+    Userid: number;
+    Sy001IdiomaId: number;
+    NavSy001IdiomaId: NavSy001IdiomaId;
+    Sy001Senhacs: string;
+    Sy001Celular: string;
+    OsusrE9aCsicpSy001Imgs: OsusrE9aCsicpSy001Imgs[];
+}
+
+export interface NavSY001_AlterarSenha {
+    Id: number;
+    Label: string;
+    Tiporegistro: number;
+    Order: number;
+}
+
+export interface NavSy001Altsenhapxlogin {
+    Id: number;
+    Label: string;
+    Tiporegistro: number;
+    Order: number;
+}
+
+export interface NavSy001ExpiraSenha {
+    Id: number;
+    Label: string;
+    Tiporegistro: number;
+    Order: number;
+}
+
+export interface NavSy001IdiomaId {
+    Id: number;
+    Label: string;
+    Order: number;
+    IsActive: boolean;
+}
+
+export interface OsusrE9aCsicpSy001Imgs {
+    TenantId: number;
+    Id: string;
+    UsuarioId: string;
+    Nome: string;
+    Tipo: string;
+    Ispadrao: boolean;
+    Path: string;
 }
 
 export interface ConvenioCreate {

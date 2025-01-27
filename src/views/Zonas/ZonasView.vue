@@ -463,7 +463,8 @@ const fetchData = async () => {
             currentPage.value,
             itemsPerPage.value
         );
-        const data = response.data;
+        const res = response.data;
+        const data = res.Data;
         items.value = data.List.map((item: List) => ({
             ID: item.Id,
             Codigo: item.Bb010Codigo,
@@ -516,7 +517,8 @@ const openEditDialog = async (item: Item) => {
     itemToEdit.value = item;
 
     try {
-        const data: ZonaById = await GetZonaById(tenant, item.ID);
+        const res: ZonaById = await GetZonaById(tenant, item.ID);
+        const data = res.Data;
 
         // Atribuindo os valores da resposta aos campos da BB010
         var_ID.value = data.Id;

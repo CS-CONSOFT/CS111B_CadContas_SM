@@ -311,10 +311,9 @@ function handleCleanValue(value: number | null) {
 
 const fetchFaixaEtariaById = async (id: string) => {
     try {
-        const response: FaixaEtariaById = await GetFaixaEtariaById(tenant, id);
-        const data = response.Data;
+        const res: FaixaEtariaById = await GetFaixaEtariaById(tenant, id);
+        const data = res.Data;
 
-        console.log(data);
         // Preencher as variáveis principais com dados retornados
         var_ID.value = data.Bb064Fxetariaid;
         var_bb064_Descricao.value = data.Bb064Descricao;

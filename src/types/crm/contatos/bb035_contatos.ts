@@ -1,4 +1,10 @@
 export interface ContatosCompleto {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     List: List[];
     CurrentPage: number;
     TotalPage: number;
@@ -35,6 +41,37 @@ export interface List {
     Bb035OrigemcontatoId: number;
     Bb035CodgCliente7x: number;
     Bb035SeqCliente7x: number;
+    NavCSICP_BB035End: NavCSICP_BB035End;
+    NavCSICP_BB035Trat: NavCSICP_BB035Trat;
+    NavCSICP_BB035Origem: NavCSICP_BB035Origem;
+}
+
+export interface NavCSICP_BB035End {
+    TenantId: number;
+    Bb035Id: string;
+    Bb035Contatoid: string;
+    Bb035Logradouro: string;
+    Bb035Numero: string;
+    Bb035Complemento: string;
+    Bb035Bairro: string;
+    Bb035CodigoCidade: string;
+    Bb035Uf: string;
+    Bb035Cep: string;
+    Bb035CodigoPais: string;
+}
+
+export interface NavCSICP_BB035Trat {
+    Id: number;
+    Label: string;
+    Order: number;
+    IsActive: boolean;
+}
+
+export interface NavCSICP_BB035Origem {
+    Id: number;
+    Label: string;
+    Order: number;
+    IsActive: boolean;
 }
 
 export interface ContatoById {

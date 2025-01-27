@@ -1,4 +1,10 @@
 export interface AtividadeCompleto {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     List: List[];
     CurrentPage: number;
     TotalPage: number;
@@ -15,8 +21,13 @@ export interface List {
     Bb011Atividade: string;
     Bb011IsActive: boolean;
 }
-
 export interface AtividadeById {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     TenantId: number;
     Id: string;
     Bb011Codigo: number;

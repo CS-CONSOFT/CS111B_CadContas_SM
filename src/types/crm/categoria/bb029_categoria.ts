@@ -1,4 +1,10 @@
 export interface CategoriaCompleta {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     List: List[];
     CurrentPage: number;
     TotalPage: number;
@@ -17,6 +23,12 @@ export interface List {
 }
 
 export interface CategoriaById {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     TenantId: number;
     Id: string;
     Bb029Codgcategoria: number;

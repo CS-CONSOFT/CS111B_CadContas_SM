@@ -229,8 +229,9 @@ const fetchData = async () => {
             currentPage.value,
             itemsPerPage.value
         );
-        const data = response.data;
-
+        const res = response.data;
+        const data = res.Data;
+        
         items.value = data.List.map((item: List) => ({
             ID: item.Bb060Convenioid,
             Codigo: item.Bb060Codigo,

@@ -138,7 +138,8 @@ const showSnackbar = (message: string, color: string) => {
 
 const fetchConvenioById = async (id: string) => {
     try {
-        const data: ConvenioById = await GetConvenioById(tenant, id);
+        const res: ConvenioById = await GetConvenioById(tenant, id);
+        const data = res.Data;
 
         BB060.value.bb060_ConvenioId = data.Bb060Convenioid;
         BB060.value.bb060_Codigo = data.Bb060Codigo;
@@ -157,7 +158,7 @@ const fetchConvenioById = async (id: string) => {
         BB060.value.bb060_EspecieID = data.Bb060Especieid;
         BB060.value.bb060_FPagto_ID = data.Bb060FpagtoId;
         BB060.value.bb060_IsActive = data.Bb060Isactive;
-        BB060.value.bb060_ConvMasterID = data.Bb060ConvMasterid;
+        BB060.value.bb060_ConvMasterID = data.Bb060Convmasterid;
     } catch (error) {
         console.error('Erro ao buscar convênio:', error);
     }

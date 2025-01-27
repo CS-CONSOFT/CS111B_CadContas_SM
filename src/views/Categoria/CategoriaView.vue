@@ -305,7 +305,8 @@ const fetchData = async () => {
             currentPage.value,
             itemsPerPage.value
         );
-        const data = response.data;
+        const res = response.data;
+        const data = res.Data;
         items.value = data.List.map((item: List) => ({
             ID: item.Id,
             Codigo: item.Bb029Codgcategoria,
@@ -342,7 +343,8 @@ const openEditDialog = async (item: Item) => {
     itemToEdit.value = item;
 
     try {
-        const data: CategoriaById = await GetCategoriaById(tenant, item.ID);
+        const res: CategoriaById = await GetCategoriaById(tenant, item.ID);
+        const data = res.Data;
         // Atribuindo os valores da resposta aos campos da BB029
         var_ID.value = data.Id;
         var_BB029_Codigo.value = data.Bb029Codgcategoria;

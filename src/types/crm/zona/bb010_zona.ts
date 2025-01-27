@@ -1,4 +1,10 @@
 export interface ZonaCompleto {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     List: List[];
     CurrentPage: number;
     TotalPage: number;
@@ -511,6 +517,12 @@ export interface NavBb032Cargo {
 }
 
 export interface ZonaById {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     TenantId: number;
     Id: string;
     Bb010Codigo: number;

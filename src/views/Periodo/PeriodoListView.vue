@@ -335,7 +335,8 @@ const fetchData = async () => {
             currentPage.value,
             itemsPerPage.value
         );
-        const data = response.data;
+        const res = response.data;
+        const data = res.Data;
         items.value = data.List.map((item: List) => {
             // Buscar o rótulo do mês baseado no valor do mês (número)
             const mesLabel = meses.find((mes) => mes.value === item.Bb062Mes)?.label || '';
@@ -391,7 +392,8 @@ const openEditDialog = async (item: Item) => {
     itemToEdit.value = item;
 
     try {
-        const data: PeridoById = await GetPeriodoById(tenant, item.ID);
+        const res: PeridoById = await GetPeriodoById(tenant, item.ID);
+        const data = res.Data;
         // Atribuindo os valores da resposta aos campos da BB062
         var_bb062_Id.value = data.Bb062Id;
         var_bb062_EstabID.value = data.Bb062Estabid;

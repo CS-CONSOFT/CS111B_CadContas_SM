@@ -1,4 +1,10 @@
 export interface ConvenioMasterCompleto {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     List: List[];
     CurrentPage: number;
     TotalPage: number;
@@ -16,6 +22,12 @@ export interface List {
 }
 
 export interface ConvenioMasterById {
+    Success: boolean;
+    Message: string;
+    Data: Data;
+}
+
+export interface Data {
     TenantId: number;
     Bb067Id: number;
     Bb067Descricao: string;

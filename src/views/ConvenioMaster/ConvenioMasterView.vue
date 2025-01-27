@@ -238,7 +238,8 @@ const fetchData = async () => {
             currentPage.value,
             itemsPerPage.value
         );
-        const data = response.data;
+        const res = response.data;
+        const data = res.Data;
         items.value = data.List.map((item: List) => ({
             ID: item.Bb067Id.toString(),
             Codigo: item.Bb067Codigo,
@@ -273,7 +274,8 @@ const openEditDialog = async (item: Item) => {
     itemToEdit.value = item;
 
     try {
-        const data: ConvenioMasterById = await GetConvenioMasterById(tenant, item.ID);
+        const res: ConvenioMasterById = await GetConvenioMasterById(tenant, item.ID);
+        const data = res.Data;
         // Atribuindo os valores da resposta aos campos da BB067
         var_ID.value = data.Bb067Id;
         var_bb067_Codigo.value = data.Bb067Codigo;
