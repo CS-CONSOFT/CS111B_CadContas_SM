@@ -205,12 +205,12 @@ const fetchData = async (id: string) => {
     loading.value = true;
     try {
         const res: ContaById = await GetContaById(tenant, id);
+        console.log(res);
         items.value = res.Data.NavRetencaoImpostosList.map((item: NavRetencaoImpostosList) => ({
-            ID: item.Id,
-            BB012_ID: item.Bb012Id,
-            //CAMPO ERRADO, NECESSARIO ADICIONAR A AA037 NA LISTA DE RETENCAO DE IMPOSTOS
-            Imposto: item.Bb012oCodigo.toString(),
-            Retem: item.Bb012oRetem,
+            ID: item.Id ?? '',
+            BB012_ID: item.Bb012Id ?? '',
+            Imposto: item.NavBb012oImposto?.Label ?? '',
+            Retem: item.Bb012oRetem ?? '',
             Percentual: `${item.Bb012oPercentual.toFixed(2)}%`
         }));
 
