@@ -137,10 +137,11 @@ const fetchData = async (id: string) => {
     loading.value = true;
     try {
         const res: ContaById = await GetContaById(tenant, id);
+
         items.value = res.Data.NavMembrosCompleto.NavMembroList.map((item: NavMembroList) => ({
-            ID: item.Id,
-            BB012_ID: item.Bb012Id,
-            Membro: item.Bb012Membroid
+            ID: item?.Id ?? '',
+            BB012_ID: item?.Bb012Id ?? '',
+            Membro: item?.NavBb012Membro?.Bb012NomeCliente ?? ''
         }));
 
         var_bb012_Id.value = res.Data.Id;

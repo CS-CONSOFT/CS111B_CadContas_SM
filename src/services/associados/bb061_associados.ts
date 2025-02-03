@@ -1,7 +1,7 @@
 import { newURLBase } from '../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { AssociadosCompleto, AssociadoCreate } from '../../types/crm/associados/bb061_associados';
+import type { AssociadosCompleto, Csicp_bb061 } from '../../types/crm/associados/bb061_associados';
 
 function GetAssociadosCompleto(
     tenantId: number | undefined,
@@ -10,7 +10,7 @@ function GetAssociadosCompleto(
     pagesize: number
 ): Promise<AxiosResponse<AssociadosCompleto>> {
     const url =
-        `${newURLBase}/api/v1/bb011?` +
+        `${newURLBase}/api/v1/bb061?` +
         `active=${encodeURIComponent(active)}&` +
         `pagenumber=${encodeURIComponent(pagenumber)}&` +
         `pagesize=${encodeURIComponent(pagesize)}`;
@@ -22,7 +22,7 @@ function GetAssociadosCompleto(
     });
 }
 
-const CreateAssociado = async (tenantId: number | undefined, associado: AssociadoCreate): Promise<AxiosResponse<any>> => {
+const CreateAssociado = async (tenantId: number | undefined, associado: Csicp_bb061): Promise<AxiosResponse<any>> => {
     try {
         const response = await axios.post(`${newURLBase}/api/v1/bb061`, associado, {
             headers: {

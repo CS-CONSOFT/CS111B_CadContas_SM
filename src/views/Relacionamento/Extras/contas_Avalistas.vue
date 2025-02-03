@@ -138,9 +138,9 @@ const fetchData = async (id: string) => {
     try {
         const res: ContaById = await GetContaById(tenant, id);
         items.value = res.Data.NavMembrosCompleto.NavAvalistaList.map((item: NavAvalistaList) => ({
-            ID: item.Id,
-            BB012_ID: item.Bb012Id,
-            Avalista: item.Bb012Membroid
+            ID: item?.Id ?? '',
+            BB012_ID: item?.Bb012Id ?? '',
+            Avalista: item?.NavBb012Membro?.Bb012NomeCliente ?? ''
         }));
 
         var_bb012_Id.value = res.Data.Id;

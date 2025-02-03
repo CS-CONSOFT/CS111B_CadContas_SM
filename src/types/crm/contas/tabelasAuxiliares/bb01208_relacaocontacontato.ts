@@ -1,4 +1,4 @@
-export interface RelacaoContatosContaCreate {
+export interface Csicp_bb01208 {
     Bb012Id: string;
     Bb012Contatoid: string;
     Bb036Candidatoid: string;

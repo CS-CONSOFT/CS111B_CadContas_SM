@@ -919,7 +919,7 @@ async function salvarConta() {
 
         try {
             const response = await UpdateConta(tenant, BB012.value.ID, In_csicp_bb012_Completo);
-            if (response.data.Str_ReturnErro.Out_IsSuccess) {
+            if (response.data.Success) {
                 showSnackbar('Conta atualizada com sucesso', 'success');
                 setTimeout(() => {
                     router.push({
@@ -927,7 +927,7 @@ async function salvarConta() {
                     });
                 }, 2000);
             } else {
-                showSnackbar(response.data.Str_ReturnErro.Out_Message || 'Erro ao criar conta', 'error');
+                showSnackbar(response.data.Message || 'Erro ao criar conta', 'error');
             }
         } catch (error) {
             showSnackbar('Erro inesperado ao editar a conta', 'error');

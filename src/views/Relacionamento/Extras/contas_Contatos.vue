@@ -336,11 +336,15 @@ import { validationRules } from '../../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../../utils/getUserStorage';
 // Import de API's
 import { GetContaById } from '../../../services/contas/bb012_Contas/bb012_conta';
-import { CreateRelacaoContaContato, DeleteRelacaoContaContato } from '../../../services/contas/bb01208_Contato/bb01208_contato';
+import {
+    CreateRelacaoContaContato,
+    UpdateRelacaoContaContato,
+    DeleteRelacaoContaContato
+} from '../../../services/contas/bb01208_Contato/bb01208_contato';
 import { GetContatoById, CreateContato } from '../../../services/contas/bb035_Contato/bb035_contato';
 // Import de types
 import type { ContaById, NavContatosList } from '../../../types/crm/contas/bb012_contabyid';
-import type { RelacaoContatosContaCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb01208_relacaocontacontato';
+import type { Csicp_bb01208 } from '../../../types/crm/contas/tabelasAuxiliares/bb01208_relacaocontacontato';
 import type { ContatoById, ContatoCreate, NavCSICP_BB035EndCreate } from '../../../types/crm/contatos/bb035_contatos';
 import type { CEP } from '../../../submodules/cs_components/src/types/enderecamento/CepTypes';
 //Import de componentes
@@ -488,15 +492,15 @@ const fetchData = async (id: string) => {
     loading.value = true;
     try {
         const res: ContaById = await GetContaById(tenant, id);
-        console.log(res);
+
         items.value = res.Data.NavContatosList.map((item: NavContatosList) => ({
-            ID: item.Id,
-            BB012_ID: item.Bb012Id,
-            BB035_ID: item.Bb012Contatoid,
-            Contato: `${item.NavCSICP_BB035.Bb035Primeironome} ${item.NavCSICP_BB035.Bb035Sobrenome}`,
-            Grau: item.NavCSICP_BB035Gpa.Label,
-            Telefone: item.NavCSICP_BB035.Bb035Telefone,
-            Grau_ID: item.Bb01208GrauparentId
+            ID: item?.Id ?? '',
+            BB012_ID: item?.Bb012Id ?? '',
+            BB035_ID: item?.Bb012Contatoid ?? '',
+            Contato: `${item?.NavCSICP_BB035?.Bb035Primeironome ?? ''} ${item?.NavCSICP_BB035?.Bb035Sobrenome ?? ''}`.trim(),
+            Grau: item?.NavCSICP_BB035Gpa?.Label ?? '',
+            Telefone: item?.NavCSICP_BB035?.Bb035Telefone ?? '',
+            Grau_ID: item?.Bb01208GrauparentId ?? ''
         }));
 
         var_bb012_Id.value = res.Data.Id;
@@ -521,7 +525,7 @@ function startEditGrauParentesco(index: number, grau: number) {
 const UpdateGrauParentesco = async (index: number) => {
     if (editingIndex.value !== null) {
         try {
-            const data: RelacaoContatosContaCreate = {
+            const data: Csicp_bb01208 = {
                 Bb012Id: items.value[index].BB012_ID,
                 Bb012Contatoid: items.value[index].BB035_ID,
                 Bb036Candidatoid: '',
@@ -536,12 +540,12 @@ const UpdateGrauParentesco = async (index: number) => {
                 Bb01208OrigemcontatoId: 0
             };
 
-            const response = await CreateRelacaoContaContato(tenant, data);
-            if (response.data.Out_IsSuccess) {
+            const response = await UpdateRelacaoContaContato(tenant, items.value[index].ID, data);
+            if (response.data.Out_Success) {
                 showSnackbar('Grau de parentesco atualizado com sucesso', 'success');
                 fetchData(props.id);
             } else {
-                showSnackbar(response.data.Out_Message || 'Falha ao salvar o grau de parentesco. Verifique os dados.', 'error');
+                showSnackbar(response.data.Message || 'Falha ao salvar o grau de parentesco. Verifique os dados.', 'error');
             }
         } catch (error) {
             showSnackbar('Erro inesperado ao salvar o contato', 'error');
@@ -570,7 +574,7 @@ const openDialog = () => {
 const adicionarRelacaoContaContato = async () => {
     if (formRef.value.validate()) {
         try {
-            const data: RelacaoContatosContaCreate = {
+            const data: Csicp_bb01208 = {
                 Bb012Id: var_bb012_Id.value,
                 Bb012Contatoid: var_SelectedContato.value,
                 Bb036Candidatoid: '',
@@ -720,6 +724,7 @@ const deleteContatoConfirmed = async () => {
     if (!itemToDelete.value) return;
     try {
         await DeleteRelacaoContaContato(tenant, itemToDelete.value.ID);
+
         showSnackbar('Contato excluído com sucesso', 'success');
         fetchData(props.id);
         confirmDialog.value = false;

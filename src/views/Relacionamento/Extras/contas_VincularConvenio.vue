@@ -131,7 +131,7 @@ import {
     SoftDeleteAssociado
 } from '../../../services/associados/bb061_associados';
 // Import de types
-import type { AssociadosCompleto, AssociadoCreate } from '../../../types/crm/associados/bb061_associados';
+import type { AssociadosCompleto, Csicp_bb061 } from '../../../types/crm/associados/bb061_associados';
 import type { ContaById } from '../../../types/crm/contas/bb012_contabyid';
 //Import de componentes
 import cs_BtnIsActive from '../../../submodules/cs_components/src/components/botoes/cs_BtnIsActive.vue';
@@ -171,7 +171,6 @@ const itemToEdit = ref<Item | null>(null);
 const itemToSoftDelete = ref<Item | null>(null);
 const loading = ref(false);
 const active = ref(true);
-const count = false;
 const search = ref('');
 
 const rules = {
@@ -221,13 +220,15 @@ const fetchAssociados = async (id: string) => {
         const response = await GetAssociadosCompleto(tenant, true, 1, 999);
         const data: AssociadosCompleto = response.data;
 
+        console.log(data);
+
         associados.value = data.Data.List.map((associados) => ({
             ID: associados.Bb061Id.toString(),
             Codigo: associados.NavBb060Convenio.Bb060Codigo || '',
             Convenio: associados.NavBb060Convenio.Bb060Descricao || '',
-            CodigoConta: Number(associados.Bb012Contaid) || 0,
-            Conta: associados.Bb012Contaid || '',
-            Associado: `${associados} ${associados}` || '',
+            CodigoConta: associados.NavBB012.Bb012Codigo || 0,
+            Conta: associados.NavBB012.Bb012NomeCliente || '',
+            Associado: `${associados.NavBB012.Bb012Descricao} ${associados}` || '',
             TipoAssociado: associados.NavBb061Tipoass.Label || '',
             Ativo: associados.Bb061Isactive,
             Valor: associados.Bb061Valor.toFixed(2)
@@ -253,7 +254,7 @@ const openDialog = () => {
 const CreateOrUpdateAssociado = async () => {
     if (formRef.value.validate()) {
         try {
-            const data: AssociadoCreate = {
+            const data: Csicp_bb061 = {
                 Bb060Convenioid: var_bb060_ConvenioID.value,
                 Bb061Tipoassid: var_bb061_tipoAssID.value,
                 Bb012Contaid: var_bb012_ContaId.value,

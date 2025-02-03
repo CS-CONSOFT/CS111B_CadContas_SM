@@ -255,8 +255,9 @@ const headers = ref([
         title: 'Nome',
         value: 'Nome',
         sortable: true,
-        width: '25%',
-        align: 'start'
+        width: '20%',
+        align: 'start',
+        cellClass: 'text-wrap'
     },
     {
         title: 'Endereço / Contato',
@@ -293,7 +294,7 @@ const headers = ref([
         align: 'center',
         value: 'actions',
         sortable: false,
-        width: '10%'
+        width: '20%'
     }
 ]);
 
@@ -567,3 +568,9 @@ onMounted(() => {
     fetchData();
 });
 </script>
+<style scoped>
+.text-wrap {
+    white-space: normal !important;
+    word-break: break-word;
+}
+</style>
