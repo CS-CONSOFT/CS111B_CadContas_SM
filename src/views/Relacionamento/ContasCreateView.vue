@@ -329,7 +329,7 @@ import { useRouter } from 'vue-router';
 import { validationRules } from '../../utils/ValidationRules';
 import { getUserFromLocalStorage } from '../../utils/getUserStorage';
 // Import de API's
-import { CreateConta } from '@/services/contas/bb012_Contas/bb012_conta';
+import { CreateConta } from '../../services/contas/bb012_Contas/bb012_conta';
 // Import de types
 import type { Bb012, Bb01201, Bb01202, Bb01206, ContaCreate } from '@/types/crm/contas/bb012_contacreate';
 import type { CEP } from '../../submodules/cs_components/src/types/enderecamento/CepTypes';
