@@ -12,10 +12,10 @@ function GetZonaCompleto(
 ): Promise<AxiosResponse<ZonaCompleto>> {
     const url =
         `${newURLBase}${serviceBs101}/v1/bb010?` +
-        `active=${encodeURIComponent(active)}&` +
-        `search=${encodeURIComponent(search)}&` +
-        `pagenumber=${encodeURIComponent(pagenumber)}&` +
-        `pagesize=${encodeURIComponent(pagesize)}`;
+        `IsActive=${encodeURIComponent(active)}&` +
+        `Search=${encodeURIComponent(search)}&` +
+        `PageNumber=${encodeURIComponent(pagenumber)}&` +
+        `PageSize=${encodeURIComponent(pagesize)}`;
 
     return axios.get<ZonaCompleto>(url, {
         headers: {

@@ -339,13 +339,13 @@ const fetchData = async () => {
         const data = res.Data;
         items.value = data.List.map((item: List) => {
             // Buscar o rótulo do mês baseado no valor do mês (número)
-            const mesLabel = meses.find((mes) => mes.value === item.Bb062Mes)?.label || '';
+            const mesLabel = meses.find((mes) => mes.value === item.Bb062Mes)?.label || 'N/A';
 
             return {
-                ID: item.Bb062Id.toString(),
-                Ano: item.Bb062Ano.toString(),
+                ID: item.Bb062Id?.toString() || '',
+                Ano: item.Bb062Ano?.toString() || '',
                 Mes: mesLabel,
-                EstabelecimentoId: item.Bb062Estabid,
+                EstabelecimentoId: item.Bb062Estabid ?? 0,
                 Emissao: item.Bb062Dtemissao
                     ? new Date(item.Bb062Dtemissao).toLocaleDateString('pt-BR', {
                           day: '2-digit',
@@ -353,13 +353,13 @@ const fetchData = async () => {
                           year: 'numeric'
                       })
                     : '',
-                Vencimento: item.NavBb062Diavencto.Id,
-                Descritivo: item.Bb062Descritivo,
-                Status: item.NavBb062Status.Label
+                Vencimento: item.NavBb062Diavencto?.Id ?? 0,
+                Descritivo: item.Bb062Descritivo || '',
+                Status: item.NavBb062Status?.Label || ''
             };
         });
 
-        totalItems.value = data.TotalCount;
+        totalItems.value = data.TotalCount ?? 0;
         totalPages.value = Math.ceil(totalItems.value / itemsPerPage.value);
     } catch (error) {
         showSnackbar('Erro ao buscar dados.', 'error');
