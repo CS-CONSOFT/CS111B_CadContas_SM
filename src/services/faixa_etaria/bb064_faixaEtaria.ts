@@ -1,4 +1,4 @@
-import { newURLBase } from '../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type {
@@ -17,7 +17,7 @@ function GetFaixaEtariaCompleto(
     pagesize: number
 ): Promise<AxiosResponse<FaixaEtariaCompleto>> {
     const url =
-        `${newURLBase}/api/v1/bb064?` +
+        `${newURLBase}${serviceBs101}/v1/bb064?` +
         `active=${encodeURIComponent(active)}&` +
         `search=${encodeURIComponent(search)}&` +
         `pagenumber=${encodeURIComponent(pagenumber)}&` +
@@ -31,7 +31,7 @@ function GetFaixaEtariaCompleto(
 }
 
 const GetFaixaEtariaById = async (tenantId: number | undefined, id: string): Promise<FaixaEtariaById> => {
-    const url = `${newURLBase}/api/v1/bb064/${encodeURIComponent(id)}`;
+    const url = `${newURLBase}${serviceBs101}/v1/bb064/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<FaixaEtariaById> = await axios.get(url, {
@@ -49,7 +49,7 @@ const GetFaixaEtariaById = async (tenantId: number | undefined, id: string): Pro
 
 const CreateFaixaEtaria = async (tenantId: number | undefined, faixaEtaria: FaixaEtariaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb064`, faixaEtaria, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb064`, faixaEtaria, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -63,7 +63,7 @@ const CreateFaixaEtaria = async (tenantId: number | undefined, faixaEtaria: Faix
 
 const UpdateFaixaEtaria = async (tenantId: number | undefined, id: string, faixaEtaria: FaixaEtariaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.put(`${newURLBase}/api/v1/bb064/${encodeURIComponent(id)}`, faixaEtaria, {
+        const response = await axios.put(`${newURLBase}${serviceBs101}/v1/bb064/${encodeURIComponent(id)}`, faixaEtaria, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -77,7 +77,7 @@ const UpdateFaixaEtaria = async (tenantId: number | undefined, id: string, faixa
 
 const DeleteFaixaEtaria = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb064/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb064/${encodeURIComponent(id)}`, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -96,7 +96,7 @@ const CreateDetalhesFaixaEtaria = async (
     detalhesFaixaEtaria: FaixaEtariaDetalhesCreate
 ): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb066`, detalhesFaixaEtaria, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb066`, detalhesFaixaEtaria, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -110,7 +110,7 @@ const CreateDetalhesFaixaEtaria = async (
 
 const DeleteDetalhesFaixaEtaria = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb066/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb066/${encodeURIComponent(id)}`, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -129,7 +129,7 @@ const CreateVinculoConvenioFaixaEtaria = async (
     vincularConvenio: FaixaEtariaConvenioCreate
 ): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb065`, vincularConvenio, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb065`, vincularConvenio, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -143,7 +143,7 @@ const CreateVinculoConvenioFaixaEtaria = async (
 
 const DeleteVinculoConvenioFaixaEtaria = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb065/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb065/${encodeURIComponent(id)}`, {
             headers: {
                 Tenant_ID: tenantId
             }

@@ -1,4 +1,4 @@
-import { newURLBase } from '../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { ConvenioMasterCompleto, ConvenioMasterById, ConvenioMasterCreate } from '../../types/convenio_master/bb067_convenioMaster';
@@ -11,7 +11,7 @@ function GetConvenioMasterCompleto(
     pagesize: number
 ): Promise<AxiosResponse<ConvenioMasterCompleto>> {
     const url =
-        `${newURLBase}/api/v1/bb067?` +
+        `${newURLBase}${serviceBs101}/v1/bb067?` +
         `active=${encodeURIComponent(active)}&` +
         `search=${encodeURIComponent(search)}&` +
         `pagenumber=${encodeURIComponent(pagenumber)}&` +
@@ -25,7 +25,7 @@ function GetConvenioMasterCompleto(
 }
 
 const GetConvenioMasterById = async (tenantId: number | undefined, id: string): Promise<ConvenioMasterById> => {
-    const url = `${newURLBase}/api/v1/bb067/${encodeURIComponent(id)}`;
+    const url = `${newURLBase}${serviceBs101}/v1/bb067/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<ConvenioMasterById> = await axios.get(url, {
@@ -43,7 +43,7 @@ const GetConvenioMasterById = async (tenantId: number | undefined, id: string): 
 
 const CreateConvenioMaster = async (tenantId: number | undefined, convenioMaster: ConvenioMasterCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb067`, convenioMaster, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb067`, convenioMaster, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -61,7 +61,7 @@ const UpdateConvenioMaster = async (
     convenioMaster: ConvenioMasterCreate
 ): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.put(`${newURLBase}/api/v1/bb067/${encodeURIComponent(id)}`, convenioMaster, {
+        const response = await axios.put(`${newURLBase}${serviceBs101}/v1/bb067/${encodeURIComponent(id)}`, convenioMaster, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -75,7 +75,7 @@ const UpdateConvenioMaster = async (
 
 const DeleteConvenioMaster = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb060/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb060/${encodeURIComponent(id)}`, {
             headers: {
                 Tenant_ID: tenantId
             }

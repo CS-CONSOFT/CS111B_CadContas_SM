@@ -1,4 +1,4 @@
-import { newURLBase } from '../../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { ReferenciasBancariasCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb012q_referenciasbancarias';
@@ -8,7 +8,7 @@ const CreateDadosBancarios = async (
     dadosBancarios: ReferenciasBancariasCreate
 ): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb012q`, dadosBancarios, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb012q`, dadosBancarios, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -22,7 +22,7 @@ const CreateDadosBancarios = async (
 
 const DeleteDadosBancarios = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb012q/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb012q/${encodeURIComponent(id)}`, {
             params: {
                 Tenant_ID: tenantId
             }

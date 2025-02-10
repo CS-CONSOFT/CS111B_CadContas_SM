@@ -1,4 +1,4 @@
-import { newURLBase } from '../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { PeriodoCompleto, PeridoById, PeriodoCreate } from '../../types/crm/periodo/bb062_periodo';
@@ -11,7 +11,7 @@ function GetPeriodoCompleto(
     pagesize: number
 ): Promise<AxiosResponse<PeriodoCompleto>> {
     const url =
-        `${newURLBase}/api/v1/bb062?` +
+        `${newURLBase}${serviceBs101}/v1/bb062?` +
         `active=${encodeURIComponent(active)}&` +
         `search=${encodeURIComponent(search)}&` +
         `pagenumber=${encodeURIComponent(pagenumber)}&` +
@@ -24,7 +24,7 @@ function GetPeriodoCompleto(
 }
 
 const GetPeriodoById = async (tenantId: number | undefined, id: string): Promise<PeridoById> => {
-    const url = `${newURLBase}/api/v1/bb062/${encodeURIComponent(id)}`;
+    const url = `${newURLBase}${serviceBs101}/v1/bb062/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<PeridoById> = await axios.get(url, {
@@ -42,7 +42,7 @@ const GetPeriodoById = async (tenantId: number | undefined, id: string): Promise
 
 const CreatePeriodo = async (tenantId: number | undefined, periodo: PeriodoCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb062`, periodo, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb062`, periodo, {
             headers: {
                 Tenant_id: tenantId
             }
@@ -56,7 +56,7 @@ const CreatePeriodo = async (tenantId: number | undefined, periodo: PeriodoCreat
 
 const UpdatePeriodo = async (tenantId: number | undefined, id: string, periodo: PeriodoCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.put(`${newURLBase}/api/v1/bb062/${encodeURIComponent(id)}`, periodo, {
+        const response = await axios.put(`${newURLBase}${serviceBs101}/v1/bb062/${encodeURIComponent(id)}`, periodo, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -70,7 +70,7 @@ const UpdatePeriodo = async (tenantId: number | undefined, id: string, periodo: 
 
 const DeletePeriodo = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb062/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb062/${encodeURIComponent(id)}`, {
             headers: {
                 Tenant_ID: tenantId
             }

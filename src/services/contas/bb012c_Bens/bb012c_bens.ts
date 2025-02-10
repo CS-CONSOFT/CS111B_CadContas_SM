@@ -1,11 +1,11 @@
-import { newURLBase } from '../../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { BensCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb012c_bens';
 
 const CreateBens = async (tenantId: number | undefined, bem: BensCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb012c`, bem, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb012c`, bem, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -19,7 +19,7 @@ const CreateBens = async (tenantId: number | undefined, bem: BensCreate): Promis
 
 const DeleteBens = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb012c/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb012c/${encodeURIComponent(id)}`, {
             params: {
                 Tenant_ID: tenantId
             }

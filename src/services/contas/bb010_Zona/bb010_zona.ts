@@ -1,4 +1,4 @@
-import { newURLBase } from '../../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { ZonaCompleto, ZonaById, ZonaCreate } from '../../../types/crm/zona/bb010_zona';
@@ -11,7 +11,7 @@ function GetZonaCompleto(
     pagesize: number
 ): Promise<AxiosResponse<ZonaCompleto>> {
     const url =
-        `${newURLBase}/api/v1/bb010?` +
+        `${newURLBase}${serviceBs101}/v1/bb010?` +
         `active=${encodeURIComponent(active)}&` +
         `search=${encodeURIComponent(search)}&` +
         `pagenumber=${encodeURIComponent(pagenumber)}&` +
@@ -25,7 +25,7 @@ function GetZonaCompleto(
 }
 
 const GetZonaById = async (tenantId: number | undefined, id: string): Promise<ZonaById> => {
-    const url = `${newURLBase}/api/v1/bb010/${encodeURIComponent(id)}`;
+    const url = `${newURLBase}${serviceBs101}/v1/bb010/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<ZonaById> = await axios.get(url, {
@@ -43,7 +43,7 @@ const GetZonaById = async (tenantId: number | undefined, id: string): Promise<Zo
 
 const CreateZona = async (tenantId: number | undefined, Zona: ZonaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb010`, Zona, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb010`, Zona, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -57,7 +57,7 @@ const CreateZona = async (tenantId: number | undefined, Zona: ZonaCreate): Promi
 
 const UpdateZona = async (tenantId: number | undefined, id: string, Zona: ZonaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.put(`${newURLBase}/api/v1/bb010/${encodeURIComponent(id)}`, Zona, {
+        const response = await axios.put(`${newURLBase}${serviceBs101}/v1/bb010/${encodeURIComponent(id)}`, Zona, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -71,7 +71,7 @@ const UpdateZona = async (tenantId: number | undefined, id: string, Zona: ZonaCr
 
 const DeleteZona = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb010/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb010/${encodeURIComponent(id)}`, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -85,7 +85,7 @@ const DeleteZona = async (tenantId: number | undefined, id: string): Promise<Axi
 
 const SoftDeleteZona = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.patch(`${newURLBase}/api/v1/bb010/changeActive/${encodeURIComponent(id)}`, null, {
+        const response = await axios.patch(`${newURLBase}${serviceBs101}/v1/bb010/changeActive/${encodeURIComponent(id)}`, null, {
             headers: {
                 Tenant_ID: tenantId
             }

@@ -1,4 +1,4 @@
-import { newURLBase } from '../../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { AtividadeCompleto, AtividadeById, AtividadeCreate } from '../../../types/crm/atividades/bb011_atividades';
@@ -11,7 +11,7 @@ function GetAtividadeCompleto(
     pagesize: number
 ): Promise<AxiosResponse<AtividadeCompleto>> {
     const url =
-        `${newURLBase}/api/v1/bb011?` +
+        `${newURLBase}${serviceBs101}/v1/bb011?` +
         `active=${encodeURIComponent(active)}&` +
         `search=${encodeURIComponent(search)}&` +
         `pagenumber=${encodeURIComponent(pagenumber)}&` +
@@ -25,7 +25,7 @@ function GetAtividadeCompleto(
 }
 
 const GetAtividadeById = async (tenantId: number | undefined, id: string): Promise<AtividadeById> => {
-    const url = `${newURLBase}/api/v1/bb011/${encodeURIComponent(id)}`;
+    const url = `${newURLBase}${serviceBs101}/v1/bb011/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<AtividadeById> = await axios.get(url, {
@@ -43,7 +43,7 @@ const GetAtividadeById = async (tenantId: number | undefined, id: string): Promi
 
 const CreateAtividade = async (tenantId: number | undefined, Atividade: AtividadeCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb011`, Atividade, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb011`, Atividade, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -57,7 +57,7 @@ const CreateAtividade = async (tenantId: number | undefined, Atividade: Atividad
 
 const UpdateAtividade = async (tenantId: number | undefined, id: string, Atividade: AtividadeCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.put(`${newURLBase}/api/v1/bb011/${encodeURIComponent(id)}`, Atividade, {
+        const response = await axios.put(`${newURLBase}${serviceBs101}/v1/bb011/${encodeURIComponent(id)}`, Atividade, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -71,7 +71,7 @@ const UpdateAtividade = async (tenantId: number | undefined, id: string, Ativida
 
 const DeleteAtividade = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb011/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb011/${encodeURIComponent(id)}`, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -85,7 +85,7 @@ const DeleteAtividade = async (tenantId: number | undefined, id: string): Promis
 
 const SoftDeleteAtividade = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.patch(`${newURLBase}/api/v1/bb011/changeActive/${encodeURIComponent(id)}`, null, {
+        const response = await axios.patch(`${newURLBase}${serviceBs101}/v1/bb011/changeActive/${encodeURIComponent(id)}`, null, {
             headers: {
                 Tenant_ID: tenantId
             }

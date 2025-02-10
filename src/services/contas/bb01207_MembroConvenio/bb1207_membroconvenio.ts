@@ -1,11 +1,11 @@
-import { newURLBase } from '../../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { AvalistaCreate } from '../../../types/crm/contas/tabelasAuxiliares/bb01207_avalistas';
 
 const CreateMembroConvAvalista = async (tenantId: number | undefined, membroConvAvalista: AvalistaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb01207`, membroConvAvalista, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb01207`, membroConvAvalista, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -19,7 +19,7 @@ const CreateMembroConvAvalista = async (tenantId: number | undefined, membroConv
 
 const DeleteMembroConvAvalista = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb01207/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb01207/${encodeURIComponent(id)}`, {
             params: {
                 Tenant_ID: tenantId
             }

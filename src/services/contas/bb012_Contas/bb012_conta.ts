@@ -1,4 +1,4 @@
-import { newURLBase } from '../../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { ContaCompleta } from '../../../types/crm/contas/bb012_conta';
@@ -35,7 +35,7 @@ function GetContasCompleta(
     if (situacao !== undefined) params.append('SituacaoId', String(situacao));
 
     // Montagem da URL final
-    const url = `${newURLBase}/api/v1/bb012?${params.toString()}`;
+    const url = `${newURLBase}${serviceBs101}/v1/bb012?${params.toString()}`;
 
     // Retorno da chamada Axios com os cabeçalhos necessários
     return axios.get<ContaCompleta>(url, {
@@ -46,7 +46,7 @@ function GetContasCompleta(
 }
 
 const GetContaById = async (tenantId: number | undefined, id: string): Promise<ContaById> => {
-    const url = `${newURLBase}/api/v1/bb012/${encodeURIComponent(id)}`;
+    const url = `${newURLBase}${serviceBs101}/v1/bb012/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<ContaById> = await axios.get(url, {
@@ -64,7 +64,7 @@ const GetContaById = async (tenantId: number | undefined, id: string): Promise<C
 
 const CreateConta = async (tenantId: number | undefined, conta: ContaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb012`, conta, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb012`, conta, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -78,7 +78,7 @@ const CreateConta = async (tenantId: number | undefined, conta: ContaCreate): Pr
 
 const UpdateConta = async (tenantId: number | undefined, id: string, convenio: ContaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.put(`${newURLBase}/api/v1/bb012/${encodeURIComponent(id)}`, convenio, {
+        const response = await axios.put(`${newURLBase}${serviceBs101}/v1/bb012/${encodeURIComponent(id)}`, convenio, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -92,7 +92,7 @@ const UpdateConta = async (tenantId: number | undefined, id: string, convenio: C
 
 const DeleteConta = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb012/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb012/${encodeURIComponent(id)}`, {
             params: {
                 Tenant_ID: tenantId
             }
@@ -106,7 +106,7 @@ const DeleteConta = async (tenantId: number | undefined, id: string): Promise<Ax
 
 const SoftDeleteConta = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.patch(`${newURLBase}/api/v1/bb012/changeActive/${encodeURIComponent(id)}`, null, {
+        const response = await axios.patch(`${newURLBase}${serviceBs101}/v1/bb012/changeActive/${encodeURIComponent(id)}`, null, {
             headers: {
                 Tenant_ID: tenantId
             }

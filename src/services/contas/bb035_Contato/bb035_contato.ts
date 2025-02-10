@@ -1,4 +1,4 @@
-import { newURLBase } from '../../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { ContatosCompleto, ContatoById, ContatoCreate } from '@/types/crm/contatos/bb035_contatos';
@@ -11,7 +11,7 @@ function GetContatosCompleto(
     pagesize: number
 ): Promise<AxiosResponse<ContatosCompleto>> {
     const url =
-        `${newURLBase}/api/v1/bb035?` +
+        `${newURLBase}${serviceBs101}/v1/bb035?` +
         `active=${encodeURIComponent(active)}&` +
         `search=${encodeURIComponent(search)}&` +
         `pagenumber=${encodeURIComponent(pagenumber)}&` +
@@ -24,7 +24,7 @@ function GetContatosCompleto(
 }
 
 const GetContatoById = async (tenantId: number | undefined, id: string): Promise<ContatoById> => {
-    const url = `${newURLBase}/api/v1/bb035/${encodeURIComponent(id)}`;
+    const url = `${newURLBase}${serviceBs101}/v1/bb035/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<ContatoById> = await axios.get(url, {
@@ -42,7 +42,7 @@ const GetContatoById = async (tenantId: number | undefined, id: string): Promise
 
 const CreateContato = async (tenantId: number | undefined, contato: ContatoCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb035`, contato, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb035`, contato, {
             headers: {
                 Tenant_id: tenantId
             }
@@ -56,7 +56,7 @@ const CreateContato = async (tenantId: number | undefined, contato: ContatoCreat
 
 const UpdateContato = async (tenantId: number | undefined, id: string, contato: ContatoCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.put(`${newURLBase}/api/v1/bb035/${encodeURIComponent(id)}`, contato, {
+        const response = await axios.put(`${newURLBase}${serviceBs101}/v1/bb035/${encodeURIComponent(id)}`, contato, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -70,7 +70,7 @@ const UpdateContato = async (tenantId: number | undefined, id: string, contato: 
 
 const DeleteContato = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb035/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb035/${encodeURIComponent(id)}`, {
             headers: {
                 Tenant_id: tenantId
             }

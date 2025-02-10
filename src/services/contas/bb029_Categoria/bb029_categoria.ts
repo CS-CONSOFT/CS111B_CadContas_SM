@@ -1,4 +1,4 @@
-import { newURLBase } from '../../../services/configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../../../services/configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { CategoriaCompleta, CategoriaById, CategoriaCreate } from '../../../types/crm/categoria/bb029_categoria';
@@ -11,7 +11,7 @@ function GetCategoriaCompleto(
     pagesize: number
 ): Promise<AxiosResponse<CategoriaCompleta>> {
     const url =
-        `${newURLBase}/api/v1/bb029?` +
+        `${newURLBase}${serviceBs101}/v1/bb029?` +
         `active=${encodeURIComponent(active)}&` +
         `search=${encodeURIComponent(search)}&` +
         `pagenumber=${encodeURIComponent(pagenumber)}&` +
@@ -25,7 +25,7 @@ function GetCategoriaCompleto(
 }
 
 const GetCategoriaById = async (tenantId: number | undefined, id: string): Promise<CategoriaById> => {
-    const url = `${newURLBase}/api/v1/bb029/${encodeURIComponent(id)}`;
+    const url = `${newURLBase}${serviceBs101}/v1/bb029/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<CategoriaById> = await axios.get(url, {
@@ -43,7 +43,7 @@ const GetCategoriaById = async (tenantId: number | undefined, id: string): Promi
 
 const CreateCategoria = async (tenantId: number | undefined, Categoria: CategoriaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb029`, Categoria, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb029`, Categoria, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -57,7 +57,7 @@ const CreateCategoria = async (tenantId: number | undefined, Categoria: Categori
 
 const UpdateCategoria = async (tenantId: number | undefined, id: string, Categoria: CategoriaCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.put(`${newURLBase}/api/v1/bb029/${encodeURIComponent(id)}`, Categoria, {
+        const response = await axios.put(`${newURLBase}${serviceBs101}/v1/bb029/${encodeURIComponent(id)}`, Categoria, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -71,7 +71,7 @@ const UpdateCategoria = async (tenantId: number | undefined, id: string, Categor
 
 const DeleteCategoria = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb029/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb029/${encodeURIComponent(id)}`, {
             headers: {
                 Tenant_ID: tenantId
             }

@@ -1,4 +1,4 @@
-import { newURLBase } from '../configuracoes_axios';
+import { newURLBase, serviceBs101 } from '../configuracoes_axios';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { ConvenioCompleto, ConvenioById, ConvenioCreate } from '../../types/convenio/bb060_convenio';
@@ -11,7 +11,7 @@ function GetConvenioCompleto(
     pagesize: number
 ): Promise<AxiosResponse<ConvenioCompleto>> {
     const url =
-        `${newURLBase}/api/v1/bb060?` +
+        `${newURLBase}${serviceBs101}/v1/bb060?` +
         `active=${encodeURIComponent(active)}&` +
         `search=${encodeURIComponent(search)}&` +
         `pagenumber=${encodeURIComponent(pagenumber)}&` +
@@ -25,7 +25,7 @@ function GetConvenioCompleto(
 }
 
 const GetConvenioById = async (tenantId: number | undefined, id: string): Promise<ConvenioById> => {
-    const url = `${newURLBase}/api/v1/bb060/${encodeURIComponent(id)}`;
+    const url = `${newURLBase}${serviceBs101}/v1/bb060/${encodeURIComponent(id)}`;
 
     try {
         const response: AxiosResponse<ConvenioById> = await axios.get(url, {
@@ -43,7 +43,7 @@ const GetConvenioById = async (tenantId: number | undefined, id: string): Promis
 
 const CreateConvenio = async (tenantId: number | undefined, convenio: ConvenioCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.post(`${newURLBase}/api/v1/bb060`, convenio, {
+        const response = await axios.post(`${newURLBase}${serviceBs101}/v1/bb060`, convenio, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -57,7 +57,7 @@ const CreateConvenio = async (tenantId: number | undefined, convenio: ConvenioCr
 
 const UpdateConvenio = async (tenantId: number | undefined, id: string, convenio: ConvenioCreate): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.put(`${newURLBase}/api/v1/bb060/${encodeURIComponent(id)}`, convenio, {
+        const response = await axios.put(`${newURLBase}${serviceBs101}/v1/bb060/${encodeURIComponent(id)}`, convenio, {
             headers: {
                 Tenant_ID: tenantId
             }
@@ -71,7 +71,7 @@ const UpdateConvenio = async (tenantId: number | undefined, id: string, convenio
 
 const DeleteConvenio = async (tenantId: number | undefined, id: string): Promise<AxiosResponse<any>> => {
     try {
-        const response = await axios.delete(`${newURLBase}/api/v1/bb060/${encodeURIComponent(id)}`, {
+        const response = await axios.delete(`${newURLBase}${serviceBs101}/v1/bb060/${encodeURIComponent(id)}`, {
             headers: {
                 Tenant_ID: tenantId
             }
